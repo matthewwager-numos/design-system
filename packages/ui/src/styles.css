@@ -1,0 +1,36 @@
+/*
+ * UI package stylesheet.
+ *
+ * Imports Tailwind v4 and our design tokens, then maps the tokens into
+ * Tailwind's theme so utilities like `bg-primary`, `rounded-md`, etc.
+ * resolve to our token CSS variables.
+ *
+ * Consumers should import this file ONCE at the app entry:
+ *
+ *   import "@numosai/ui/styles.css";
+ */
+
+@import "tailwindcss";
+@import "@numosai/tokens/tokens.css";
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-fg: var(--color-fg);
+  --color-muted: var(--color-muted);
+  --color-border: var(--color-border);
+  --color-primary: var(--color-primary);
+  --color-primary-fg: var(--color-primary-fg);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-accent: var(--color-accent);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}

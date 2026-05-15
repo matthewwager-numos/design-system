@@ -1,0 +1,68 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as ButtonStories from "./Button.stories";
+
+<Meta of={ButtonStories} />
+
+# Button
+
+The primary affordance for user actions. Use it whenever you want someone to *do something*.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Submitting forms, confirming actions, navigating to a primary destination.
+- Use `variant="primary"` for the *one* most important action on a screen.
+- Use `variant="secondary"` or `"ghost"` for less prominent actions.
+- Use `variant="danger"` only for destructive actions (delete, leave, etc.).
+
+## When NOT to use
+
+- For navigation between top-level pages — use a `<Link>` instead.
+- For toggles — use `<Switch>` or `<Checkbox>`.
+- More than one `primary` button per screen.
+
+## Implementation
+
+```tsx
+import { Button } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Button variant="primary" onClick={handleSave}>
+  Save changes
+</Button>
+```
+
+### With an icon
+
+```tsx
+import { Save } from "lucide-react";
+
+<Button leadingIcon={<Save />}>
+  Save changes
+</Button>
+```
+
+## Variants
+
+<Canvas of={ButtonStories.Primary} />
+<Canvas of={ButtonStories.Secondary} />
+<Canvas of={ButtonStories.Ghost} />
+<Canvas of={ButtonStories.Danger} />
+
+## Sizes
+
+<Canvas of={ButtonStories.Sizes} />
+
+## Accessibility
+
+- Renders a real `<button>` element — screen readers and keyboard navigation work for free.
+- Focus ring uses `--color-primary` and `2px` outline offset. Visible on keyboard focus only (`:focus-visible`).
+- Disabled buttons set `aria-disabled` automatically (via the HTML `disabled` attribute) and skip pointer/keyboard interactions.
+- Always provide a meaningful `children` label. For icon-only buttons, add `aria-label`.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

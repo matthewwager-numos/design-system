@@ -1,0 +1,36 @@
+{
+  "name": "@numosai/storybook",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Documentation site for components and illustration tools.",
+  "scripts": {
+    "dev": "storybook dev -p 6006",
+    "build": "storybook build",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf storybook-static .turbo"
+  },
+  "dependencies": {
+    "@numosai/generative": "workspace:*",
+    "@numosai/motion": "workspace:*",
+    "@numosai/tokens": "workspace:*",
+    "@numosai/transforms": "workspace:*",
+    "@numosai/ui": "workspace:*",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^8.3.0",
+    "@storybook/blocks": "^8.3.0",
+    "@storybook/react": "^8.3.0",
+    "@storybook/react-vite": "^8.3.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "storybook": "^8.3.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0"
+  }
+}

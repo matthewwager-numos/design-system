@@ -1,0 +1,26 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Introduction" />
+
+# Numosai Design System
+
+A library of React components mirroring our Figma design system, plus a suite of generative SVG, transform, and motion tools.
+
+## How this docs site is organized
+
+- **Foundations** — design tokens (color, spacing, type, radii)
+- **Components** — every React component, one page each, with examples + props
+- **Illustration tools** — generative SVG, recolor/transform utilities, motion components
+
+## Authoring stories
+
+Every component gets two files:
+
+1. `<Component>.stories.tsx` — one or more usage examples, rendered live with knob controls
+2. `<Component>.mdx` — prose: when to use, when not to, implementation guidance, accessibility notes
+
+Both live in `apps/storybook/src/stories/`. The MDX page references the stories file with `<Canvas>` and `<ArgsTable>` blocks, so prose and live demos sit side-by-side.
+
+## Tokens are the source of truth
+
+Components never hard-code values. If you want to change something across the system, you edit `packages/tokens/src/tokens.css`. The next render of Storybook (and every consuming app) reflects it.

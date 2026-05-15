@@ -1,0 +1,106 @@
+/*
+ * Button styles — pure token-driven CSS. No hard-coded colors or sizes.
+ * Update tokens.css to restyle every Button in every app.
+ */
+
+.ds-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.ds-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.ds-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ds-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-button--sm {
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-3);
+}
+
+.ds-button--md {
+  font-size: var(--text-base);
+  padding: var(--space-3) var(--space-4);
+}
+
+.ds-button--lg {
+  font-size: var(--text-lg);
+  padding: var(--space-4) var(--space-5);
+}
+
+/* ── Variants ──────────────────────────────────────────────────────── */
+
+.ds-button--primary {
+  background: var(--color-primary);
+  color: var(--color-primary-fg);
+}
+.ds-button--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.ds-button--secondary {
+  background: transparent;
+  color: var(--color-fg);
+  border-color: var(--color-border);
+}
+.ds-button--secondary:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--color-fg) 6%, transparent);
+}
+
+.ds-button--ghost {
+  background: transparent;
+  color: var(--color-fg);
+}
+.ds-button--ghost:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--color-fg) 6%, transparent);
+}
+
+.ds-button--danger {
+  background: var(--color-danger);
+  color: var(--color-primary-fg);
+}
+.ds-button--danger:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--color-danger) 88%, black);
+}
+
+/* ── Modifiers ─────────────────────────────────────────────────────── */
+
+.ds-button--full {
+  width: 100%;
+}
+
+.ds-button__icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ds-button__icon svg {
+  width: 1em;
+  height: 1em;
+}

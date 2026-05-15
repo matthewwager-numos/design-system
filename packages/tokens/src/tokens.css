@@ -1,0 +1,75 @@
+/*
+ * Design tokens — single source of truth for color, spacing, type, radius.
+ *
+ * This file will eventually be GENERATED from Figma via Tokens Studio + Style
+ * Dictionary. For now it's hand-written so you can iterate in code.
+ *
+ * Everything downstream (ui components, illustrate tools, playgrounds) reads
+ * from these CSS variables — NEVER hard-code values.
+ */
+
+:root {
+  /* ── Color ───────────────────────────────────────────────────────── */
+  --color-bg: oklch(99% 0 0);
+  --color-fg: oklch(20% 0.02 270);
+  --color-muted: oklch(60% 0.02 270);
+  --color-border: oklch(90% 0.01 270);
+
+  --color-primary: oklch(60% 0.18 270);
+  --color-primary-fg: oklch(99% 0 0);
+  --color-primary-hover: oklch(55% 0.2 270);
+
+  --color-accent: oklch(75% 0.18 50);
+  --color-success: oklch(65% 0.17 145);
+  --color-warning: oklch(78% 0.15 80);
+  --color-danger: oklch(60% 0.22 25);
+
+  /* ── Spacing (4px scale) ─────────────────────────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  /* ── Radius ──────────────────────────────────────────────────────── */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* ── Typography ──────────────────────────────────────────────────── */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  /* ── Motion ──────────────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+
+  /* ── Elevation ───────────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.05);
+  --shadow-md: 0 4px 8px oklch(0% 0 0 / 0.08);
+  --shadow-lg: 0 12px 24px oklch(0% 0 0 / 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: oklch(15% 0.01 270);
+    --color-fg: oklch(95% 0.01 270);
+    --color-muted: oklch(60% 0.02 270);
+    --color-border: oklch(25% 0.02 270);
+  }
+}
