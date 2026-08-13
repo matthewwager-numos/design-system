@@ -1,4 +1,4 @@
-name: Deploy Playgrounds
+name: Deploy Pages
 
 on:
   push:
@@ -23,7 +23,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # pnpm@11 requires Node >=22.13 — Node 20 fails at pnpm startup
+          # (ERR_UNKNOWN_BUILTIN_MODULE: node:sqlite).
+          node-version: 22
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
@@ -32,11 +34,27 @@ jobs:
         env:
           BASE_PATH: /design-system/
 
+      - run: pnpm --filter @numosai/demo build
+        env:
+          BASE_PATH: /design-system/demo/
+
+      - run: pnpm --filter @numosai/storybook build
+
+      # One Pages site, three apps: playgrounds at the root (unchanged URL),
+      # storybook and demo nested under their own subpaths.
+      - run: |
+          mkdir -p site
+          cp -r apps/playgrounds/dist/. site/
+          mkdir -p site/demo
+          cp -r apps/demo/dist/. site/demo/
+          mkdir -p site/storybook
+          cp -r apps/storybook/storybook-static/. site/storybook/
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/playgrounds/dist
+          path: site
 
   deploy:
     needs: build
