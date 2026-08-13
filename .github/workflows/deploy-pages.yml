@@ -51,6 +51,12 @@ jobs:
           cp -r apps/storybook/storybook-static/. site/storybook/
 
       - uses: actions/configure-pages@v5
+        with:
+          # Pages has never been turned on for this repo (Settings > Pages);
+          # v5 defaults to enablement:false and just fails checking for a
+          # site that doesn't exist yet. This has the action create/enable
+          # it itself via the API, using this workflow's own token.
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
