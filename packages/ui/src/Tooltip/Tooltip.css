@@ -1,0 +1,90 @@
+/*
+ * Tooltip styles — pure token-driven CSS. Always uses the *-inverse color
+ * tokens so it stays visually "inverted" against the page regardless of
+ * light/dark mode, matching Figma's single always-dark-on-light-page look.
+ *
+ * Position (top/left) and the placement transform are computed in Tooltip.tsx
+ * from the trigger's measured getBoundingClientRect() and set inline — the
+ * tooltip is portaled to <body> and needs viewport-relative coordinates, not
+ * CSS anchored to a (possibly clipping) ancestor. Only the arrow's own
+ * position, which is always relative to the tooltip box itself, stays here.
+ */
+
+.ds-tooltip-root {
+  position: relative;
+  display: inline-block;
+}
+
+.ds-tooltip {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  max-width: 15rem;
+  padding: var(--space-1) var(--space-2);
+  background: var(--background-default-inverse);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+
+.ds-tooltip--visible {
+  opacity: 1;
+}
+
+.ds-tooltip__title {
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+  color: var(--content-emphasis-inverse);
+}
+
+.ds-tooltip__body {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-base-inverse);
+}
+
+.ds-tooltip__arrow {
+  position: absolute;
+  background: var(--background-default-inverse);
+}
+
+/* ── Arrow ─────────────────────────────────────────────────────────── */
+
+.ds-tooltip--top .ds-tooltip__arrow {
+  bottom: calc(-1 * var(--space-2));
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--space-4);
+  height: var(--space-2);
+  clip-path: polygon(50% 100%, 100% 0%, 0% 0%);
+}
+
+.ds-tooltip--bottom .ds-tooltip__arrow {
+  top: calc(-1 * var(--space-2));
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--space-4);
+  height: var(--space-2);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.ds-tooltip--left .ds-tooltip__arrow {
+  right: calc(-1 * var(--space-2));
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--space-2);
+  height: var(--space-4);
+  clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+}
+
+.ds-tooltip--right .ds-tooltip__arrow {
+  left: calc(-1 * var(--space-2));
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--space-2);
+  height: var(--space-4);
+  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+}

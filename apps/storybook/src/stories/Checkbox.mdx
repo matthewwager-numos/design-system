@@ -1,0 +1,85 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as CheckboxStories from "./Checkbox.stories";
+
+<Meta of={CheckboxStories} />
+
+# Checkbox
+
+A real `<input type="checkbox">`. Figma's Hover/Focus/Checked/Disabled "states" aren't separate props here — they're real `:hover`, `:focus-visible`, `:checked`, and `:disabled` behavior, the same philosophy as `<TextInput>`. Only `error` and `indeterminate` are props, since neither is something a browser can infer or express as an HTML attribute.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A single yes/no or on/off setting, or one option within a `<CheckboxGroup>` where more than one can be selected at once.
+
+## When NOT to use
+
+- For a single on/off setting that takes effect immediately (no separate "Save" step) — use `<Toggle>` instead; Checkbox implies a pending choice, Toggle implies an immediate one.
+- For a set of options where only one can be selected — use `<RadioGroup>`.
+
+## Implementation
+
+```tsx
+import { Checkbox } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+const [checked, setChecked] = useState(false);
+
+<Checkbox label="Send me product updates" checked={checked} onChange={(e) => setChecked(e.target.checked)} />
+```
+
+<Canvas of={CheckboxStories.Default} />
+
+## Indeterminate
+
+A third visual state for "some, but not all, of this group's children are checked" — common for a "select all" checkbox above a list. There's no HTML attribute for this (unlike `checked`), so `indeterminate` sets the real DOM property imperatively via a ref internally; you just pass the prop.
+
+```tsx
+<Checkbox label="Select all" indeterminate />
+```
+
+<Canvas of={CheckboxStories.Indeterminate} />
+
+`indeterminate` is purely visual — it doesn't affect `checked`. Clicking an indeterminate checkbox checks it (or unchecks it), same as a native checkbox; you're expected to derive `indeterminate` from your own "are some, but not all, children checked?" logic and pass it back down.
+
+## Error
+
+```tsx
+<Checkbox label="I agree to the terms" error helpText="You must agree to continue" />
+```
+
+<Canvas of={CheckboxStories.Error} />
+
+## Disabled
+
+Real `disabled`, including the checked+disabled combination (Figma's "Disabled, Checked=True" state — a muted fill rather than the full brand color, so a locked-in checked box still reads as visually distinct from an interactive one):
+
+<Canvas of={CheckboxStories.Disabled} />
+<Canvas of={CheckboxStories.DisabledChecked} />
+
+## Groups
+
+`<CheckboxGroup>` is a real `<fieldset>`/`<legend>` — assistive tech announces the group's label once, not per checkbox. Figma's "Checkbox Group" is just a layout symbol (a vertical stack with a gap), not a detailed spec, so this is a straightforward wrapper rather than something pulled from distinct Figma states.
+
+```tsx
+<CheckboxGroup label="Notify me about" helpText="Pick as many as you'd like">
+  <Checkbox label="Comments" />
+  <Checkbox label="Mentions" />
+  <Checkbox label="Weekly digest" />
+</CheckboxGroup>
+```
+
+<Canvas of={CheckboxStories.Group} />
+
+## Accessibility
+
+- `label` renders as a real `<label htmlFor>` — clicking it toggles the checkbox.
+- `error` sets `aria-invalid` on the input.
+- `<CheckboxGroup>`'s `label` is a `<legend>`, not a floating `<label>` — it's read once for the whole group, not repeated per option.
+
+## Props
+
+`label`, `helpText`, `error`, `indeterminate`, plus any native `<input>` prop (`checked`, `onChange`, `disabled`, etc.). `<CheckboxGroup>`: `label`, `helpText`, `error`, `children`.

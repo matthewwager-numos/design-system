@@ -1,0 +1,75 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as RadioStories from "./Radio.stories";
+
+<Meta of={RadioStories} />
+
+# Radio
+
+A real `<input type="radio">`, styled the same way `<Checkbox>` is — Figma's Hover/Focus/Checked/Disabled states are real CSS selectors, not props. Always used inside a `<RadioGroup>`, which supplies a shared `name` and drives selection for you — see "Always use a group" below for why a bare, ungrouped `<Radio>` isn't a supported pattern here.
+
+## When to use
+
+- A set of mutually-exclusive options, in a form where the choice isn't final until submitted — pick one from a short, fully-visible list, including a binary Yes/No or True/False choice (see `orientation="horizontal"` below).
+
+## When NOT to use
+
+- For a single on/off setting — use `<Checkbox>` (pending choice) or `<Toggle>` (immediate effect).
+- For more than ~6 options, or when space is tight — use `<Select>` instead.
+
+## Implementation
+
+```tsx
+import { Radio, RadioGroup } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+const [value, setValue] = useState("weekly");
+
+<RadioGroup label="Email frequency" value={value} onValueChange={setValue}>
+  <Radio value="daily" label="Daily" />
+  <Radio value="weekly" label="Weekly" />
+  <Radio value="monthly" label="Monthly" />
+</RadioGroup>
+```
+
+Click an option below — it's a real, live component, not a screenshot.
+
+<Canvas of={RadioStories.Default} />
+
+## Always use a group
+
+A single, ungrouped radio button is a UX anti-pattern — on its own it doesn't communicate a mutually-exclusive choice the way a group of them does, and anything it could mean (a pending on/off setting) is already said more clearly by `<Checkbox>`. So `<Radio>` isn't documented or demonstrated standalone here; every example wraps it in `<RadioGroup>`, which is also what actually gives same-`name` inputs their radio behavior in the first place — `<RadioGroup>` just tracks the selected `value` for you too, so you don't wire up `checked`/`onChange` on every option by hand.
+
+### Binary choices
+
+For a short, binary choice — True/False, Yes/No — `orientation="horizontal"` lays the two options side by side instead of stacking them, which better matches how small a decision this actually is:
+
+```tsx
+<RadioGroup label="Is this a recurring charge?" orientation="horizontal" value={value} onValueChange={setValue}>
+  <Radio value="true" label="Yes" />
+  <Radio value="false" label="No" />
+</RadioGroup>
+```
+
+<Canvas of={RadioStories.Binary} />
+
+## Error
+
+Set `error` on the group's message and on the individual `<Radio>`s you want visually flagged:
+
+<Canvas of={RadioStories.ErrorState} />
+
+## Disabled
+
+`disabled` on an individual `<Radio>` — the rest of the group stays interactive:
+
+<Canvas of={RadioStories.Disabled} />
+
+## Accessibility
+
+- `label` renders as a real `<label htmlFor>` — clicking it selects the radio.
+- `<RadioGroup>`'s `label` is a `<legend>`, read once for the whole group rather than repeated per option.
+- Arrow keys move between options within a group — that's native browser behavior for same-`name` radio inputs, not something this component implements.
+
+## Props
+
+`<Radio>`: `label`, `helpText`, `error`, `value`, plus any native `<input>` prop. `<RadioGroup>`: `name`, `label`, `helpText`, `error`, `orientation`, `value`, `defaultValue`, `onValueChange`, `children`.

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "description": "A React component library, design tokens, and illustration/animation tools — all in one monorepo.",
-  "packageManager": "pnpm@9.12.0",
+  "packageManager": "pnpm@11.1.2",
   "engines": {
     "node": ">=20"
   },
@@ -15,6 +15,7 @@
     "test": "turbo run test",
     "storybook": "pnpm --filter @numosai/storybook dev",
     "playgrounds": "pnpm --filter @numosai/playgrounds dev",
+    "demo": "pnpm --filter @numosai/demo dev",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {

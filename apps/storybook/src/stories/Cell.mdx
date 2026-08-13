@@ -1,0 +1,122 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as CellStories from "./Cell.stories";
+
+<Meta of={CellStories} />
+
+# Cell
+
+The contents of one table cell — matches Figma's Cell exactly, all 16 `type`s implemented as one component (Figma's own "Type" variant axis), not 16 separate ones.
+
+<Canvas of={CellStories.Gallery} />
+
+## When to use
+
+- Building a data table's rows and header, once composed with `<Column>` (and, later, `<Row>`/`<Table>`) — `<Cell>` is the reusable content unit that goes inside them.
+
+## Types
+
+Most types are plain text with different typography/color/alignment. A few compose other real components rather than reimplementing their look — that's deliberate, the same "reuse the primitive" reasoning as everywhere else in this library.
+
+### Text
+
+<Canvas of={CellStories.Text} />
+
+### Numeric
+
+Right-aligned — for values where alignment communicates magnitude (numbers, currency, counts).
+
+<Canvas of={CellStories.Numeric} />
+
+### Emphasis
+
+Bolder and darker than `text` — for a column's "primary" identifying value in a row otherwise full of `text` cells.
+
+<Canvas of={CellStories.Emphasis} />
+
+### Double
+
+A primary line (`children`) and a subdued second line (`secondary`) — a name and a role, a title and a subtitle.
+
+<Canvas of={CellStories.Double} />
+
+### Null
+
+Always renders "—" — there's nothing to pass it, since it represents the absence of a value, not a specific one.
+
+<Canvas of={CellStories.Null} />
+
+### Loading
+
+A pulsing skeleton bar, for a cell whose value hasn't loaded yet. Figma's mockup is necessarily static; the pulse animation is this implementation's own reasonable addition, not something a static frame could specify.
+
+<Canvas of={CellStories.Loading} />
+
+### Slot
+
+The escape hatch — a single flexible child, for content that doesn't fit any of the other 15 types.
+
+<Canvas of={CellStories.Slot} />
+
+### Progress
+
+Composes `<ProgressBar>` (`showValue={false}`, since Figma's own trailing "49%" is styled and positioned differently from `<ProgressBar>`'s built-in label/value row) plus its own trailing value text. `formatValue` overrides the default `${value}%`.
+
+<Canvas of={CellStories.Progress} />
+
+### Label
+
+A status pill — visually similar to `<Badge status="neutral">`'s colors, but Figma gives this cell type its own confirmed padding and type scale (`Paragraph S Regular`, not Badge's usual `text-xs`), so it isn't literally a nested `<Badge>` instance.
+
+<Canvas of={CellStories.Label} />
+
+### Button
+
+A real `<Button variant="secondary" size="sm">` — confirmed directly from Figma's own instance, not approximated.
+
+<Canvas of={CellStories.ButtonCell} />
+
+### Avatar
+
+A real `<Avatar size="xs">` next to a primary label and an optional `sublabel`.
+
+<Canvas of={CellStories.AvatarCell} />
+
+### Checkbox
+
+A real `<Checkbox>`, right-aligned, no visible label of its own — pass `aria-label`.
+
+<Canvas of={CellStories.CheckboxCell} />
+
+### Icon
+
+Up to 3 right-aligned row-action icon buttons (`actions`), plus an optional trailing `count`.
+
+<Canvas of={CellStories.IconCell} />
+
+## Header types
+
+`columnHead`, `sorted`, and `checkboxColumnHead` share one look (a shaded background, a firmer border, a subtle drop shadow) — Figma treats them as more `Cell` types, not a separate header component, so this does too. Use them as a column's `header`.
+
+### Column Head
+
+<Canvas of={CellStories.ColumnHead} />
+
+### Sorted
+
+Adds a direction arrow (`direction`, `"asc" | "desc"`) and bolder text — for whichever column a table is currently sorted by.
+
+<Canvas of={CellStories.Sorted} />
+
+### Checkbox Column Head
+
+A `<Checkbox>` for "select all" — same alignment as the body `checkbox` type, so the column lines up (Figma's two checkbox-cell mockups happen to be too narrow to show this alignment directly, but the body cell's explicit right-alignment is the real signal; this cell type matches it rather than the header mockup's default/unconfirmed alignment).
+
+<Canvas of={CellStories.CheckboxColumnHead} />
+
+## Not implemented: Input
+
+Figma's "Input" cell type reuses a component explicitly named — and marked — "Deprecated" in the source file. Reproducing a deprecated pattern as current didn't seem right, so it's left out rather than guessed at. For an inline-editable cell, use `type="slot"` with a real `<TextInput size="sm">` or `<Select size="sm">` instead.
+
+## Props
+
+`type` (default `"text"`), `children`, `secondary` (`double`), `value`/`formatValue` (`progress`), `name`/`src`/`initials`/`sublabel` (`avatar`), `checked`/`onCheckedChange`/`aria-label` (`checkbox`/`checkboxColumnHead`), `disabled` (`button`/`checkbox`/`checkboxColumnHead`), `onClick` (`button`), `actions`/`count` (`icon`), `direction` (`sorted`), `className`.

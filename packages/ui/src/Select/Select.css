@@ -1,0 +1,202 @@
+/*
+ * Select styles — pure token-driven CSS. No hard-coded colors or sizes.
+ * Mirrors TextInput.css almost exactly (same field anatomy in Figma), with
+ * two differences: the field is a <button>, not an <input>, so "placeholder
+ * vs value" is a class instead of ::placeholder; and there's a chevron that
+ * rotates when the menu is open.
+ */
+
+.ds-select {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+/* <DropdownMenu>'s own root wrapper is display:inline-block (shrink-to-fit
+   by design — a plain dropdown trigger button shouldn't stretch on its
+   own). Select needs it to fill the field's own width instead, the same
+   way TextInput/Textarea do; scoped to .ds-select so a bare <DropdownMenu>
+   used elsewhere keeps its normal shrink-to-fit sizing. */
+.ds-select .ds-dropdown-menu-root {
+  display: block;
+  width: 100%;
+}
+
+.ds-select__label {
+  color: var(--content-emphasis);
+}
+
+.ds-select:has(.ds-select__field:disabled) .ds-select__label {
+  color: var(--content-disabled);
+}
+
+.ds-select__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  border: 1px solid transparent;
+  background: var(--background-element);
+  color: var(--content-base);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-select__field:hover:not(:disabled):not(.ds-select__field--error):not(.ds-select__field--success) {
+  background: var(--background-hover);
+}
+
+.ds-select__field:focus-visible {
+  background: var(--background-default);
+  border-color: var(--border-brand);
+  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+  outline: none;
+}
+
+.ds-select__field:disabled {
+  background: var(--background-secondary);
+  cursor: not-allowed;
+}
+
+.ds-select__field--error {
+  background: var(--background-default);
+  border-color: var(--border-negative);
+  box-shadow: 0 0 0 2px var(--background-negative);
+}
+.ds-select__field--error:focus-visible {
+  border-color: var(--border-negative);
+  box-shadow: 0 0 0 2px var(--background-negative);
+}
+.ds-select__field--error .ds-select__value:not(.ds-select__value--placeholder) {
+  color: var(--content-emphasis);
+}
+
+.ds-select__field--success {
+  background: var(--background-default);
+  border-color: var(--border-positive);
+  box-shadow: 0 0 0 2px var(--background-positive);
+}
+.ds-select__field--success:focus-visible {
+  border-color: var(--border-positive);
+  box-shadow: 0 0 0 2px var(--background-positive);
+}
+.ds-select__field--success .ds-select__value:not(.ds-select__value--placeholder) {
+  color: var(--content-emphasis);
+}
+
+.ds-select__value {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-select__value--placeholder {
+  color: var(--content-placeholder);
+}
+
+.ds-select__field:disabled .ds-select__value:not(.ds-select__value--placeholder) {
+  color: var(--content-disabled);
+}
+
+.ds-select__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ds-select__chevron {
+  color: var(--content-subtle);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.ds-select__chevron--open {
+  transform: rotate(180deg);
+}
+
+.ds-select__help {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--content-subtle);
+}
+
+.ds-select__help--error {
+  color: var(--content-negative);
+}
+
+.ds-select__help--success {
+  color: var(--content-positive);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-select--lg .ds-select__label {
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+}
+.ds-select--lg .ds-select__field {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+}
+.ds-select--lg .ds-select__value {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+.ds-select--lg .ds-select__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-select--lg .ds-select__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ds-select--md .ds-select__label {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+}
+.ds-select--md .ds-select__field {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+.ds-select--md .ds-select__value {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-select--md .ds-select__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-select--md .ds-select__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-select--sm .ds-select__label {
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+}
+.ds-select--sm .ds-select__field {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.ds-select--sm .ds-select__value {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-select--sm .ds-select__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-select--sm .ds-select__icon svg {
+  width: 1rem;
+  height: 1rem;
+}

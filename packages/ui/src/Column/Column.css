@@ -1,0 +1,6 @@
+.ds-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-width: 0;
+}

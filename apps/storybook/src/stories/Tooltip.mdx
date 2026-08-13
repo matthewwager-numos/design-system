@@ -1,0 +1,94 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as TooltipStories from "./Tooltip.stories";
+
+<Meta of={TooltipStories} />
+
+# Tooltip
+
+A means of displaying a description or extra information about an element — usually on hover, but can also be on click or tap.
+
+<Primary />
+
+<Controls />
+
+The example above is wrapped in a small Storybook-only `TooltipPlayground` so Controls can drive it — its trigger is always the same "Hover me" button, and `open` forces the tooltip to render without needing to hover it. Both are Storybook conveniences; the real `<Tooltip>` API is exactly what's documented below.
+
+## When to use
+
+- Explaining what an icon-only button does.
+- Adding a short bit of extra context to a label, metric, or truncated value, without permanently taking up space on the page.
+
+## When NOT to use
+
+- For content someone needs to interact with (links, buttons) — a tooltip is non-interactive (`pointer-events: none`) and disappears the moment the pointer leaves the trigger. Use `<Popover>` instead.
+- For anything critical to completing a task — tooltips are easy to miss, especially on touch devices.
+
+## Implementation
+
+```tsx
+import { Tooltip, Button } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Tooltip content="Saved 2 minutes ago">
+  <Button variant="secondary">Hover me</Button>
+</Tooltip>
+```
+
+`children` is the trigger — any single element, wired up via `cloneElement` (matching `<DropdownMenuTrigger>`'s pattern), so it renders exactly as you wrote it plus the hover/focus/click handlers Tooltip needs.
+
+Hover over the button below — it's a real, live component, not a screenshot.
+
+<Canvas of={TooltipStories.Default} />
+
+### Title
+
+Figma's Tooltip has an optional bold heading above the body text, hidden unless set. Pass it as `title`:
+
+```tsx
+<Tooltip title="Autosave" content="Changes are saved automatically as you type.">
+  <Button variant="secondary">Hover me</Button>
+</Tooltip>
+```
+
+<Canvas of={TooltipStories.WithTitle} />
+
+## Placement
+
+`placement` (`"top" | "bottom" | "left" | "right"`, defaults to `"top"`) is which side of the trigger the tooltip opens toward — the arrow always points back at the trigger from the opposite side. Position is computed from the trigger's measured `getBoundingClientRect()`, not CSS anchoring, and there's no viewport collision detection: if `placement="top"` would run off the top of the screen, it stays there rather than flipping to `"bottom"`.
+
+<Canvas of={TooltipStories.Placements} />
+
+## Trigger mode
+
+`trigger` (`"hover" | "click"`, defaults to `"hover"`) matches Figma's description that a tooltip is "usually on hover, but can also be on click or tap." `"hover"` also opens on keyboard focus, so it's reachable without a mouse. `"click"` toggles on click/tap and additionally closes on an outside click, mirroring `<DropdownMenu>`.
+
+<Canvas of={TooltipStories.ClickTrigger} />
+
+## Icon-only triggers
+
+The most common real use — pair with `aria-label` on the trigger since it has no visible text of its own:
+
+<Canvas of={TooltipStories.IconTrigger} />
+
+## Colors
+
+Tooltip always renders with `--background-default-inverse` / `--content-base-inverse` / `--content-emphasis-inverse` — the same *-inverse tokens used elsewhere for content sitting on an inverted surface. `--background-default-inverse` is new: it didn't exist in this file before Tooltip needed it. Confirmed directly from Figma's Foundations semantic doc table (`Background/Default Inverse`) — Mode 1 (light) is Gray/600, Mode 2 (dark) is Beige/100, so the tooltip flips to a light surface on a dark page instead of blending into it. See the Foundations → Tokens page.
+
+## Behavior
+
+- **Opens on**: hover or focus (`trigger="hover"`, the default) or click/tap (`trigger="click"`).
+- **Closes on**: mouse leave / blur (hover mode), an outside click (click mode), or Escape (either mode).
+- **Transition**: fades in while sliding `var(--space-1)` from the trigger's side into its resting `placement` position — e.g. `placement="left"` starts closer to the trigger and settles further left as it fades in. Reverses on close, and (like `<DropdownMenu>`) stays mounted for the exit transition instead of disappearing instantly.
+- **Rendering**: portaled to `document.body` and positioned via the trigger's measured position (re-measured on scroll/resize), rather than CSS `position: absolute` in place. Otherwise a scrolling or `overflow: hidden` ancestor — a scrollable panel, a modal, `<Navigation>`'s scrollable item list — would clip the tooltip the instant it extended past that ancestor's own box, no matter how high its z-index. The portaled tooltip re-applies whatever `data-theme` its trigger was under (so it still renders dark inside `<Navigation>`, for example) even though it's no longer a DOM descendant of it.
+- **Controlled open state**: skip `defaultOpen`/hover entirely and drive it yourself with `open`/`onOpenChange`, same pattern as `<DropdownMenu>`.
+- **Not handled yet**: no open/close delay, and no viewport collision detection — see Placement above.
+
+## Accessibility
+
+- The trigger gets `aria-describedby` pointing at the tooltip's content while it's open, so screen readers announce it on focus.
+- The tooltip panel is a real `role="tooltip"`.
+- `trigger="hover"` also opens on keyboard focus (and closes on blur), so it's reachable without a mouse — an icon-only trigger still needs its own `aria-label`, since the tooltip's own accessible-name wiring doesn't replace that.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

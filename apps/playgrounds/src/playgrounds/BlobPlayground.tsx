@@ -9,7 +9,7 @@ export function BlobPlayground() {
     randomness: { value: 0.35, min: 0, max: 1, step: 0.01 },
     radius: { value: 140, min: 40, max: 300, step: 10 },
     seed: { value: 42, step: 1 },
-    fill: "var(--color-primary)",
+    fill: "var(--content-brand-primary)",
     Reseed: button(() => {
       // Leva's button can't easily mutate other controls without state; just hint at it.
       window.dispatchEvent(new CustomEvent("blob-reseed"));
@@ -44,7 +44,7 @@ export function BlobPlayground() {
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
       <header>
         <h2 style={{ margin: 0 }}>Blob</h2>
-        <p style={{ color: "var(--color-muted)", margin: "var(--space-2) 0 0" }}>
+        <p style={{ color: "var(--content-subtle)", margin: "var(--space-2) 0 0" }}>
           Parametric organic shapes. Adjust the knobs (top-right) and export.
         </p>
       </header>
@@ -55,7 +55,7 @@ export function BlobPlayground() {
           placeItems: "center",
           padding: "var(--space-6)",
           borderRadius: "var(--radius-lg)",
-          background: "color-mix(in oklch, var(--color-fg) 4%, var(--color-bg))",
+          background: "color-mix(in oklch, var(--content-base) 4%, var(--background-default))",
           minHeight: 360,
         }}
       >

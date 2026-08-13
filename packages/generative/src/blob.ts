@@ -24,7 +24,7 @@ export interface BlobResult {
  * Generate a smooth, organic blob shape.
  *
  *   const { d, viewBox } = blob({ points: 6, randomness: 0.35, seed: 42 });
- *   // <svg viewBox={viewBox}><path d={d} fill="var(--color-primary)" /></svg>
+ *   // <svg viewBox={viewBox}><path d={d} fill="var(--content-brand-primary)" /></svg>
  */
 export function blob(options: BlobOptions = {}): BlobResult {
   const points = Math.max(3, options.points ?? 6);

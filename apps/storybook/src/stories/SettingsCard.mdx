@@ -1,0 +1,54 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as SettingsCardStories from "./SettingsCard.stories";
+
+<Meta of={SettingsCardStories} />
+
+# SettingsCard
+
+A card of `<Setting>` rows that switches between a read-only summary and a real editable form — matches Figma's SettingsCard exactly. Built directly from `<Form>`/`<FormHeader>`/`<FormBody>`/`<FormFooter>` (confirmed from Figma's own component names, not just a visual resemblance), so none of that chrome is reimplemented here.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A focused settings form for one object — a profile, a project's configuration — that mostly gets *viewed*, with editing as a deliberate, occasional action rather than the default state.
+
+## Implementation
+
+```tsx
+import { Setting, SettingsCard } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<SettingsCard
+  title="Object Settings"
+  description="This is a brief description about the object"
+  onSave={(event) => {
+    const data = new FormData(event.currentTarget);
+    // persist data
+  }}
+>
+  <Setting label="Name" type="text" name="name" value={name} />
+  <Setting label="Role" type="select" name="role" value={role} options={roleOptions} />
+</SettingsCard>
+```
+
+<Canvas of={SettingsCardStories.Default} />
+
+## Read → edit → save/cancel
+
+The pencil icon in the header enters edit mode; every `<Setting>` inside switches to its real editable field at once (they all read the same edit state from context — see `<Setting>`'s own docs). While editing, that same button becomes an **×**, and the footer gains Cancel/Save:
+
+<Canvas of={SettingsCardStories.EditingByDefault} />
+
+- **Cancel** (the × or the footer button) discards whatever was typed and returns to the read-only summary. This isn't extra logic tracking a "draft" to throw away — every edit-mode field is uncontrolled, so simply switching back to read mode unmounts them, which is what discards the in-progress edits, for free.
+- **Save** submits the real `<form>` this card renders and calls `onSave` with that submit event — `new FormData(event.currentTarget)` collects every `<Setting>`'s current value in one read, the same pattern `<Wizard>` uses. SettingsCard doesn't persist anything itself; that's the caller's job, using whatever `onSave` receives to update the values passed back into `<Setting>` as props.
+
+## Controlled vs. uncontrolled
+
+`defaultEditing` (default `false`) for an uncontrolled card that manages its own mode. Pass `editing`/`onEditingChange` together if something else needs to know or control whether it's currently being edited.
+
+## Props
+
+`title` (required), `description`, `children` (required — `<Setting>` rows), `editing`, `defaultEditing` (default `false`), `onEditingChange`, `onSave`, `onCancel`, `className`.

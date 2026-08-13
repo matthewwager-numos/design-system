@@ -1,0 +1,90 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as HeaderStories from "./Header.stories";
+
+<Meta of={HeaderStories} />
+
+# Header
+
+An element that appears across the top of all pages on a website or application; it usually contains the page name and main navigation. Composed from `<AppIcon>` and `<Tabs>` — the sub-nav is just a `<TabList>` of `<Tab>`s.
+
+<Primary />
+
+<Controls />
+
+The example above is wrapped in a small Storybook-only `HeaderPlayground` so Controls can drive it — `subNav` and `actions` there are booleans that toggle a bundled example `<Tabs>` row and icon button on/off. Both are Storybook conveniences; the real `<Header>` props are `subNav`/`actions: ReactNode`, documented below.
+
+## When to use
+
+- The top of a page or a drawer/panel, to name what you're looking at and (optionally) switch between its sub-sections.
+
+## When NOT to use
+
+- For the app-wide sidebar — use `<Navigation>`. Header is what sits at the top of the content `<Navigation>` doesn't cover, not a replacement for it.
+
+## Implementation
+
+```tsx
+import { Header, AppIcon, Tabs, TabList, Tab } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Header
+  icon={<AppIcon app="tasks" />}
+  title="Accruals"
+  onClose={() => {}}
+  subNav={
+    <Tabs defaultValue="overview">
+      <TabList>
+        <Tab value="overview">Overview</Tab>
+        <Tab value="entries">Entries</Tab>
+      </TabList>
+    </Tabs>
+  }
+/>
+```
+
+`subNav` needs a `<Tabs>` ancestor of its own — `<TabList>`/`<Tab>` read their selection state from it, same as anywhere else in this library.
+
+## Variants
+
+`variant="app"` (default) is the larger page-level header, with an icon slot and a trailing close button next to the title. `variant="modal"` is the compact version for `<Modal>`, a drawer, or any side panel — reusable across all of them: no icon, a smaller title, and the close button moves to the *leading* edge (before the title) — this exact placement swap is what Figma's own two sizes do, not an approximation. Renamed from Figma's own "Drawer" label once `<Modal>` started using this same variant for its header slot regardless of whether `<Modal>` itself is a centered dialog or an actual drawer — "modal" describes the shared use case better than "drawer" does.
+
+One component with a `variant` prop, not two separate components — this matches how Figma itself models Header (one component set, a `Size` variant) and how every other multi-variant piece of this library works (`Button`'s `variant`, `Avatar`'s `type`, `Tabs`' `orientation`). Named `variant` rather than `size`, since "app" and "modal" aren't bigger/smaller versions of the same layout — they have different slots entirely. More variants are expected to land here over time as new Header treatments come out of Figma, the same way `Button` accumulated variants rather than spawning new components per one.
+
+```tsx
+<Header variant="modal" title="Edit accrual" onClose={() => setOpen(false)} />
+```
+
+<Canvas of={HeaderStories.Drawer} />
+
+## Sub-nav actions
+
+`actions` is trailing content in the sub-nav row, next to `subNav`. For `variant="app"` it sits inline (Figma's example: a small icon button, e.g. a "view history" action); for `variant="modal"` it stretches full-width instead (Figma's example: room for a search box or button group) — same prop, different layout per variant.
+
+## Without sub-nav
+
+Both `subNav` and `actions` are optional — the sub-nav row doesn't render at all if you pass neither.
+
+<Canvas of={HeaderStories.TitleOnly} />
+
+## Closing a drawer
+
+`onClose` is just a callback — `<Header>` doesn't hold any open/closed state itself. Whatever renders the drawer owns that state and decides what happens when it changes, same as `<DropdownMenu>`'s `open`/`onOpenChange`. Click the **×** below — it's a real, live component, not a screenshot.
+
+<Canvas of={HeaderStories.InteractiveClose} />
+
+## A note on Figma fidelity
+
+Figma's own Code Connect export for this component reuses a single ambiguous `actions` prop name for what are visibly two different, differently-positioned slots (a trailing close **×** in one composed example, an unrelated small icon in another) depending on variant and row. Rather than copy that ambiguity, `<Header>` splits it into explicit, purpose-named props — `onClose` for the well-defined close affordance (rendered in the position Figma actually shows it in per variant), `titleActions`/`actions` for the remaining, more open-ended slots.
+
+## Colors
+
+The bottom border uses `--border-disabled` — confirmed directly from Figma's Form and Modal components, which use this exact divider style for their own header/footer borders (an earlier pass here had guessed `--border-subtle` before those were built and gave a real value to check against).
+
+## Accessibility
+
+- The close button has `aria-label="Close"` — no visible text of its own.
+- `title` renders as plain text content (a `<p>`, matching `<Banner>`'s own title), not an `<h1>`/`<h2>` — Header doesn't assume where it sits in your page's heading structure. Wrap it yourself (`title={<h1>Accruals</h1>}`) if you want a real heading tag there.
+
+## Props
+
+`variant`, `icon`, `title` (required), `onClose`, `titleActions`, `subNav`, `actions`, `className`. See the sections above for exactly how each behaves per `variant`.

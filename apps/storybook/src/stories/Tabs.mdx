@@ -1,0 +1,97 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as TabsStories from "./Tabs.stories";
+
+<Meta of={TabsStories} />
+
+# Tabs
+
+Tabbed interfaces are a way of navigating between multiple panels, reducing clutter and fitting more into a smaller space.
+
+## When to use
+
+- Splitting related content into sections someone switches between, without leaving the page (settings, a profile, a record's detail view).
+
+## When NOT to use
+
+- For a small, fixed sequence someone moves through in order — use `<Stepper>`.
+- For primary app-level navigation between different pages — use `<Navigation>`.
+
+## Implementation
+
+This is a compound component, mirroring `<DropdownMenu>`'s shape: `<Tabs>` (root, owns the selected value) wraps a `<TabList>` (the row/column of triggers) and one `<TabPanel>` per `<Tab>`, matched by `value`.
+
+```tsx
+import { Tabs, TabList, Tab, TabPanel } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Tabs defaultValue="overview">
+  <TabList>
+    <Tab value="overview">Overview</Tab>
+    <Tab value="activity">Activity</Tab>
+    <Tab value="settings">Settings</Tab>
+  </TabList>
+  <TabPanel value="overview">A summary of what's happened recently.</TabPanel>
+  <TabPanel value="activity">A chronological feed of every change.</TabPanel>
+  <TabPanel value="settings">Preferences for this workspace.</TabPanel>
+</Tabs>
+```
+
+Click a tab below — it's a real, live component, not a screenshot.
+
+<Canvas of={TabsStories.Default} />
+
+There's no selection at all until you set `defaultValue` (uncontrolled) or `value` (controlled) — Tabs doesn't auto-select the first tab for you.
+
+### Controlled selection
+
+For cases where something else needs to change the active tab (e.g. a URL param), skip `defaultValue` and control it directly:
+
+```tsx
+const [tab, setTab] = useState("overview");
+
+<Tabs value={tab} onValueChange={setTab}>
+  ...
+</Tabs>
+```
+
+## Orientation
+
+`orientation="vertical"` matches Figma's "Stacked" variant — a column of tabs, each with a left-edge indicator instead of a bottom one, typically paired with its panel beside it rather than below it.
+
+<Canvas of={TabsStories.Vertical} />
+
+## Icons and badges
+
+`<Tab>` takes the same `leadingIcon`/`trailingIcon` props as `<DropdownMenuItem>`, plus `badge` for a count pill (Figma's optional "Badge" — e.g. an unread count):
+
+```tsx
+<Tab value="inbox" badge={12}>Inbox</Tab>
+```
+
+<Canvas of={TabsStories.WithBadge} />
+
+## Disabled
+
+Not part of Figma's Tab component set — no "Disabled" state is defined there — but added since it's a common real need. A disabled tab is skipped by arrow-key navigation and can't be clicked or selected.
+
+<Canvas of={TabsStories.DisabledTab} />
+
+## Behavior
+
+- **Selecting a tab**: click, or Enter/Space while it's focused (both are free from `<Tab>` being a real `<button>`).
+- **Keyboard navigation**: Arrow Right/Left (horizontal) or Arrow Down/Up (vertical) move focus between tabs *and* select the newly focused one — the "automatic activation" pattern, matching how most real tab strips behave. Home/End jump to the first/last tab. Only the selected tab is in the natural Tab-key order (roving `tabindex`), same as arrow-key list navigation elsewhere in this library.
+- **Panels**: a `<TabPanel>` unmounts (not just visually hides) while its tab isn't selected.
+- **Selected indicator**: a single bar owned by `<TabList>`, measured off the selected `<Tab>`'s own box and repositioned via CSS transition — it slides from the previously selected tab to the newly selected one, and fades in on first selection, rather than teleporting. Also re-measures on window resize, so it doesn't end up pointing at stale coordinates if the list reflows.
+- **Layout stability**: horizontal tabs reserve their hover indicator's 2px border space (transparent, or `background-brand-subdued` on hover) even when unselected — Figma's separate per-state frames don't need to worry about this, but a live component does: without it, hovering a tab would shift every tab after it by 2px. The *selected* indicator doesn't need this — it's the overlay described above, not a per-tab border, so it never affects tab layout.
+
+## Accessibility
+
+- Follows the WAI-ARIA Tabs pattern: `<TabList>` is `role="tablist"` with `aria-orientation`; each `<Tab>` is `role="tab"` with `aria-selected` and `aria-controls` pointing at its panel; each `<TabPanel>` is `role="tabpanel"` with `aria-labelledby` pointing back at its tab.
+- Panels are focusable (`tabIndex={0}`) so keyboard users can move from the tab straight into its content.
+
+## Props
+
+`<Tabs>`: `orientation`, `value`, `defaultValue`, `onValueChange`, `className`.
+`<TabList>`: any `<div>` prop (it's a thin wrapper — `role`/`aria-orientation`/keyboard handling are automatic).
+`<Tab>`: `value` (required), `leadingIcon`, `trailingIcon`, `badge`, `disabled`, plus any native `<button>` prop.
+`<TabPanel>`: `value` (required), plus any native `<div>` prop.

@@ -1,0 +1,87 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as SearchInputStories from "./SearchInput.stories";
+
+<Meta of={SearchInputStories} />
+
+# SearchInput
+
+A text field that filters a list of suggestions as you type — matches Figma's Search Input (the field) and Combobox (the filtered dropdown) together, since that's what this component actually is: a combobox with a search icon baked in.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Filtering a known, client-side list of options by typed text, where the person can also freely type something not in the list (a genuine search, not a forced choice) — see `<Select>` instead when the value truly must be one of a fixed set of options.
+
+## Implementation
+
+```tsx
+import { SearchInput } from "@numosai/ui";
+import type { SearchInputOption } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+const options: SearchInputOption[] = [
+  { value: "apple", label: "Apple" },
+  { value: "banana", label: "Banana" },
+  { value: "cherry", label: "Cherry" },
+];
+
+<SearchInput label="Fruit" placeholder="Search fruit" options={options} />
+```
+
+<Canvas of={SearchInputStories.Default} />
+
+## It's a text field, not a forced choice
+
+`value`/`defaultValue`/`onChange` are plain strings, exactly like `<TextInput>` — typing freely always works, whether or not anything matches. Picking a suggestion just fills the field with that option's `label` and additionally fires `onSelect` with the whole option, in case you need its `value` (a stable id) rather than just the display text:
+
+<Canvas of={SearchInputStories.OnSelect} />
+
+## Filtering
+
+The typed text narrows `options` to whatever matches — the default is a case-insensitive substring match on `label`, no configuration needed for a plain client-side list. Override `filter` to match differently, or pass `filter={null}` to turn off this built-in narrowing entirely (e.g. server-side/async search, where `options` arriving via props is already exactly what should show — you're filtering outside the component, not inside it).
+
+Omit `options` (or pass `[]`) for a plain search box with no dropdown at all:
+
+<Canvas of={SearchInputStories.NoDropdown} />
+
+## Clearing
+
+A trailing "×" button appears — filling Figma's own (otherwise-unused) trailing-icon slot — whenever the field is filled or focused, clearing the text (and refocusing the input) on click. Not shown while empty and unfocused, so an idle search box stays visually simple.
+
+## Sizes
+
+<Canvas of={SearchInputStories.Sizes} />
+
+## Status
+
+<Canvas of={SearchInputStories.Status} />
+
+## Disabled
+
+<Canvas of={SearchInputStories.Disabled} />
+
+## Inside a `<form>`
+
+Unlike `<Select>`/`<SegmentedControl>`, no hidden input is needed — the visible `<input>` *is* the real form field, so `name` passes straight through to it:
+
+<Canvas of={SearchInputStories.InForm} />
+
+## Interaction
+
+- **Typing** narrows the dropdown to matching options and opens it (as long as there's at least one match).
+- **Keyboard**: Arrow Down/Up move which option is highlighted (the input keeps real focus the entire time — see "Accessibility" below for why), Enter picks the highlighted one, Escape closes the dropdown without changing the typed text, Home/End jump to the first/last enabled option.
+- Clicking outside, or moving focus elsewhere (Tab), closes the dropdown.
+
+## Accessibility
+
+Deliberately not built on `<DropdownMenu>` (which `<Select>` uses) — `<DropdownMenuContent>` moves real DOM focus onto menu items for keyboard navigation, which would yank focus out of the input mid-keystroke. A combobox instead tracks "which option is highlighted" as plain component state and exposes it via `aria-activedescendant`, so focus provably never leaves the input — the documented ARIA combobox pattern, not an approximation of `<Select>`'s menu pattern.
+
+- The input is `role="combobox"` with `aria-expanded`, `aria-controls` (the listbox), `aria-autocomplete="list"`, and `aria-activedescendant` pointing at whichever option is currently highlighted.
+- The dropdown is a real `role="listbox"` of `role="option"`s.
+
+## Props
+
+`options`, `value`/`defaultValue`/`onChange`, `onSelect`, `filter`, `label`, `placeholder`, `helpText`, `status`, `size` (`"sm" | "md" | "lg"`, default `"lg"`), `disabled`, `name`, `className`, plus any other native `<input>` attribute.

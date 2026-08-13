@@ -2,7 +2,7 @@ export interface RecolorOptions {
   /**
    * Map of "from color" → "to color". Both sides are matched as-is, so use
    * the exact string as it appears in the SVG (`#FF0000`, `rgb(...)`,
-   * `var(--color-primary)`, etc.). Case-insensitive for hex codes.
+   * `var(--content-brand-primary)`, etc.). Case-insensitive for hex codes.
    */
   map: Record<string, string>;
 }
@@ -10,7 +10,7 @@ export interface RecolorOptions {
 /**
  * Find-and-replace colors inside an SVG string.
  *
- *   recolor(svg, { map: { "#FF0000": "var(--color-primary)" } })
+ *   recolor(svg, { map: { "#FF0000": "var(--content-brand-primary)" } })
  *
  * Naive on purpose — operates on the raw text. For real production use you
  * may want to swap in `svgo` or DOM parsing, but for quick illustration

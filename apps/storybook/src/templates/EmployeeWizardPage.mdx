@@ -1,0 +1,35 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as WizardPageStories from "./EmployeeWizardPage.stories";
+
+<Meta of={WizardPageStories} />
+
+# Wizard (page template)
+
+A full-page "create object" example — the real `<Wizard>` component (see its own docs under Components) next to `<Navigation>`, the way it'd actually sit in a product.
+
+<Canvas of={WizardPageStories.Default} />
+
+## What this demonstrates
+
+- `<Wizard>` is not something the surrounding page needs to configure much around: it fills the remaining width next to `<Navigation>` on its own (`flex: 1`), and takes care of its own header, step panel, and footer internally.
+- `<Navigation>`'s selected item reflects where this page lives in the app ("Employees") — it has nothing to do with wizard progress. That's the step panel's and header progress bar's job, entirely inside `<Wizard>`.
+- The 3-step outline (Details → Role → Access) lives in this file as a plain `WizardStep[]` array passed to `steps` — see `EmployeeWizardPage.tsx` for the full outline, including each step's fields.
+- Finishing the flow reads the collected `FormData` from `onFinish` and swaps in a summary card — standing in for an actual "create the object" API call.
+
+## Storybook plumbing for full-page templates
+
+Every other story in this library renders inside a decorator that splits the canvas into light/dark halves — appropriate for a single small component, not a full page. Templates opt out with `parameters.noThemeSplit`:
+
+```tsx
+const meta: Meta<typeof EmployeeWizardPage> = {
+  title: "Templates/Wizard",
+  component: EmployeeWizardPage,
+  parameters: { layout: "fullscreen", noThemeSplit: true },
+};
+```
+
+See `.storybook/preview.tsx`'s `withThemeSplit` decorator for the other half of this — it checks `context.parameters.noThemeSplit` and, when true, renders the story directly with no wrapper.
+
+## What's next
+
+A table-based CRUD template (view/edit/delete existing records via a data table + `<Modal>`) is planned once this library has table cell/row/column components — it doesn't yet, so that's deliberately out of scope here.

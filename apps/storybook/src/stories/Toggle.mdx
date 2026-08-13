@@ -1,0 +1,64 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as ToggleStories from "./Toggle.stories";
+
+<Meta of={ToggleStories} />
+
+# Toggle
+
+A real `<input type="checkbox" role="switch">` — native form participation and keyboard/click behavior for free, styled as Figma's pill-shaped Switch. `role="switch"` overrides the implicit checkbox role so assistive tech announces "on/off" rather than "checked/unchecked", which is what this actually is: a real distinction, even though both controls boil down to a boolean.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A single setting that takes effect immediately, with no separate "Save" step — "Wi-Fi", "Dark mode", "Notifications on".
+
+## When NOT to use
+
+- For a setting that's part of a form and only takes effect on submit — use `<Checkbox>` instead; a checkbox implies a pending choice, a toggle implies an immediate one.
+
+## Implementation
+
+```tsx
+import { Toggle } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+const [checked, setChecked] = useState(true);
+
+<Toggle label="Enable notifications" checked={checked} onChange={(e) => setChecked(e.target.checked)} />
+```
+
+<Canvas of={ToggleStories.Default} />
+
+## Sizes
+
+`size`: `"sm" | "md" | "lg"` (defaults to `"lg"`), matching Figma's three Switch sizes.
+
+<Canvas of={ToggleStories.Sizes} />
+
+## Label placement
+
+`labelPlacement`: `"right" | "left" | "above"` (defaults to `"right"`, matching Figma's own layout).
+
+<Canvas of={ToggleStories.LabelPlacement} />
+
+## Disabled
+
+Real `disabled`, on or off:
+
+<Canvas of={ToggleStories.Disabled} />
+
+## A note on the "on" ring
+
+The brand-colored ring around an "on" toggle isn't a focus indicator — it's part of Figma's resting style for every checked example, focused or not. A separate `:focus-visible` outline is added on top for real keyboard-focus visibility, since Figma's variant set doesn't otherwise specify one for this component.
+
+## Accessibility
+
+- `label` renders inside a `<label>` wrapping the whole control — clicking the label text toggles it, same as clicking the switch itself.
+- `role="switch"` is set directly on the input, overriding its implicit checkbox role.
+
+## Props
+
+`label`, `size`, `labelPlacement`, plus any native `<input>` prop (`checked`, `onChange`, `disabled`, etc.).

@@ -1,16 +1,21 @@
 /*
  * Button styles — pure token-driven CSS. No hard-coded colors or sizes.
  * Update tokens.css to restyle every Button in every app.
+ *
+ * NOTE: Figma specifies "PP Neue Montreal" for button text. That's a paid
+ * font with no license/files in this repo yet, so we fall back to
+ * --font-sans until it's added.
  */
 
 .ds-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
   font-family: var(--font-sans);
   font-weight: 500;
   line-height: 1;
+  letter-spacing: var(--tracking-sm);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -18,18 +23,21 @@
     background-color var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out),
     border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
     transform var(--duration-fast) var(--ease-out);
   user-select: none;
   white-space: nowrap;
 }
 
 .ds-button:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--button-primary-default);
   outline-offset: 2px;
 }
 
 .ds-button:disabled {
-  opacity: 0.5;
+  background: var(--background-disabled);
+  color: var(--content-disabled);
+  border-color: transparent;
   cursor: not-allowed;
 }
 
@@ -40,53 +48,96 @@
 /* ── Sizes ─────────────────────────────────────────────────────────── */
 
 .ds-button--sm {
-  font-size: var(--text-sm);
-  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  line-height: var(--leading-sm);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
 }
 
 .ds-button--md {
-  font-size: var(--text-base);
-  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  line-height: var(--leading-md);
+  font-weight: 400;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
 }
 
 .ds-button--lg {
-  font-size: var(--text-lg);
-  padding: var(--space-4) var(--space-5);
+  font-size: var(--text-base);
+  line-height: var(--leading-lg);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
 }
 
 /* ── Variants ──────────────────────────────────────────────────────── */
 
 .ds-button--primary {
-  background: var(--color-primary);
-  color: var(--color-primary-fg);
+  background: var(--button-primary-default);
+  color: var(--content-brand-inverse);
 }
 .ds-button--primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
+  background: var(--button-primary-hover);
+}
+.ds-button--primary:active:not(:disabled) {
+  background: var(--button-primary-active);
 }
 
 .ds-button--secondary {
   background: transparent;
-  color: var(--color-fg);
-  border-color: var(--color-border);
+  color: var(--content-brand-primary);
+  border-color: var(--border-brand);
 }
 .ds-button--secondary:hover:not(:disabled) {
-  background: color-mix(in oklch, var(--color-fg) 6%, transparent);
+  background: var(--background-brand-subdued);
+  color: var(--button-primary-default);
+}
+.ds-button--secondary:active:not(:disabled) {
+  background: var(--background-brand-subdued);
+  color: var(--button-primary-default);
+  border-width: 1.5px;
+  border-color: var(--content-link-default);
+  box-shadow: 0 0 0 2px var(--background-brand-subdued);
 }
 
-.ds-button--ghost {
-  background: transparent;
-  color: var(--color-fg);
+.ds-button--accent {
+  background: var(--button-accent-default);
+  color: var(--button-accent-content);
 }
-.ds-button--ghost:hover:not(:disabled) {
-  background: color-mix(in oklch, var(--color-fg) 6%, transparent);
+.ds-button--accent:hover:not(:disabled) {
+  background: var(--button-accent-hover);
+}
+.ds-button--accent:active:not(:disabled) {
+  background: var(--button-accent-active);
 }
 
-.ds-button--danger {
-  background: var(--color-danger);
-  color: var(--color-primary-fg);
+.ds-button--destructive {
+  background: var(--button-destructive-default);
+  color: var(--background-negative);
 }
-.ds-button--danger:hover:not(:disabled) {
-  background: color-mix(in oklch, var(--color-danger) 88%, black);
+.ds-button--destructive:hover:not(:disabled) {
+  background: var(--button-destructive-hover);
+}
+.ds-button--destructive:active:not(:disabled) {
+  background: var(--button-destructive-active);
+}
+
+.ds-button--link {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  color: var(--content-link-default);
+}
+.ds-button--link:hover:not(:disabled) {
+  color: var(--content-link-hover);
+  text-decoration: underline;
+}
+.ds-button--link:active:not(:disabled) {
+  color: var(--content-link-active);
+  text-decoration: underline;
+}
+.ds-button--link:disabled {
+  background: none;
 }
 
 /* ── Modifiers ─────────────────────────────────────────────────────── */
@@ -101,6 +152,6 @@
 }
 
 .ds-button__icon svg {
-  width: 1em;
-  height: 1em;
+  width: 1rem;
+  height: 1rem;
 }

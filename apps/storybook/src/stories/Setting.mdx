@@ -1,0 +1,74 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as SettingStories from "./Setting.stories";
+
+<Meta of={SettingStories} />
+
+# Setting
+
+One row of a settings form: a label, and either a read-only value or a real editable field, depending on `edit` — matches Figma's Setting exactly across all 8 `type`s.
+
+## When to use
+
+- Building a settings form alongside `<SettingsCard>` — `<Setting>` is the reusable row; a card composes several of them under one title, description, and edit-mode toggle.
+
+## Implementation
+
+```tsx
+import { Setting } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Setting label="Full name" type="text" value="Maya Chen" edit={false} />
+```
+
+`edit` only needs to be passed explicitly when using `<Setting>` on its own like this — nested inside `<SettingsCard>`, every `<Setting>` reads the card's current mode from context automatically, without the prop.
+
+## Every edit-mode field is a real component
+
+Nothing here is reimplemented — each `type`'s edit mode is a real field this library already ships, at the confirmed `"md"` size, with `<Setting>` supplying only the label and switching between read/edit:
+
+| `type` | Edit mode renders | Read mode shows |
+| --- | --- | --- |
+| `text` | `<TextInput>` | `value` |
+| `textarea` | `<Textarea>` | `value` |
+| `select` | `<Select>` | the chosen option's label |
+| `radio` | `<RadioGroup>` of `<Radio>` | the chosen option's label |
+| `checkbox` | `<CheckboxGroup>` of `<Checkbox>` | every checked option's label, joined with ", " |
+| `slider` | `<Slider>` | a formatted value (`${value}%` by default) |
+| `toggle` | `<Toggle>` | "On"/"Off" |
+| `segmentedControl` | `<SegmentedControl>` | the chosen option's label |
+
+### text
+
+<Canvas of={SettingStories.Text} />
+
+### textarea
+
+<Canvas of={SettingStories.Textarea} />
+
+### select
+
+<Canvas of={SettingStories.Select} />
+
+### radio
+
+<Canvas of={SettingStories.Radio} />
+
+### checkbox
+
+<Canvas of={SettingStories.Checkbox} />
+
+### slider
+
+<Canvas of={SettingStories.Slider} />
+
+### toggle
+
+<Canvas of={SettingStories.Toggle} />
+
+### segmentedControl
+
+<Canvas of={SettingStories.SegmentedControlType} />
+
+## Props
+
+`label` (required), `type` (default `"text"`), `edit`, `name`, `value` (`text`/`textarea`/`select`/`radio`/`segmentedControl`), `values` (`checkbox`, plural — multi-select), `checked` (`toggle`), `options` (`select`/`radio`/`checkbox`/`segmentedControl`), `placeholder` (`text`/`textarea`), `min`/`max`/`step`/`formatValue` (`slider`), `className`.

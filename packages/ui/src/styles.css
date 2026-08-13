@@ -14,17 +14,13 @@
 @import "@numosai/tokens/tokens.css";
 
 @theme inline {
-  --color-bg: var(--color-bg);
-  --color-fg: var(--color-fg);
-  --color-muted: var(--color-muted);
-  --color-border: var(--color-border);
-  --color-primary: var(--color-primary);
-  --color-primary-fg: var(--color-primary-fg);
-  --color-primary-hover: var(--color-primary-hover);
-  --color-accent: var(--color-accent);
-  --color-success: var(--color-success);
-  --color-warning: var(--color-warning);
-  --color-danger: var(--color-danger);
+  --color-bg: var(--background-default);
+  --color-fg: var(--content-base);
+  --color-muted: var(--content-subtle);
+  --color-border: var(--border-base);
+  --color-brand: var(--content-brand-primary);
+  --color-brand-inverse: var(--content-brand-inverse);
+  --color-negative: var(--content-negative);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);

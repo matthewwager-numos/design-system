@@ -168,16 +168,16 @@ export function ParticlePlayground() {
 
   const dropZoneBase: React.CSSProperties = {
     display: "grid", placeItems: "center", borderRadius: "var(--radius-lg)",
-    border: "2px dashed var(--color-border)", cursor: "pointer",
+    border: "2px dashed var(--border-base)", cursor: "pointer",
   };
 
-  const previewBg = "color-mix(in oklch, var(--color-fg) 4%, var(--color-bg))";
+  const previewBg = "color-mix(in oklch, var(--content-base) 4%, var(--background-default))";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
       <header>
         <h2 style={{ margin: 0 }}>Particles</h2>
-        <p style={{ color: "var(--color-muted)", margin: "var(--space-2) 0 0" }}>
+        <p style={{ color: "var(--content-subtle)", margin: "var(--space-2) 0 0" }}>
           Upload an SVG — its shape is sampled into particles that scatter and reassemble in a looping SMIL animation.
           Adjust count, motion, and colors with the knobs (top-right).
         </p>
@@ -194,7 +194,7 @@ export function ParticlePlayground() {
           onDragOver={(e) => e.preventDefault()}
           onKeyDown={(e) => e.key === "Enter" && fileRef.current?.click()}
         >
-          <span style={{ color: "var(--color-muted)", fontSize: "var(--text-sm)", pointerEvents: "none" }}>
+          <span style={{ color: "var(--content-subtle)", fontSize: "var(--text-sm)", pointerEvents: "none" }}>
             {filename || "Drop or click to upload SVG (A)"}
           </span>
           <input ref={fileRef} type="file" accept=".svg,image/svg+xml" style={{ display: "none" }}
@@ -211,7 +211,7 @@ export function ParticlePlayground() {
             onDragOver={(e) => e.preventDefault()}
             onKeyDown={(e) => e.key === "Enter" && fileRef2.current?.click()}
           >
-            <span style={{ color: "var(--color-muted)", fontSize: "var(--text-sm)", pointerEvents: "none" }}>
+            <span style={{ color: "var(--content-subtle)", fontSize: "var(--text-sm)", pointerEvents: "none" }}>
               {filename2 || "Drop or click to upload SVG (B)"}
             </span>
             <input ref={fileRef2} type="file" accept=".svg,image/svg+xml" style={{ display: "none" }}
@@ -225,17 +225,17 @@ export function ParticlePlayground() {
         style={{
           position: "relative", minHeight: 360,
           borderRadius: "var(--radius-lg)", overflow: "hidden",
-          background: "color-mix(in oklch, var(--color-fg) 3%, var(--color-bg))",
-          border: "1px solid var(--color-border)",
+          background: "color-mix(in oklch, var(--content-base) 3%, var(--background-default))",
+          border: "1px solid var(--border-base)",
           display: "grid", placeItems: "center",
         }}
       >
         {processing && (
           <div style={{
             position: "absolute", inset: 0, display: "grid", placeItems: "center",
-            background: "color-mix(in oklch, var(--color-bg) 70%, transparent)", zIndex: 1,
+            background: "color-mix(in oklch, var(--background-default) 70%, transparent)", zIndex: 1,
           }}>
-            <p style={{ margin: 0, color: "var(--color-muted)" }}>Processing…</p>
+            <p style={{ margin: 0, color: "var(--content-subtle)" }}>Processing…</p>
           </div>
         )}
         <div
@@ -243,7 +243,7 @@ export function ParticlePlayground() {
           style={{ maxWidth: "100%", maxHeight: 520, lineHeight: 0, display: "grid", placeItems: "center" }}
         />
         {!sourceSvg && !svgOutput && (
-          <p style={{ position: "absolute", color: "var(--color-muted)", margin: 0, fontSize: "var(--text-sm)" }}>
+          <p style={{ position: "absolute", color: "var(--content-subtle)", margin: 0, fontSize: "var(--text-sm)" }}>
             Upload an SVG above to preview
           </p>
         )}
@@ -253,11 +253,11 @@ export function ParticlePlayground() {
       <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center", flexWrap: "wrap" }}>
         <Button variant="primary" onClick={download} disabled={!svgOutput || processing}>Download SVG</Button>
         <Button variant="secondary" onClick={copy} disabled={!svgOutput || processing}>Copy SVG markup</Button>
-        <Button variant="ghost" size="sm" onClick={togglePause} disabled={!svgOutput}>
+        <Button variant="secondary" size="sm" onClick={togglePause} disabled={!svgOutput}>
           {paused ? "Play" : "Pause"}
         </Button>
         <Button
-          variant="ghost" size="sm"
+          variant="secondary" size="sm"
           onClick={() => { setSourceSvg(null); setSvgOutput(null); setFilename(""); setStatus("Upload an SVG to get started."); }}
           disabled={!sourceSvg}
         >
@@ -265,7 +265,7 @@ export function ParticlePlayground() {
         </Button>
       </div>
 
-      <p style={{ margin: 0, fontSize: "var(--text-sm)", color: "var(--color-muted)" }}>{status}</p>
+      <p style={{ margin: 0, fontSize: "var(--text-sm)", color: "var(--content-subtle)" }}>{status}</p>
     </div>
   );
 }

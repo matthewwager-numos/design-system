@@ -1,0 +1,44 @@
+import { Meta } from "@storybook/blocks";
+import { IconGallery } from "./IconGallery";
+
+<Meta title="Foundations/Icons" />
+
+# Icons
+
+This design system uses [lucide-react](https://lucide.dev) (`v1.31.0`, already installed in `@numosai/ui` and this Storybook app) for general-purpose icons — arrows, actions, objects, anything not covered by a named component. For the 11 branded app glyphs (Tasks, Accruals, Chat, etc.), use `<AppIcon>` instead — see its own docs page.
+
+## Usage
+
+```tsx
+import { Trash2 } from "lucide-react";
+
+<Trash2 size={16} />
+```
+
+Every icon is a React component named in PascalCase from its kebab-case entry in the gallery below (`arrow-right` → `ArrowRight`, `circle-check` → `CircleCheck`).
+
+### Sizing
+
+Lucide icons default to 24px. Pass `size` explicitly when rendering one standalone:
+
+```tsx
+<Trash2 size={16} />
+```
+
+Inside `<Button>` and `<Label>` icon slots (`leadingIcon`/`trailingIcon`), the component's own CSS forces icons to a fixed 16px regardless of the `size` prop you pass — so it's safe to omit `size` there, but passing `size={16}` keeps the source readable and matches what actually renders.
+
+### Color
+
+Lucide icons stroke with `currentColor` by default — no `color` prop needed. Used inside `<Button>` or `<Label>`, an icon automatically inherits that component's text color for the current variant/status, including on hover/active states, since it's real CSS color inheritance rather than a baked-in fill.
+
+```tsx
+<Button variant="destructive" leadingIcon={<Trash2 size={16} />}>
+  Delete
+</Button>
+```
+
+## Browse icons
+
+Search below, or browse the full set at [lucide.dev/icons](https://lucide.dev/icons) — same names, searchable by keyword and category there too.
+
+<IconGallery />

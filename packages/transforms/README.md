@@ -8,7 +8,7 @@ SVG transformations — take an SVG string, apply an effect, get an SVG string b
 import { recolor } from "@numosai/transforms";
 
 const tinted = recolor(originalSvg, {
-  map: { "#FF0000": "var(--color-primary)", "#0000FF": "var(--color-accent)" }
+  map: { "#FF0000": "var(--content-brand-primary)", "#0000FF": "var(--button-accent-default)" }
 });
 ```
 

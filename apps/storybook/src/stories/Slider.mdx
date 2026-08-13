@@ -1,0 +1,80 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as SliderStories from "./Slider.stories";
+
+<Meta of={SliderStories} />
+
+# Slider
+
+A track, fill, and one or two draggable thumbs for picking a value (or a range) along a continuum — matches Figma's Slider exactly (S/M sizes, Default/Hover/Disabled/Range states).
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Picking a numeric value (or a min/max range) where the *relative* position along a scale matters more than typing an exact number — volume, brightness, a price filter.
+
+## When NOT to use
+
+- When the exact number matters more than the gesture of choosing it, or the range is large/sparse (a year, a dollar amount with no natural bounds) — use `<TextInput type="number">` instead; dragging a thumb across a huge range is imprecise.
+
+## Implementation
+
+```tsx
+import { Slider } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Slider label="Volume" defaultValue={40} />
+```
+
+<Canvas of={SliderStories.Default} />
+
+## Range
+
+Pass a `[min, max]` tuple instead of a single number — for `value`/`defaultValue` *and* whatever `onValueChange` receives back — and Slider renders two thumbs instead of one. There's no separate `range` prop: whether it's a range slider is just the shape of the value, the same way `<RadioGroup>` doesn't need a prop to tell it how many `<Radio>` children it has.
+
+```tsx
+<Slider label="Price range" defaultValue={[25, 75]} />
+```
+
+<Canvas of={SliderStories.Range} />
+
+The two thumbs can't cross — dragging or arrowing one past the other clamps it there instead, so the tuple's first value is always the lower one.
+
+## Sizes
+
+Figma only defines `"sm"` and `"md"` for this component — there's no `"lg"` to match `<TextInput>`/`<Select>`'s three-size scale, so neither does this prop.
+
+<Canvas of={SliderStories.Sizes} />
+
+## Disabled
+
+<Canvas of={SliderStories.Disabled} />
+
+## Formatting the value
+
+The text beside the label defaults to `${value}%` (matching Figma's own "75%" / "25–75%" examples) — override it with `formatValue` for anything else a slider's value might represent:
+
+<Canvas of={SliderStories.CustomFormat} />
+
+## Inside a `<form>`
+
+Pass `name` to participate in real `<form>` submission via a hidden input — `name` alone for a single thumb, `${name}Min`/`${name}Max` for a range (since a tuple can't collapse into one form field):
+
+<Canvas of={SliderStories.InForm} />
+
+## Interaction
+
+- **Pointer**: drag a thumb, or click/tap anywhere on the track to jump the nearest thumb there. Uses pointer capture, so dragging tracks the pointer correctly even once it leaves the track's bounds.
+- **Keyboard**: focus a thumb (Tab) and use Arrow Left/Right/Up/Down (±`step`), Page Up/Down (±`step × 10`), Home (this thumb's lower bound), End (this thumb's upper bound).
+- Hover isn't a prop — it's real `:hover` on the track, same philosophy as `<TextInput>`. Confirmed from Figma to darken the whole track and the thumb's border together, not just the thumb.
+
+## Accessibility
+
+- Each thumb is a real `role="slider"` with `aria-valuemin`/`aria-valuemax`/`aria-valuenow`/`aria-valuetext` (the last using `formatValue`, so a screen reader hears "75%" rather than a bare "75"). A two-thumb range is two adjacent sliders with distinguishing labels ("Volume minimum"/"Volume maximum") — the documented ARIA pattern, since there's no dedicated "range slider" role.
+- A single thumb is `aria-labelledby` the visible label directly, rather than duplicating it into an `aria-label`.
+
+## Props
+
+`label`, `size` (`"sm" | "md"`, default `"md"`), `min`/`max`/`step` (default `0`/`100`/`1`), `value`/`defaultValue`/`onValueChange` (`number | [number, number]`), `showValue`, `formatValue`, `disabled`, `name`, `className`.

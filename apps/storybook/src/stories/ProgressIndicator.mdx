@@ -1,0 +1,80 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as ProgressIndicatorStories from "./ProgressIndicator.stories";
+
+<Meta of={ProgressIndicatorStories} />
+
+# ProgressIndicator
+
+A representation of a user's progress through a series of discrete steps.
+
+## When to use
+
+- A multi-step flow with a known, fixed number of steps — onboarding, a checkout, a setup wizard — where showing what's done, what's next, and (if applicable) what failed helps someone orient themselves.
+
+## When NOT to use
+
+- For a single continuous quantity (percent complete, bytes uploaded) — use `<ProgressBar>`.
+- For a small, linear sequence someone actively navigates back and forth through — use `<Stepper>` once it ships; this component only *displays* progress, it doesn't drive navigation.
+
+## Implementation
+
+```tsx
+import { ProgressIndicator } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<ProgressIndicator
+  steps={[
+    { label: "Account", state: "completed" },
+    { label: "Profile", state: "completed" },
+    { label: "Team" },
+    { label: "Billing" },
+  ]}
+/>
+```
+
+Each step is `{ label, state? }` — `state` defaults to `"default"` (an upcoming, numbered step) when omitted, so you only need to mark the steps that are `"completed"` or `"error"`. Hover (or Tab to) a badge below — since this is `orientation="horizontal"`, labels aren't shown as text, so each one is in a `<Tooltip>` instead.
+
+<Canvas of={ProgressIndicatorStories.Default} />
+
+## Orientation
+
+`orientation="vertical"` shows each step's label next to it. `orientation="horizontal"` (the default) never shows labels at all — that's a real Figma distinction, not a limitation of this implementation: Figma's horizontal variant is just the connected badges, full stop.
+
+<Canvas of={ProgressIndicatorStories.Vertical} />
+
+## Error
+
+<Canvas of={ProgressIndicatorStories.WithError} />
+
+## Without labels
+
+`showStepTitle={false}` hides labels even in `orientation="vertical"`, leaving just the connected badges — useful in a tight space (e.g. inside a card header) where full step names don't fit.
+
+<Canvas of={ProgressIndicatorStories.WithoutLabels} />
+
+## Tooltips
+
+Whenever a step's label isn't shown as visible text — always in `orientation="horizontal"`, and in `orientation="vertical"` when `showStepTitle={false}` — its badge gets a `<Tooltip>` showing the label instead, so the information isn't lost, just moved to hover/focus. It's a no-op (and adds nothing extra) wherever the label is already visible, so you don't need to think about it in the common vertical-with-labels case. On by default; set `showTooltips={false}` to turn it off:
+
+<Canvas of={ProgressIndicatorStories.WithoutTooltips} />
+
+## A note on "current step"
+
+Figma's Progress Step only defines three states — completed, default (upcoming/numbered), and error — there's no distinct visual for "this is the step I'm on right now." So the step in progress just renders as the next `"default"` step, identical to every other upcoming one, unless you choose to mark it `"completed"` or `"error"` yourself. This isn't an oversight on this component's part; it's a real gap in what Figma defines, called out here rather than silently invented.
+
+## Connectors
+
+The connector leading into a step (to its left, horizontal; above it, vertical) takes *that step's own* color, not the step before it — confirmed directly from Figma: a "completed → default" transition renders the connector in the *default* (upcoming) color, not completed. The very first step never has a leading connector at all, since there's nothing before it to connect from.
+
+## Built on Badge
+
+Each step's circle is a real `<Badge>` — `"completed"` and `"error"` map to `<Badge>`'s own `status="complete"`/`status="error"` icon variants, `"default"` maps to `status="neutral"` showing the step number. Fixing this component's badges surfaced a real bug in `<Badge>` itself: its `complete`/`error` variants used the same min-width-plus-padding sizing as its text/count variants, which produces an oblong pill instead of a circle for icon-only content — now fixed directly in `Badge.css`, so it's correct everywhere `<Badge>` is used, not just here.
+
+## Accessibility
+
+- Each badge's icon/number is decorative (`aria-hidden`) — a visually-hidden string ("Step 2: completed") carries the actual status to assistive tech, since Figma's badge is visual-only and wouldn't otherwise communicate anything on its own (this applies in `orientation="horizontal"` too, even though there's no visible label there for it to sit next to).
+- When a badge has a tooltip, it also gets `tabIndex={0}` — otherwise a plain `<span>` can't receive keyboard focus at all, and the same information a mouse user gets on hover would be unreachable without one.
+
+## Props
+
+`steps` (required — `{ label, state? }[]`), `orientation`, `showStepTitle`, `showTooltips`, `className`.

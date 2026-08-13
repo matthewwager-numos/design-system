@@ -1,0 +1,100 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as AvatarStories from "./Avatar.stories";
+
+<Meta of={AvatarStories} />
+
+# Avatar
+
+A person or entity's visual identifier: a photo when there is one, otherwise a single initial. `type="person"` renders circular; `type="entity"` (an org, app, or other non-person) renders as a rounded square.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Representing a user or account next to their name — a comment, a table row, a nav menu.
+- Representing a non-person entity (a company, an integration, an app) — use `type="entity"`.
+
+## When NOT to use
+
+- For the 11 specific branded product apps (Tasks, Accruals, Chat, etc.) — use `<AppIcon>` instead, which matches those exact glyphs.
+
+## Implementation
+
+```tsx
+import { Avatar } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Avatar name="Maya Chen" src="/maya.jpg" />
+```
+
+`src` is shown when it's set and loads successfully. Otherwise — no `src`, or the image fails to load — it falls back to a single initial: the first character of `name`, uppercased. Pass `initials` directly if you want to control that fallback yourself instead of deriving it from `name`.
+
+### Entity
+
+```tsx
+<Avatar type="entity" name="Acme Corp" />
+```
+
+<Canvas of={AvatarStories.Entity} />
+
+### Image, with automatic fallback
+
+The `Image` control on the example above isn't a real `Avatar` prop — Avatar has no boolean for this, whether `src` is set (vs. `undefined`) is what decides image-vs-initial. The control just fills `src` with a bundled example asset (a gradient PNG for `type="person"`, an SVG logo mark for `type="entity"`) so you can toggle it on/off in Controls without needing a real URL.
+
+<Canvas of={AvatarStories.WithImage} />
+<Canvas of={AvatarStories.EntityWithLogo} />
+<Canvas of={AvatarStories.BrokenImage} />
+
+### Explicit initials
+
+```tsx
+<Avatar initials="Z" />
+```
+
+<Canvas of={AvatarStories.ExplicitInitials} />
+
+## Sizes
+
+Figma's five sizes (XS/SM/Med/L/XL) map directly onto the first five steps of the Heading semantic type scale — confirmed at both ends directly from Figma, and the fallback initial's typography scales with it automatically.
+
+<Canvas of={AvatarStories.Sizes} />
+
+## Colors
+
+Figma's Avatar only ever shows one color (brand blue, `color="info"`, the default here). The rest reuse the same semantic status colors as `<Badge>`/`<Label>`/`<Banner>` — useful for color-coding avatars (by team, by status, to visually distinguish people from bots) rather than every avatar looking identical.
+
+```tsx
+<Avatar name="Maya Chen" color="positive" />
+```
+
+<Canvas of={AvatarStories.Colors} />
+
+`color="alt-negative"` is new — Figma added an "Alt Negative" semantic color (Background/Background Base/Border/Content, all magenta-based) after the rest of this token system was built from its Foundations page. `--background-alt-negative`, `--background-alt-negative-base`, `--border-alt-negative`, and `--content-alt-negative` were added to `tokens.css` to match, confirmed directly from Figma's variables panel — see the Foundations → Tokens page. It's a second, visually distinct "negative" — useful when you need to tell two different error/negative states apart at a glance (e.g. two failure categories) without both reading as the same red.
+
+## Tooltip
+
+Not a Figma-specified behavior — an addition, since an avatar only ever shows an image or a single initial, never the full name. On by default: hovering (or focusing) any avatar with a `name` or `initials` shows it in a `<Tooltip placement="top">`. Set `tooltip={false}` to opt out.
+
+```tsx
+<Avatar name="Maya Chen" tooltip={false} />
+```
+
+<Canvas of={AvatarStories.TooltipDisabled} />
+
+Content prefers `name`; if there's no `name` (only `initials`), the tooltip shows `initials` instead. If neither is set, `tooltip` is a no-op — there's nothing to show. See `<Tooltip>`'s own docs for placement, trigger mode, and transition details; Avatar doesn't expose those as separate props, it always uses `<Tooltip>`'s defaults (`placement="top"`, `trigger="hover"`).
+
+## Overlapping groups
+
+Every avatar has a 2px ring in its own background color baked in via `box-shadow` — that's what gives overlapping avatars a visible seam instead of blending into one shape. For laying out a row or column of overlapping avatars, see `<AvatarGroup>`, which handles the spacing (and optional random coloring) for you.
+
+## Accessibility
+
+- When showing an image, `alt` is set to `name` (or left empty if `name` isn't provided, marking it decorative).
+- The fallback initial is plain text content — no extra ARIA needed, but it's not a substitute for a visible or accessible name elsewhere on the page if the avatar is the only identifier for who/what it represents.
+- The tooltip (when shown) wires up `aria-describedby` automatically, and `trigger="hover"` also opens on keyboard focus — so the name is announced on focus even without a mouse.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

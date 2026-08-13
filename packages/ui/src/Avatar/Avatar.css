@@ -1,0 +1,100 @@
+/*
+ * Avatar styles — pure token-driven CSS. No hard-coded colors or sizes.
+ * The 5 Figma sizes (XS/SM/Med/L/XL) map exactly onto the first 5 steps of
+ * the Heading semantic type scale (xs/s/m/l/xl) — confirmed at both ends
+ * (XS and XL) directly from Figma; the middle three follow the same
+ * progression.
+ */
+
+.ds-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--ds-avatar-bg);
+  color: var(--ds-avatar-fg);
+  /* Matches the avatar's own background, per Figma — the seam this creates
+     only becomes visible once avatars overlap (see the Group story). */
+  box-shadow: 0 0 0 2px var(--ds-avatar-bg);
+  user-select: none;
+}
+
+.ds-avatar--person {
+  border-radius: 50%;
+}
+
+.ds-avatar--entity {
+  border-radius: var(--radius-sm);
+}
+
+/* ── Colors ────────────────────────────────────────────────────────── */
+
+.ds-avatar--info {
+  --ds-avatar-bg: var(--background-brand-subdued);
+  --ds-avatar-fg: var(--content-brand-primary);
+}
+.ds-avatar--positive {
+  --ds-avatar-bg: var(--background-positive);
+  --ds-avatar-fg: var(--content-positive);
+}
+.ds-avatar--notice {
+  --ds-avatar-bg: var(--background-notice);
+  --ds-avatar-fg: var(--content-notice);
+}
+.ds-avatar--negative {
+  --ds-avatar-bg: var(--background-negative);
+  --ds-avatar-fg: var(--content-negative);
+}
+.ds-avatar--neutral {
+  --ds-avatar-bg: var(--background-disabled);
+  --ds-avatar-fg: var(--content-placeholder);
+}
+.ds-avatar--alt-negative {
+  --ds-avatar-bg: var(--background-alt-negative);
+  --ds-avatar-fg: var(--content-alt-negative);
+}
+
+.ds-avatar--xs {
+  width: 1.5rem;
+  height: 1.5rem;
+  font: var(--type-heading-xs);
+  letter-spacing: var(--type-heading-xs-tracking);
+}
+
+.ds-avatar--sm {
+  width: 2rem;
+  height: 2rem;
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
+}
+
+.ds-avatar--md {
+  width: 2.5rem;
+  height: 2.5rem;
+  font: var(--type-heading-m);
+  letter-spacing: var(--type-heading-m-tracking);
+}
+
+.ds-avatar--lg {
+  width: 3rem;
+  height: 3rem;
+  font: var(--type-heading-l);
+  letter-spacing: var(--type-heading-l-tracking);
+}
+
+.ds-avatar--xl {
+  width: 4rem;
+  height: 4rem;
+  font: var(--type-heading-xl);
+  letter-spacing: var(--type-heading-xl-tracking);
+}
+
+.ds-avatar__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -1,0 +1,141 @@
+/*
+ * MobileNav styles — pure token-driven CSS, scoped under `[data-theme="dark"]`
+ * (set directly on both the bar and the panel in MobileNav.tsx) so every
+ * semantic token below resolves to its dark value regardless of the page's
+ * own theme — same forced-dark reasoning as `<Navigation>`, which this is
+ * the mobile counterpart to.
+ *
+ * Deliberately matches <Navigation>'s own background/shadow tokens exactly
+ * (`--background-default` + the same Brand/1100-at-10% glow), even though
+ * Figma's own collapsed-bar mockup used `--background-secondary` instead —
+ * requested explicitly, for maximum visual symmetry with the desktop rail
+ * rather than literal fidelity to that one static frame.
+ *
+ * Nav-item/section/user styling itself (`.ds-nav-item`, `.ds-nav-section`,
+ * `.ds-nav-user`, etc.) isn't duplicated here at all — it's `<Navigation>`'s
+ * own CSS, reused directly since the expanded panel renders the identical
+ * `<NavItem>`/`<NavSection>`/`<NavUser>` components.
+ */
+
+.ds-mobile-nav {
+  width: 100%;
+}
+
+.ds-mobile-nav-bar,
+.ds-mobile-nav-panel {
+  background: var(--background-default);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--brand-1100) 10%, transparent);
+}
+
+/* ── Collapsed bar ─────────────────────────────────────────────────── */
+
+.ds-mobile-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+.ds-mobile-nav-bar__logo {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+  padding: var(--space-1);
+  cursor: pointer;
+}
+
+.ds-mobile-nav-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ds-mobile-nav-bar__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--content-brand-primary);
+  cursor: pointer;
+}
+.ds-mobile-nav-bar__icon-button:hover {
+  background: var(--background-hover);
+}
+
+.ds-mobile-nav-bar__avatar {
+  display: inline-flex;
+  border: none;
+  background: none;
+  padding: 0;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+/* ── Expanded panel ────────────────────────────────────────────────── */
+
+.ds-mobile-nav-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  overflow-y: auto;
+  /* Grows from 0 to the full viewport height, top-anchored — the same
+     "single dimension animating from the collapsed edge" idea as
+     <Navigation>'s own width transition, just on the other axis (a mobile
+     panel expands downward from a top bar; a rail expands sideways from
+     its collapsed edge). */
+  height: 0;
+  transition: height var(--duration-base) var(--ease-out);
+}
+
+.ds-mobile-nav-panel--visible {
+  height: 100%;
+}
+
+.ds-mobile-nav-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 3rem;
+  flex-shrink: 0;
+  margin-bottom: var(--space-4);
+}
+
+.ds-mobile-nav-panel__logo {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.ds-mobile-nav-panel__wordmark {
+  height: 1.5rem;
+  width: auto;
+}
+
+.ds-mobile-nav-panel__close {
+  display: inline-flex;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--content-brand-primary);
+  cursor: pointer;
+}
+.ds-mobile-nav-panel__close:hover {
+  color: var(--content-base);
+}

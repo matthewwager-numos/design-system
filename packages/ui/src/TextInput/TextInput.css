@@ -1,0 +1,183 @@
+/*
+ * TextInput styles — pure token-driven CSS. No hard-coded colors or sizes.
+ *
+ * Figma's Hover/Focus/Filled/Disabled "states" map to real CSS here rather
+ * than modifier classes: :hover, :focus-within, ::placeholder vs. the
+ * input's own value color, and :has(:disabled). Only validation state
+ * (default/error/success) is a prop-driven class, since a browser has no
+ * way to infer that on its own.
+ */
+
+.ds-text-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.ds-text-input__label {
+  color: var(--content-emphasis);
+}
+
+.ds-text-input:has(.ds-text-input__control:disabled) .ds-text-input__label {
+  color: var(--content-disabled);
+}
+
+.ds-text-input__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  border: 1px solid transparent;
+  background: var(--background-element);
+  color: var(--content-subtle);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-text-input__field:hover:not(:focus-within):not(.ds-text-input__field--error):not(.ds-text-input__field--success):not(:has(:disabled)) {
+  background: var(--background-hover);
+}
+
+.ds-text-input__field:focus-within {
+  background: var(--background-default);
+  border-color: var(--border-brand);
+  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+}
+
+.ds-text-input__field:has(:disabled) {
+  background: var(--background-secondary);
+}
+
+.ds-text-input__field--error {
+  background: var(--background-default);
+  border-color: var(--border-negative);
+  box-shadow: 0 0 0 2px var(--background-negative);
+}
+.ds-text-input__field--error:focus-within {
+  border-color: var(--border-negative);
+  box-shadow: 0 0 0 2px var(--background-negative);
+}
+.ds-text-input__field--error .ds-text-input__control {
+  color: var(--content-emphasis);
+}
+
+.ds-text-input__field--success {
+  background: var(--background-default);
+  border-color: var(--border-positive);
+  box-shadow: 0 0 0 2px var(--background-positive);
+}
+.ds-text-input__field--success:focus-within {
+  border-color: var(--border-positive);
+  box-shadow: 0 0 0 2px var(--background-positive);
+}
+.ds-text-input__field--success .ds-text-input__control {
+  color: var(--content-emphasis);
+}
+
+.ds-text-input__control {
+  flex: 1 0 0;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  color: var(--content-base);
+}
+
+.ds-text-input__control::placeholder {
+  color: var(--content-placeholder);
+}
+
+.ds-text-input__control:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-text-input__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ds-text-input__help {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--content-subtle);
+}
+
+.ds-text-input__help--error {
+  color: var(--content-negative);
+}
+
+.ds-text-input__help--success {
+  color: var(--content-positive);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-text-input--lg .ds-text-input__label {
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+}
+.ds-text-input--lg .ds-text-input__field {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+}
+.ds-text-input--lg .ds-text-input__control {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+.ds-text-input--lg .ds-text-input__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-text-input--lg .ds-text-input__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ds-text-input--md .ds-text-input__label {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+}
+.ds-text-input--md .ds-text-input__field {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+.ds-text-input--md .ds-text-input__control {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-text-input--md .ds-text-input__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-text-input--md .ds-text-input__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-text-input--sm .ds-text-input__label {
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+}
+.ds-text-input--sm .ds-text-input__field {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.ds-text-input--sm .ds-text-input__control {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-text-input--sm .ds-text-input__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-text-input--sm .ds-text-input__icon svg {
+  width: 1rem;
+  height: 1rem;
+}

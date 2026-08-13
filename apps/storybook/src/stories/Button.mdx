@@ -15,8 +15,8 @@ The primary affordance for user actions. Use it whenever you want someone to *do
 
 - Submitting forms, confirming actions, navigating to a primary destination.
 - Use `variant="primary"` for the *one* most important action on a screen.
-- Use `variant="secondary"` or `"ghost"` for less prominent actions.
-- Use `variant="danger"` only for destructive actions (delete, leave, etc.).
+- Use `variant="secondary"` for less prominent actions, `"accent"` to draw attention without competing with primary, and `"link"` for the lowest-emphasis, text-only actions.
+- Use `variant="destructive"` only for destructive actions (delete, leave, etc.).
 
 ## When NOT to use
 
@@ -40,17 +40,20 @@ import "@numosai/ui/styles.css"; // once, at your app entry
 ```tsx
 import { Save } from "lucide-react";
 
-<Button leadingIcon={<Save />}>
+<Button leadingIcon={<Save size={16} />}>
   Save changes
 </Button>
 ```
+
+<Canvas of={ButtonStories.WithIcon} />
 
 ## Variants
 
 <Canvas of={ButtonStories.Primary} />
 <Canvas of={ButtonStories.Secondary} />
-<Canvas of={ButtonStories.Ghost} />
-<Canvas of={ButtonStories.Danger} />
+<Canvas of={ButtonStories.Accent} />
+<Canvas of={ButtonStories.Destructive} />
+<Canvas of={ButtonStories.Link} />
 
 ## Sizes
 
@@ -59,7 +62,7 @@ import { Save } from "lucide-react";
 ## Accessibility
 
 - Renders a real `<button>` element — screen readers and keyboard navigation work for free.
-- Focus ring uses `--color-primary` and `2px` outline offset. Visible on keyboard focus only (`:focus-visible`).
+- Focus ring uses `--button-primary-default` and `2px` outline offset. Visible on keyboard focus only (`:focus-visible`).
 - Disabled buttons set `aria-disabled` automatically (via the HTML `disabled` attribute) and skip pointer/keyboard interactions.
 - Always provide a meaningful `children` label. For icon-only buttons, add `aria-label`.
 

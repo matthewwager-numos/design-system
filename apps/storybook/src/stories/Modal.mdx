@@ -1,0 +1,109 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as ModalStories from "./Modal.stories";
+
+<Meta of={ModalStories} />
+
+# Modal
+
+A centered dialog or edge-anchored drawer, portaled to `document.body` over a backdrop — matches Figma's Modal (Default/Drawer types) exactly, filled with `<Header variant="modal">`, `<ModalBody>`, and `<ModalFooter>`.
+
+<Primary />
+
+<Controls />
+
+The example above is wrapped in a small Storybook-only `ModalPlayground` so Controls can drive it — the real `<Modal>` doesn't manage its own trigger button, that's just how the demo opens it.
+
+## When to use
+
+- A focused task or decision that interrupts the current page until it's resolved — confirming a destructive action, a short create/edit form, reviewing something before continuing.
+
+## When NOT to use
+
+- For a non-blocking status message — use `<Alert>`.
+- For a small amount of extra info attached to an element — use `<Tooltip>` or `<Popover>`.
+
+## Implementation
+
+```tsx
+import { Modal, ModalBody, ModalFooter, Header, Button, ButtonGroup } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+const [open, setOpen] = useState(false);
+
+<Modal open={open} onOpenChange={setOpen}>
+  <Header variant="modal" title="Delete project" onClose={() => setOpen(false)} />
+  <ModalBody>
+    <p>This can't be undone. Are you sure you want to delete "Q3 roadmap"?</p>
+  </ModalBody>
+  <ModalFooter>
+    <ButtonGroup>
+      <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+      <Button variant="destructive" onClick={() => setOpen(false)}>Delete</Button>
+    </ButtonGroup>
+  </ModalFooter>
+</Modal>
+```
+
+Click the button below — it's a real, live component, not a screenshot.
+
+<Canvas of={ModalStories.Default} />
+
+## The header slot
+
+`<Header variant="modal">` is exactly what fills Figma's "Header" slot — that variant exists specifically for this (see `<Header>`'s own docs for why it's named "modal" and not "drawer"). Its `onClose` is what you wire up to close the modal; `<Modal>` itself has no idea how its own header is closed, the same way it has no idea what's in its body.
+
+## Variants
+
+`variant="default"` (the default) is a centered dialog that fades in while scaling up from the center. `variant="drawer"` slides in from an edge instead — pick which one with `side`: `"top" | "right" | "bottom" | "left"` (defaults to `"right"`).
+
+```tsx
+<Modal variant="drawer" side="left" open={open} onOpenChange={setOpen}>
+  ...
+</Modal>
+```
+
+<Canvas of={ModalStories.Drawer} />
+<Canvas of={ModalStories.DrawerLeft} />
+<Canvas of={ModalStories.DrawerTop} />
+<Canvas of={ModalStories.DrawerBottom} />
+
+Figma gives "drawer" square corners and lets it run edge-to-edge (no radius, matching its own frame exactly) — "default" keeps the `radius-xl` rounded corners of a normal dialog.
+
+## Closing
+
+Three ways to close, plus a fourth you control yourself: the header's own **×** button, clicking the backdrop, and Escape — the first two are just callbacks/props you wire up yourself (`onClose`, `closeOnOverlayClick`), the third is always on.
+
+- `closeOnOverlayClick` (default `true`) — clicking the dimmed backdrop behind the modal closes it. Set to `false` for a modal that should only close via an explicit action (a destructive confirmation you don't want dismissed by an accidental outside click).
+- Escape always closes the modal, regardless of `closeOnOverlayClick` — that's a keyboard-accessibility affordance, not a "casual dismiss" one, so it isn't gated behind the same prop.
+
+```tsx
+<Modal closeOnOverlayClick={false} open={open} onOpenChange={setOpen}>
+  ...
+</Modal>
+```
+
+<Canvas of={ModalStories.ManualClose} />
+
+`<Modal>` never closes itself — `open`/`onOpenChange` is how it tells you it *wants* to close (backdrop click, Escape); your own state decides whether that actually happens, same pattern as `<DropdownMenu>`.
+
+## With form fields
+
+`<ModalBody>` holds whatever you'd put in a form — real fields, not a nested `<Form>` (that would double up the card shell; `<Modal>` already *is* the card).
+
+<Canvas of={ModalStories.WithFormFields} />
+
+## Behavior
+
+- **Portaled** to `document.body`, so it always escapes any clipping/`overflow: hidden` ancestor and stacks above everything else on the page. If opened from somewhere with a forced `data-theme` (e.g. inside `<Navigation>`), that theme is captured and reapplied to the portaled modal, even though it's no longer a DOM descendant of it — same technique `<Tooltip>` uses.
+- **Background scroll locks** while a modal is open, and unlocks when it closes.
+- **Focus moves into the modal** on open (the panel itself, so no field gets an unintended initial value/selection) and **is trapped there** — Tab/Shift+Tab cycle within it rather than escaping to the page behind it — until it closes, at which point focus returns to whatever had it before the modal opened.
+- **Transition**: stays mounted for the duration of the close animation rather than disappearing instantly, same mount/visible split as `<Tooltip>`/`<DropdownMenu>`.
+
+## Accessibility
+
+- The panel is `role="dialog"` with `aria-modal="true"`.
+- Give it an accessible name yourself if the visible header text isn't enough on its own — `<Modal aria-label="...">` (any native `<div>`/ARIA prop passes through) — or point `aria-labelledby` at your header's own id.
+
+## Props
+
+`<Modal>`: `variant`, `side`, `open`, `defaultOpen`, `onOpenChange`, `closeOnOverlayClick`, `className`, plus any native `<div>`/ARIA prop. `<ModalBody>`: any native `<div>` prop. `<ModalFooter>`: `secondaryAction`, `children` (required).

@@ -1,0 +1,68 @@
+/*
+ * Label styles — pure token-driven CSS. No hard-coded colors or sizes.
+ * Sizes reuse the Paragraph XS/S Regular semantic type styles directly
+ * (font shorthand + tracking), rather than composing size/weight/leading
+ * by hand like Button does.
+ */
+
+.ds-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-block: var(--space-1);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-label--md {
+  padding-inline: var(--space-2);
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+
+.ds-label--lg {
+  padding-inline: var(--space-3);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+
+/* ── Status colors ─────────────────────────────────────────────────── */
+
+.ds-label--neutral {
+  background: var(--background-element);
+  color: var(--content-placeholder);
+}
+
+.ds-label--positive {
+  background: var(--background-positive);
+  color: var(--content-positive);
+}
+
+.ds-label--negative {
+  background: var(--background-negative);
+  color: var(--content-negative);
+}
+
+.ds-label--notice {
+  background: var(--background-notice);
+  color: var(--content-notice);
+}
+
+.ds-label--info {
+  background: var(--background-brand-subdued);
+  color: var(--content-info);
+}
+
+/* ── Icons ─────────────────────────────────────────────────────────── */
+
+.ds-label__icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ds-label__icon svg {
+  width: 1rem;
+  height: 1rem;
+}

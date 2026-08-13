@@ -1,0 +1,136 @@
+/*
+ * Radio styles — mirrors Checkbox.css almost exactly (same tokens, same
+ * Hover/Focus/Checked/Disabled-as-real-CSS philosophy), just circular and
+ * with a solid inner dot instead of a checkmark, and no indeterminate state.
+ */
+
+.ds-radio {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.ds-radio__control {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  /* Aligns the box against the label's own line — half the gap between the
+     label's line-height (paragraph-s, 20px) and the box (16px) — rather
+     than centering against the whole label+help-text block, which is wrong
+     the moment help text makes that block taller than one line. */
+  margin-top: var(--space-0);
+}
+
+.ds-radio__input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.ds-radio__input:disabled {
+  cursor: not-allowed;
+}
+
+.ds-radio__box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-full);
+  background: var(--background-default);
+  pointer-events: none;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-radio__box::after {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--content-base-inverse);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+.ds-radio__input:checked ~ .ds-radio__box::after {
+  opacity: 1;
+}
+
+.ds-radio__input:hover:not(:disabled) ~ .ds-radio__box {
+  background: var(--background-secondary);
+  border-color: var(--border-emphasis);
+}
+
+.ds-radio__input:checked ~ .ds-radio__box {
+  background: var(--button-primary-default);
+  border-color: var(--button-primary-default);
+}
+.ds-radio__input:checked:hover:not(:disabled) ~ .ds-radio__box {
+  background: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
+}
+
+.ds-radio__input:focus-visible ~ .ds-radio__box {
+  border-color: var(--background-brand-base);
+  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+}
+
+.ds-radio__input--error ~ .ds-radio__box {
+  background: var(--background-default);
+  border-color: var(--background-negative-base);
+}
+.ds-radio__input--error:focus-visible ~ .ds-radio__box {
+  box-shadow: 0 0 0 2px var(--background-negative);
+}
+.ds-radio__input--error:checked ~ .ds-radio__box {
+  background: var(--button-primary-default);
+  border-color: var(--button-primary-default);
+}
+
+.ds-radio__input:disabled ~ .ds-radio__box {
+  background: var(--background-disabled);
+  border-color: var(--border-disabled);
+}
+.ds-radio__input:checked:disabled ~ .ds-radio__box {
+  background: var(--background-active);
+  border-color: var(--background-active);
+}
+
+.ds-radio__text {
+  display: flex;
+  flex-direction: column;
+  /* Confirmed from Figma: space/none (0) between the label and help text —
+     the visual gap between them is just the label's own line-height. */
+  gap: 0;
+}
+
+.ds-radio__label {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+  cursor: pointer;
+}
+.ds-radio:has(.ds-radio__input:disabled) .ds-radio__label {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-radio__help {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+.ds-radio__help--error {
+  color: var(--content-negative);
+}
+.ds-radio__help svg {
+  flex-shrink: 0;
+}

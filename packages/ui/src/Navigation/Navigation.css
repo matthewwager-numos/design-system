@@ -1,0 +1,214 @@
+/*
+ * Navigation styles — pure token-driven CSS, scoped under `[data-theme="dark"]`
+ * (set directly on .ds-navigation in Navigation.tsx) so every semantic token
+ * below resolves to its dark value regardless of the page's own theme.
+ *
+ * Two values are flagged as NOT directly confirmed from Figma's Foundations
+ * doc table and are called out at their declaration:
+ *   1. Default (unselected) item color — the live Navigation instance uses
+ *      Brand/400, not the --content-brand-primary token's own dark value
+ *      (Brand/200). Likely an intentional per-instance contrast tweak against
+ *      this specific dark background; used as-is rather than "corrected".
+ *   2. Hover background — no composed dark example exists in Figma (the
+ *      standalone Hover symbol was authored against a light background).
+ *      --background-hover is the inferred stand-in.
+ */
+
+.ds-navigation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 14.75rem; /* 236px */
+  height: 100%;
+  padding: var(--space-4) var(--space-2);
+  background: var(--background-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--brand-1100) 10%, transparent);
+  transition: width var(--duration-base) var(--ease-out);
+}
+
+.ds-navigation--collapsed {
+  width: 3.5rem; /* 56px */
+}
+
+/* ── Head ──────────────────────────────────────────────────────────── */
+
+.ds-navigation__head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 3rem;
+  flex-shrink: 0;
+}
+
+.ds-navigation--collapsed .ds-navigation__head {
+  /* Expanded, the wordmark is left-aligned (with the collapse button
+     absolutely positioned to its right) — collapsed, it's just the
+     logomark alone, and Figma centers it in the rail rather than pinning
+     it to the same left edge. */
+  justify-content: center;
+}
+
+.ds-navigation__wordmark {
+  height: 1.5rem;
+  width: auto;
+}
+
+.ds-navigation__collapse {
+  position: absolute;
+  right: 0;
+  display: flex;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--content-brand-primary);
+  cursor: pointer;
+}
+.ds-navigation__collapse:hover {
+  color: var(--content-base);
+}
+
+.ds-navigation__expand {
+  display: flex;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* ── Sections ──────────────────────────────────────────────────────── */
+
+.ds-nav-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.ds-nav-section--grow {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ── Nav Item ──────────────────────────────────────────────────────── */
+
+.ds-nav-item-wrapper {
+  width: 100%;
+}
+
+.ds-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  border: none;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
+  /* See file header note (1) — confirmed from the live Figma instance, not the generic --content-brand-primary dark value. */
+  color: var(--brand-400);
+  text-align: left;
+  text-decoration: none;
+}
+
+.ds-nav-item:hover:not(:disabled):not(.ds-nav-item--selected) {
+  /* See file header note (2) — inferred, no confirmed dark example. */
+  background: var(--background-hover);
+}
+
+.ds-nav-item--selected {
+  background: var(--background-brand-subdued);
+  color: var(--content-emphasis);
+}
+
+.ds-nav-item--disabled,
+.ds-nav-item:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-nav-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ds-nav-item__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ds-nav-item__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-navigation--collapsed .ds-nav-item,
+.ds-navigation--collapsed .ds-nav-user {
+  justify-content: center;
+}
+
+/* ── Sub-items (Figma's "Expanded" state) ─────────────────────────────
+   Visually matches <Tab>'s vertical/"Block" styling — a left-border
+   indicator on the active item — without mounting a real <Tab>, since
+   role="tab" would be the wrong semantics for a navigation link. */
+
+.ds-nav-item__sublist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 0 var(--space-2) 0 var(--space-3);
+}
+
+.ds-nav-subitem {
+  padding: 0 var(--space-2) 0 calc(var(--space-2) + var(--space-3));
+  border-left: 2px solid transparent;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-brand-primary);
+  text-decoration: none;
+}
+
+.ds-nav-subitem--active {
+  border-left-color: var(--border-brand);
+  color: var(--content-base);
+}
+
+/* ── NavUser ───────────────────────────────────────────────────────── */
+
+.ds-nav-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-1);
+  border: none;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
+  color: var(--brand-400);
+}
+.ds-nav-user:hover {
+  background: var(--background-hover);
+}
+
+.ds-nav-user__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}

@@ -1,0 +1,47 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as ButtonGroupStories from "./ButtonGroup.stories";
+
+<Meta of={ButtonGroupStories} />
+
+# ButtonGroup
+
+A wrapper for multiple, related buttons. It's a layout primitive around real `<Button>` instances — not a styled component of its own — so it composes with any `variant`/`size` combination.
+
+## When to use
+
+- A row (or stack) of related actions that belong together — most commonly a form's Cancel/Submit pair, in `<FormFooter>`.
+
+## When NOT to use
+
+- For unrelated actions scattered around a layout — just place `<Button>`s directly; grouping implies they belong together.
+- For a single-choice toggle between options — use `<SegmentedControl>`.
+
+## Implementation
+
+```tsx
+import { Button, ButtonGroup } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<ButtonGroup>
+  <Button variant="secondary">Cancel</Button>
+  <Button variant="primary">Submit</Button>
+</ButtonGroup>
+```
+
+<Canvas of={ButtonGroupStories.Default} />
+
+## Orientation
+
+`orientation="vertical"` (Figma's "Block") stacks the buttons and stretches each to the group's full width, instead of sitting side by side at their natural size.
+
+<Canvas of={ButtonGroupStories.Vertical} />
+
+## More than two
+
+Not limited to a Cancel/Submit pair — any number of related buttons, any variants:
+
+<Canvas of={ButtonGroupStories.ThreeButtons} />
+
+## Props
+
+`orientation`, plus any native `<div>` prop.

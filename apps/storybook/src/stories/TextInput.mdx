@@ -1,0 +1,79 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as TextInputStories from "./TextInput.stories";
+
+<Meta of={TextInputStories} />
+
+# TextInput
+
+A labeled single-line text field, with optional help text, icons, and validation state.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Any single-line text entry: names, emails, search, short freeform values.
+- Use `status="error"` / `"success"` with `helpText` to surface validation feedback.
+
+## When NOT to use
+
+- For multi-line content — use a `<Textarea>` instead.
+- For a fixed set of choices — use `<Select>`, `<RadioButton>`, or `<Checkbox>`.
+
+## Implementation
+
+```tsx
+import { TextInput } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<TextInput label="Email" placeholder="you@example.com" />
+```
+
+### With help text and validation
+
+```tsx
+<TextInput
+  label="Email"
+  status="error"
+  helpText="This field is required."
+/>
+```
+
+`status="error"` and `status="success"` both style the field border/ring and automatically prefix `helpText` with a matching icon — no extra markup needed.
+
+### With an icon
+
+```tsx
+import { Mail } from "lucide-react";
+
+<TextInput label="Email" leadingIcon={<Mail size={16} />} />
+```
+
+## A note on state
+
+Figma's Hover/Focus/Filled/Disabled variants aren't separate props on this component — they're real `:hover`, `:focus-within`, `::placeholder` (vs. the input's own typed value), and native `disabled` behavior. A browser already knows when a field is hovered, focused, or has a value; encoding that as extra props would just be a second, driftable source of truth. Only `status` (default/error/success) is a real prop, since that's actual application state — validity — that nothing in the DOM can infer on its own.
+
+## Examples
+
+<Canvas of={TextInputStories.Default} />
+<Canvas of={TextInputStories.WithHelpText} />
+<Canvas of={TextInputStories.WithIcon} />
+<Canvas of={TextInputStories.Error} />
+<Canvas of={TextInputStories.Success} />
+<Canvas of={TextInputStories.Disabled} />
+
+## Sizes
+
+<Canvas of={TextInputStories.Sizes} />
+
+## Accessibility
+
+- Renders a real `<label>` wired to the `<input>` via `htmlFor`/`id` (auto-generated with React's `useId` if you don't pass one).
+- Sets `aria-invalid="true"` automatically when `status="error"`.
+- Disabled fields use the native `disabled` attribute — screen readers and keyboard navigation skip them for free.
+- If `helpText` conveys an error, make sure it's the primary explanation of *why* — screen reader users hear the icon's meaning only through the text, not the glyph.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

@@ -18,10 +18,10 @@ function FadeInDemo(props: FadeInDemoProps) {
         <div
           style={{
             padding: "var(--space-5) var(--space-6)",
-            background: "var(--color-primary)",
-            color: "var(--color-primary-fg)",
+            background: "var(--background-brand-base)",
+            color: "var(--content-brand-inverse)",
             borderRadius: "var(--radius-lg)",
-            fontSize: "var(--text-xl)",
+            fontSize: "var(--text-l)",
           }}
         >
           Hello, world

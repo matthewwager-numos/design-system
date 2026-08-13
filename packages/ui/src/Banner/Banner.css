@@ -1,0 +1,87 @@
+/*
+ * Banner styles — pure token-driven CSS. No hard-coded colors or sizes.
+ * The status colors here are identical to Badge/Label's status colors —
+ * same semantic tokens, same statuses. <Alert> renders this same markup
+ * and layers its own positioning/transition classes on top (see Alert.css).
+ */
+
+.ds-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+
+.ds-banner--neutral {
+  background: var(--background-disabled);
+  color: var(--content-placeholder);
+}
+
+.ds-banner--positive {
+  background: var(--background-positive);
+  color: var(--content-positive);
+}
+
+.ds-banner--negative {
+  background: var(--background-negative);
+  color: var(--content-negative);
+}
+
+.ds-banner--notice {
+  background: var(--background-notice);
+  color: var(--content-notice);
+}
+
+.ds-banner--info {
+  background: var(--background-brand-subdued);
+  color: var(--content-info);
+}
+
+.ds-banner__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.ds-banner__icon svg {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-banner__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.ds-banner__title {
+  margin: 0;
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+}
+
+.ds-banner__description {
+  margin: 0;
+}
+
+.ds-banner__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+}
+.ds-banner__close svg {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}

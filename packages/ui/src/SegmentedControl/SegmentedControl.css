@@ -1,0 +1,105 @@
+/*
+ * SegmentedControl styles — pure token-driven CSS. Matches Figma's confirmed
+ * L/M states exactly, including unselected-hover (background-brand-subdued
+ * fill, text switches to button-primary-default); S (padding + type scale)
+ * follows the same downward progression established at L→M, flagged here
+ * since it wasn't individually confirmed. Disabled isn't in Figma's variant
+ * set at all — a reasonable addition, styled consistently with the rest of
+ * this library rather than left unstyled.
+ *
+ * One deliberate departure from Figma: the control is width:100% (not
+ * shrink-to-fit) with each segment flex:1, so it fills its container and
+ * distributes evenly — the same default TextInput/Select/Textarea already
+ * use, needed for this to behave like a normal form field rather than only
+ * being as wide as its own label text.
+ */
+
+.ds-segmented-control {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  border: 1px solid var(--content-brand-inverse);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.ds-segment {
+  display: flex;
+  flex: 1 1 0%;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 0;
+  border: none;
+  border-left: 1px solid var(--content-brand-inverse);
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--content-brand-primary);
+  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+.ds-segment:first-child {
+  border-left: none;
+}
+
+.ds-segment:hover:not(:disabled):not(.ds-segment--selected) {
+  background: var(--background-brand-subdued);
+  color: var(--button-primary-default);
+}
+
+.ds-segment--selected {
+  border-left-color: transparent;
+  background: var(--button-primary-default);
+  color: var(--content-brand-inverse);
+}
+.ds-segment--selected:hover:not(:disabled) {
+  background: var(--button-primary-hover);
+  color: var(--content-emphasis-inverse);
+}
+/* The segment right after a selected one abuts its fill directly — no
+   divider needed there either. */
+.ds-segment--selected + .ds-segment {
+  border-left-color: transparent;
+}
+
+.ds-segment:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-segment__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-segment__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.ds-segment__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-segmented-control--lg .ds-segment {
+  padding: var(--space-3) var(--space-4);
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+}
+
+.ds-segmented-control--md .ds-segment {
+  padding: var(--space-2) var(--space-3);
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+}
+
+.ds-segmented-control--sm .ds-segment {
+  padding: var(--space-1) var(--space-2);
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+}

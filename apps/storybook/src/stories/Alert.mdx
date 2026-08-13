@@ -1,0 +1,87 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as AlertStories from "./Alert.stories";
+
+<Meta of={AlertStories} />
+
+# Alert
+
+A toast/snackbar — a status notification that floats over the page and dismisses itself, manually or after a delay. Renders the exact same card as `<Banner>` (matching Figma's visually-identical "Alert" and "Toast" components), portaled to a screen edge with a position-aware slide transition.
+
+Click **Show alert** below, then use Controls to change status, position, or switch dismissal between manual (close button only) and auto (a delay in ms).
+
+<Primary />
+
+<Controls />
+
+<p style={{ fontSize: "var(--text-sm)", color: "var(--content-subtle)" }}>
+  The <code>Dismiss</code> control and its delay field aren't real `<Alert>` props — they're a small wrapper this Storybook example uses to drive a live demo, since Alert itself doesn't have a single "show it" prop (see Implementation below for the real API).
+</p>
+
+## When to use
+
+- Confirming the result of an action the user just took ("Changes saved", "Payment failed") without blocking the page.
+- Anything that should disappear on its own — pair with `autoDismissDelay`.
+
+## When NOT to use
+
+- For a persistent, in-page status message — use `<Banner>` instead (no portal, no timer, no transition, stays until the user or your app removes it).
+- For anything the user must act on before continuing — that's a `<Modal>`, not a toast.
+
+## Implementation
+
+Alert doesn't manage its own presence — you control whether it's mounted, and `onDismiss` tells you when it's safe to unmount (after the exit transition finishes, not before).
+
+```tsx
+import { useState } from "react";
+import { Alert, Button } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+function SaveButton() {
+  const [shown, setShown] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setShown(true)}>Save</Button>
+      {shown && (
+        <Alert
+          status="positive"
+          title="Changes saved"
+          position="bottom-center"
+          autoDismissDelay={3000}
+          onDismiss={() => setShown(false)}
+        />
+      )}
+    </>
+  );
+}
+```
+
+Auto-dismiss is just passing a delay instead of leaving `autoDismissDelay` undefined — try switching the `Dismiss` control above from manual to auto to see it:
+
+```tsx
+<Alert status="positive" title="Changes saved" autoDismissDelay={3000} onDismiss={...} />
+```
+
+### Multiple alerts stack automatically
+
+Alerts floated to the same `position` share one viewport and stack — you don't need to coordinate this yourself.
+
+<Canvas of={AlertStories.AllStatuses} />
+
+## Positions
+
+`position` sets which screen edge the alert anchors to (default `"bottom-center"`). The slide direction follows the vertical half of the position — top positions slide down, bottom positions slide up — regardless of left/center/right alignment.
+
+<Canvas of={AlertStories.AllPositions} />
+
+## Behavior
+
+- **Enter**: mounts hidden, then slides/fades in from its anchored edge on the next frame.
+- **Exit**: triggered by the close button or `autoDismissDelay`. Plays the reverse transition, and only calls `onDismiss` once that transition actually finishes — remove the `<Alert>` from your tree in that callback, not before.
+- **Stacking**: alerts at the same `position` share a single fixed viewport element (created on demand, removed once empty) so they stack instead of overlapping. Bottom positions stack with the newest closest to the edge; top positions stack with the newest closest to the edge as well.
+- **Not handled yet**: pausing the auto-dismiss timer on hover, and a queue/limit for how many toasts can stack at once. Both are common toast-library features this doesn't have — worth adding if you need them.
+
+## Accessibility
+
+- Renders with `role="alert"` (inherited from `<Banner>`) — an assertive ARIA live region, so screen readers announce it as soon as it's inserted.
+- The close button has `aria-label="Dismiss"`.

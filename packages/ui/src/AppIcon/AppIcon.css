@@ -1,0 +1,28 @@
+/*
+ * AppIcon styles — pure token-driven CSS. No hard-coded colors or sizes.
+ * Every glyph draws with `currentColor`, so the tile's `color` (set here to
+ * --green-700, matching every glyph's baked Figma stroke color) recolors
+ * all of them at once.
+ */
+
+.ds-app-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  background: var(--button-primary-default);
+  color: var(--green-700);
+}
+
+.ds-app-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The Accruals icon layers a dark accent on top of its own green fill. */
+.ds-app-icon__accent-strong {
+  color: var(--brand-dark-blue);
+}

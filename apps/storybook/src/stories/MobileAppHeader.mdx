@@ -1,0 +1,68 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as MobileAppHeaderStories from "./MobileAppHeader.stories";
+
+<Meta of={MobileAppHeaderStories} />
+
+# MobileAppHeader
+
+A mobile page header: a branded app icon + title, a row of tabs for switching between that page's sub-views, and an optional trailing action — matches Figma's MobileAppHeader exactly.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- The header for a single page/app section in a mobile layout — below `<MobileNav>`'s own top bar, at the top of that page's actual content — when that page has its own set of sub-views to switch between (Figma's example: an "Accruals" page with Recurring/One-time/Templates/Archived).
+
+## Implementation
+
+```tsx
+import { MobileAppHeader, Tab } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+const [tab, setTab] = useState("recurring");
+
+<MobileAppHeader icon="accruals" title="Accruals" value={tab} onValueChange={setTab}>
+  <Tab value="recurring">Recurring</Tab>
+  <Tab value="one-time">One-time</Tab>
+  <Tab value="templates">Templates</Tab>
+  <Tab value="archived">Archived</Tab>
+</MobileAppHeader>
+```
+
+<Canvas of={MobileAppHeaderStories.Default} />
+
+## Nothing here is reimplemented
+
+The icon is a real `<AppIcon>` — confirmed as a scaled-down instance of the same component, not a new one: Figma's own 4.8px corner radius on this header's icon is exactly `<AppIcon>`'s usual 8px radius at the 0.6× scale down from its normal 40px to this header's 24px, not a distinct design decision.
+
+The tabs are the real `<Tabs>`/`<TabList>`/`<Tab>` components — `children` takes `<Tab>`s directly, same as anywhere else `<Tabs>` is used. Confirmed color-for-color identical to their existing styling (unselected `content-brand-primary`, selected `content-base`, the sliding `border-brand` indicator) — nothing about tab appearance is overridden here.
+
+There's deliberately no paired `<TabPanel>` inside this component: the sub-page content these tabs switch between lives in the page below the header, not inside it. Read `value`/`onValueChange` the same way you would with a standalone `<Tabs>`, and render that content yourself alongside `<MobileAppHeader>`:
+
+```tsx
+<MobileAppHeader icon="accruals" title="Accruals" value={tab} onValueChange={setTab}>
+  <Tab value="recurring">Recurring</Tab>
+  <Tab value="one-time">One-time</Tab>
+</MobileAppHeader>
+
+{tab === "recurring" && <RecurringAccrualsList />}
+{tab === "one-time" && <OneTimeAccrualsList />}
+```
+
+## Actions
+
+An optional trailing slot — Figma's own example reserves this space but hides it (nothing to show in that particular instance), so it's optional here too:
+
+<Canvas of={MobileAppHeaderStories.WithActions} />
+
+## Overflow
+
+Real phone screens can easily have more tabs than fit — the tab row scrolls horizontally rather than wrapping or overflowing the header. This is this component's own addition; a static Figma frame can't specify scroll behavior, only a fixed number of tabs that happened to fit its own mockup width.
+
+<Canvas of={MobileAppHeaderStories.Overflow} />
+
+## Props
+
+`icon` (required — any `AppIconName`), `title` (required), `children` (required — `<Tab>`s), `value`, `defaultValue`, `onValueChange`, `actions`, `className`.

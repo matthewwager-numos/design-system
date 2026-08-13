@@ -1,0 +1,18 @@
+/*
+ * SettingsCard styles — pure token-driven CSS. `<Form>`/`<FormHeader>`/
+ * `<FormBody>`/`<FormFooter>`'s own CSS already handles the card shell,
+ * header, body, and footer — this file only adds what's specific to
+ * SettingsCard itself: the card's max-width and the description text.
+ */
+
+.ds-settings-card {
+  width: 100%;
+  max-width: 45rem; /* 720px, confirmed from Figma */
+}
+
+.ds-settings-card__description {
+  margin: 0;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}

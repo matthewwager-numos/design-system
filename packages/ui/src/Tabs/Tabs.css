@@ -1,0 +1,155 @@
+/*
+ * Tabs styles — pure token-driven CSS. Matches Figma's Tab component:
+ * default text is content-brand-primary; hover and selected both switch to
+ * content-base. The selected indicator (2px border-brand — bottom edge when
+ * horizontal, left edge when vertical) isn't drawn per-tab: it's a single
+ * absolutely-positioned bar owned by <TabList> (see .ds-tab-list__indicator)
+ * that's measured off the selected tab and slid into place via transition,
+ * so it moves between tabs instead of instantly teleporting. Horizontal
+ * hover still reserves its own 2px border (transparent, filled with
+ * background-brand-subdued on hover) since that's a per-tab, non-animated
+ * affordance independent of which tab is selected.
+ */
+
+.ds-tabs {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.ds-tabs--horizontal {
+  flex-direction: column;
+}
+
+.ds-tabs--vertical {
+  flex-direction: row;
+}
+
+/* ── TabList ───────────────────────────────────────────────────────── */
+
+.ds-tab-list {
+  position: relative;
+  display: flex;
+}
+
+.ds-tab-list__indicator {
+  position: absolute;
+  background: var(--border-brand);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform var(--duration-fast) var(--ease-out), width var(--duration-fast) var(--ease-out),
+    height var(--duration-fast) var(--ease-out), opacity var(--duration-fast) var(--ease-out);
+}
+.ds-tab-list__indicator--visible {
+  opacity: 1;
+}
+
+.ds-tab-list--horizontal .ds-tab-list__indicator {
+  bottom: 0;
+  left: 0;
+  height: 2px;
+}
+
+.ds-tab-list--vertical .ds-tab-list__indicator {
+  top: 0;
+  left: 0;
+  width: 2px;
+}
+
+.ds-tab-list--horizontal {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.ds-tab-list--vertical {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ── Tab ───────────────────────────────────────────────────────────── */
+
+.ds-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  font-family: inherit;
+  color: var(--content-brand-primary);
+}
+
+.ds-tab:hover:not(:disabled):not(.ds-tab--selected) {
+  color: var(--content-base);
+}
+
+.ds-tab--selected {
+  color: var(--content-base);
+}
+
+.ds-tab:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-tab__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.ds-tab__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-tab__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1rem;
+  height: 1rem;
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--background-element);
+  color: var(--content-placeholder);
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+
+/* ── Horizontal ("Inline") ─────────────────────────────────────────── */
+
+.ds-tab-list--horizontal .ds-tab {
+  padding: var(--space-2) 0;
+  border-bottom: 2px solid transparent;
+}
+.ds-tab-list--horizontal .ds-tab:hover:not(:disabled):not(.ds-tab--selected) {
+  border-bottom-color: var(--background-brand-subdued);
+}
+
+/* ── Vertical ("Stacked") ──────────────────────────────────────────── */
+/* Figma doesn't give vertical tabs a hover indicator, only the color
+   change above — matching that rather than inventing one. No border to
+   reserve here either: unlike horizontal, nothing ever adds a real border
+   to an individual vertical tab (the selected indicator is the shared
+   overlay above, not a per-tab border). */
+
+.ds-tab-list--vertical .ds-tab {
+  width: 100%;
+  justify-content: flex-start;
+  padding: var(--space-1) var(--space-2);
+}
+
+/* ── TabPanel ──────────────────────────────────────────────────────── */
+
+.ds-tab-panel {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+.ds-tab-panel:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+}

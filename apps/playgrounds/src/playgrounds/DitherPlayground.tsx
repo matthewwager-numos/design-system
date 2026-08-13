@@ -96,13 +96,13 @@ export function DitherPlayground() {
     if (ditheredSvg) void navigator.clipboard.writeText(ditheredSvg);
   }
 
-  const previewBg = "color-mix(in oklch, var(--color-fg) 4%, var(--color-bg))";
+  const previewBg = "color-mix(in oklch, var(--content-base) 4%, var(--background-default))";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
       <header>
         <h2 style={{ margin: 0 }}>Dither</h2>
-        <p style={{ color: "var(--color-muted)", margin: "var(--space-2) 0 0" }}>
+        <p style={{ color: "var(--content-subtle)", margin: "var(--space-2) 0 0" }}>
           Upload an SVG — gradients and blurs are re-rendered as halftone dots. Adjust
           cell size, shape, and angle with the knobs (top-right).
         </p>
@@ -119,7 +119,7 @@ export function DitherPlayground() {
             padding: "var(--space-6)",
             borderRadius: "var(--radius-lg)",
             background: previewBg,
-            border: "2px dashed var(--color-border)",
+            border: "2px dashed var(--border-base)",
             cursor: "pointer",
           }}
           onClick={() => fileInputRef.current?.click()}
@@ -128,8 +128,8 @@ export function DitherPlayground() {
           onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
         >
           <div style={{ textAlign: "center", pointerEvents: "none" }}>
-            <p style={{ margin: 0, fontSize: "var(--text-lg)" }}>Drop an SVG here</p>
-            <p style={{ margin: "var(--space-2) 0 0", color: "var(--color-muted)", fontSize: "var(--text-sm)" }}>
+            <p style={{ margin: 0, fontSize: "var(--text-l)" }}>Drop an SVG here</p>
+            <p style={{ margin: "var(--space-2) 0 0", color: "var(--content-subtle)", fontSize: "var(--text-sm)" }}>
               or click to browse
             </p>
           </div>
@@ -162,12 +162,12 @@ export function DitherPlayground() {
                   inset: 0,
                   display: "grid",
                   placeItems: "center",
-                  background: "color-mix(in oklch, var(--color-bg) 75%, transparent)",
+                  background: "color-mix(in oklch, var(--background-default) 75%, transparent)",
                   borderRadius: "var(--radius-lg)",
                   zIndex: 1,
                 }}
               >
-                <p style={{ color: "var(--color-muted)", margin: 0 }}>Processing…</p>
+                <p style={{ color: "var(--content-subtle)", margin: 0 }}>Processing…</p>
               </div>
             )}
             {ditheredSvg && (
@@ -186,7 +186,7 @@ export function DitherPlayground() {
               Copy SVG markup
             </Button>
             <Button
-              variant="ghost"
+              variant="secondary"
               size="sm"
               onClick={() => {
                 setSourceSvg(null);
@@ -198,7 +198,7 @@ export function DitherPlayground() {
               Upload new
             </Button>
             {sourceFilename && (
-              <span style={{ color: "var(--color-muted)", fontSize: "var(--text-sm)" }}>
+              <span style={{ color: "var(--content-subtle)", fontSize: "var(--text-sm)" }}>
                 {sourceFilename}
               </span>
             )}
@@ -207,7 +207,7 @@ export function DitherPlayground() {
       )}
 
       {error && (
-        <p style={{ margin: 0, fontSize: "var(--text-sm)", color: "var(--color-danger, #e53e3e)" }}>
+        <p style={{ margin: 0, fontSize: "var(--text-sm)", color: "var(--content-negative)" }}>
           {error}
         </p>
       )}

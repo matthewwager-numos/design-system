@@ -1,0 +1,79 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as SegmentedControlStories from "./SegmentedControl.stories";
+
+<Meta of={SegmentedControlStories} />
+
+# SegmentedControl
+
+A single-choice control styled as connected pill segments. Implements the WAI-ARIA `radiogroup`/`radio` pattern — this is fundamentally a mutually-exclusive choice, the same as `<RadioGroup>`, just styled as buttons — with the same roving-tabindex, automatic-activation keyboard behavior as `<TabList>`: arrow keys move focus and select in one step.
+
+## When to use
+
+- Switching between a small number (2-4) of closely-related views or filters that are all visible at once — "Day / Week / Month", "List / Grid".
+
+## When NOT to use
+
+- For navigating between unrelated sections of content — use `<Tabs>`.
+- For more than ~4-5 options — use `<Select>` or `<RadioGroup>` instead; segmented controls get cramped fast.
+
+## Implementation
+
+```tsx
+import { SegmentedControl, SegmentedControlOption } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+const [value, setValue] = useState("week");
+
+<SegmentedControl value={value} onValueChange={setValue}>
+  <SegmentedControlOption value="day">Day</SegmentedControlOption>
+  <SegmentedControlOption value="week">Week</SegmentedControlOption>
+  <SegmentedControlOption value="month">Month</SegmentedControlOption>
+</SegmentedControl>
+```
+
+Click an option below — it's a real, live component, not a screenshot. There's no selection at all until you set `defaultValue` (uncontrolled) or `value` (controlled), same as `<Tabs>`.
+
+<Canvas of={SegmentedControlStories.Default} />
+
+## Width
+
+The control fills its container's width (`width: 100%`), with every option taking an equal share of it (`flex: 1` each) — not shrink-to-fit like Figma's own frames, which only ever show it at its content's natural width. This matters most inside `<Form>`/`<FormBody>`, where it needs to behave like any other field and span the same width as `<TextInput>`/`<Select>` above and below it, rather than being only as wide as its own labels.
+
+## Sizes
+
+`size`: `"sm" | "md" | "lg"` (defaults to `"lg"`). `lg`/`md` padding and type are confirmed directly from Figma; `sm` follows the same downward progression rather than being individually confirmed there, since Figma's own doc didn't include a fully worked example at that size.
+
+<Canvas of={SegmentedControlStories.Sizes} />
+
+## Icons
+
+<Canvas of={SegmentedControlStories.WithIcons} />
+
+## Disabled options
+
+<Canvas of={SegmentedControlStories.DisabledOption} />
+
+## A note on disabled
+
+Disabled isn't in Figma's variant set at all — it's added here rather than left unstyled, using `--content-disabled` with pointer events off, consistent with the rest of this library.
+
+## Using it in a form
+
+Since the selected option isn't a real `<input>`, it doesn't participate in a `<form>`'s submission on its own. Pass `name` to render a hidden native input that tracks the selected value — same pattern as `<Select>`'s `name`:
+
+```tsx
+<SegmentedControl name="priority" defaultValue="medium">
+  <SegmentedControlOption value="low">Low</SegmentedControlOption>
+  <SegmentedControlOption value="medium">Medium</SegmentedControlOption>
+  <SegmentedControlOption value="high">High</SegmentedControlOption>
+</SegmentedControl>
+```
+
+## Accessibility
+
+- The container is `role="radiogroup"`; each option is `role="radio"` with `aria-checked`.
+- Arrow Left/Right move focus and select in one step (roving `tabindex` — only the selected option is in the natural Tab order). Home/End jump to the first/last option.
+
+## Props
+
+`<SegmentedControl>`: `size`, `value`, `defaultValue`, `onValueChange`, `name`, `className`. `<SegmentedControlOption>`: `value` (required), `leadingIcon`, `trailingIcon`, `disabled`, `className`.

@@ -1,0 +1,63 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as BadgeStories from "./Badge.stories";
+
+<Meta of={BadgeStories} />
+
+# Badge
+
+A small status or count indicator. Use it to surface a state (positive/negative/notice/info) or a number (unread count, item count) attached to another element.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Attaching a status to another element (a list item, a nav icon, a table row).
+- Showing a count — `size="md"` or `"lg"` renders whatever you pass as `children`.
+- Use `status="complete"` / `"error"` for a fixed check/x icon instead of a count — these always render their icon regardless of `children`, and are always a fixed-size circle (`1.5rem` square) rather than sized to content, since there's no text to size around.
+
+## When NOT to use
+
+- As a standalone clickable element — Badge isn't interactive. Use `<Button>` if it needs to respond to clicks.
+- For long text labels — Badge is sized for a digit or two, not a sentence.
+
+## Implementation
+
+```tsx
+import { Badge } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Badge status="positive">3</Badge>
+```
+
+### As a plain status dot
+
+```tsx
+<Badge status="negative" size="sm" />
+```
+
+`size="sm"` never renders content — it's a plain dot, matching Figma's spec.
+
+## Statuses
+
+<Canvas of={BadgeStories.Neutral} />
+<Canvas of={BadgeStories.Positive} />
+<Canvas of={BadgeStories.Negative} />
+<Canvas of={BadgeStories.Notice} />
+<Canvas of={BadgeStories.Info} />
+<Canvas of={BadgeStories.Complete} />
+<Canvas of={BadgeStories.Error} />
+
+## Sizes
+
+<Canvas of={BadgeStories.Sizes} />
+
+## Accessibility
+
+- Renders a `<span>` — it's presentational, not interactive or focusable.
+- Badge conveys status via color alone. If the status is meaningful (not just decorative), pair it with visible text nearby or an `aria-label` on the badge itself.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

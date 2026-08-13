@@ -1,0 +1,42 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as AppIconStories from "./AppIcon.stories";
+
+<Meta of={AppIconStories} />
+
+# AppIcon
+
+A branded 40×40 tile representing one of the product's apps. Use it in an app switcher, nav rail, or anywhere you need a recognizable glyph for a specific app rather than a generic icon.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- App switchers, launchers, and nav rails where each app needs a distinct, recognizable glyph.
+- Anywhere the design explicitly calls for one of the 11 named apps (`tasks`, `accruals`, `chat`, `reconciliations`, `variance`, `assistant`, `help-desk`, `transactions`, `reports`, `workflows`, `settings`).
+
+## When NOT to use
+
+- For arbitrary/general-purpose icons — this is a fixed, named set matching Figma's own "Icon" component, not a wrapper around an icon library. Use `lucide-react` icons directly (as `leadingIcon`/`trailingIcon` on `<Button>` or `<Label>`) for anything else.
+
+## Implementation
+
+```tsx
+import { AppIcon } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<AppIcon app="tasks" />
+```
+
+## All apps
+
+<Canvas of={AppIconStories.AllApps} />
+
+## Accessibility
+
+- Renders a `<span>` wrapping a decorative `<svg aria-hidden>` — it carries no accessible name on its own. If the app name needs to be announced (e.g. in a switcher button), provide it via `aria-label` on the interactive element that wraps the icon.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

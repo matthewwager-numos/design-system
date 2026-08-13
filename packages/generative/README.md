@@ -8,7 +8,7 @@ Generative SVG art — pure functions that return SVG path data. Framework-agnos
 import { blob } from "@numosai/generative";
 
 const { d, viewBox } = blob({ points: 6, randomness: 0.35, seed: 42 });
-// → <svg viewBox={viewBox}><path d={d} fill="var(--color-primary)" /></svg>
+// → <svg viewBox={viewBox}><path d={d} fill="var(--content-brand-primary)" /></svg>
 ```
 
 ## What goes in here

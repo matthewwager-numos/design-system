@@ -1,0 +1,100 @@
+/*
+ * ProgressBar styles — pure token-driven CSS. No hard-coded colors or sizes.
+ * Label/value typography matches Figma's "Heading XS" style exactly
+ * (12px/12px/Medium/tight tracking) — the one place in this design system
+ * that uses --tracking-tight instead of --tracking-sm for body-ish text.
+ */
+
+.ds-progress-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  /* Lives here, not on __row, so label/value keep this typography whether
+     they're wrapped in __row (stacked) or flat siblings (inline). */
+  font: var(--type-heading-xs);
+  letter-spacing: var(--type-heading-xs-tracking);
+}
+
+.ds-progress-bar--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ds-progress-bar__row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.ds-progress-bar__label {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--content-emphasis);
+}
+
+.ds-progress-bar--inline .ds-progress-bar__label {
+  flex: none;
+}
+
+.ds-progress-bar__value {
+  flex-shrink: 0;
+  width: 2rem;
+  text-align: right;
+  color: var(--content-placeholder);
+}
+
+.ds-progress-bar__value--positive {
+  color: var(--content-positive);
+}
+.ds-progress-bar__value--notice {
+  color: var(--content-notice);
+}
+.ds-progress-bar__value--negative {
+  color: var(--content-negative);
+}
+.ds-progress-bar__value--info {
+  color: var(--content-info);
+}
+
+.ds-progress-bar__track {
+  position: relative;
+  width: 100%;
+  height: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--background-element);
+  overflow: hidden;
+}
+
+.ds-progress-bar--inline .ds-progress-bar__track {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.ds-progress-bar__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: var(--radius-sm);
+  transition: width var(--duration-base) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+}
+
+.ds-progress-bar__fill--positive {
+  background: var(--background-positive-base);
+}
+.ds-progress-bar__fill--notice {
+  background: var(--background-notice-base);
+}
+.ds-progress-bar__fill--negative {
+  background: var(--background-negative-base);
+}
+.ds-progress-bar__fill--info {
+  background: var(--background-brand-base);
+}

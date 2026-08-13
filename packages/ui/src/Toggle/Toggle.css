@@ -1,0 +1,147 @@
+/*
+ * Toggle styles — pure token-driven CSS. Figma gives the "on" track a
+ * permanent brand-subdued ring (not just a focus indicator — it's there in
+ * every "Selected=True" example regardless of focus), so that's kept as
+ * part of the resting checked style; a separate `:focus-visible` outline is
+ * added on top for real keyboard-focus visibility, which Figma's variant
+ * set doesn't otherwise specify for this component.
+ */
+
+.ds-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+.ds-toggle:has(.ds-toggle__input:disabled) {
+  cursor: not-allowed;
+}
+
+.ds-toggle--label-above {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ds-toggle__control {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.ds-toggle__input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.ds-toggle__input:disabled {
+  cursor: not-allowed;
+}
+
+.ds-toggle__track {
+  position: relative;
+  display: block;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  background: var(--background-hover);
+  overflow: hidden;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-toggle__thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: var(--radius-full);
+  background: var(--background-default);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.ds-toggle__input:checked ~ .ds-toggle__track {
+  background: var(--content-brand-primary);
+  border-color: var(--content-brand-primary);
+  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+}
+
+.ds-toggle__input:focus-visible ~ .ds-toggle__track {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+}
+
+.ds-toggle__input:disabled ~ .ds-toggle__track {
+  background: var(--background-disabled);
+  border-color: var(--border-disabled);
+}
+.ds-toggle__input:disabled ~ .ds-toggle__track .ds-toggle__thumb {
+  border: 1px solid var(--border-disabled);
+}
+.ds-toggle__input:checked:disabled ~ .ds-toggle__track {
+  background: var(--background-active);
+  border-color: var(--background-active);
+  box-shadow: none;
+}
+
+.ds-toggle__label {
+  color: var(--content-emphasis);
+}
+.ds-toggle:has(.ds-toggle__input:disabled) .ds-toggle__label {
+  color: var(--content-disabled);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+/* Thumb diameter always equals the track's height, and travel distance
+   (checked translateX) always equals that same diameter — the track width
+   is exactly 2x its height at every size. */
+
+.ds-toggle--lg .ds-toggle__control,
+.ds-toggle--lg .ds-toggle__track {
+  width: 3rem;
+  height: 1.5rem;
+}
+.ds-toggle--lg .ds-toggle__thumb {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.ds-toggle--lg .ds-toggle__input:checked ~ .ds-toggle__track .ds-toggle__thumb {
+  transform: translateX(1.5rem);
+}
+.ds-toggle--lg .ds-toggle__label {
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+}
+
+.ds-toggle--md .ds-toggle__control,
+.ds-toggle--md .ds-toggle__track {
+  width: 2rem;
+  height: 1rem;
+}
+.ds-toggle--md .ds-toggle__thumb {
+  width: 1rem;
+  height: 1rem;
+}
+.ds-toggle--md .ds-toggle__input:checked ~ .ds-toggle__track .ds-toggle__thumb {
+  transform: translateX(1rem);
+}
+.ds-toggle--md .ds-toggle__label {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+}
+
+.ds-toggle--sm .ds-toggle__control,
+.ds-toggle--sm .ds-toggle__track {
+  width: 1.5rem;
+  height: 0.75rem;
+}
+.ds-toggle--sm .ds-toggle__thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+.ds-toggle--sm .ds-toggle__input:checked ~ .ds-toggle__track .ds-toggle__thumb {
+  transform: translateX(0.75rem);
+}
+.ds-toggle--sm .ds-toggle__label {
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+}

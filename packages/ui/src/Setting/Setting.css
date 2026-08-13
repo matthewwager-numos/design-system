@@ -1,0 +1,34 @@
+/*
+ * Setting styles — pure token-driven CSS. Only the label/read-value text
+ * is styled here; every edit-mode field is a real component with its own
+ * complete CSS already (`<TextInput>`, `<Select>`, etc.) — nothing about
+ * them is touched or overridden.
+ */
+
+.ds-setting {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.ds-setting__label {
+  flex: 1 0 0;
+  min-width: 0;
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-setting__value {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-setting__read {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}

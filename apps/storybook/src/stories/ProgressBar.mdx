@@ -1,0 +1,80 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as ProgressBarStories from "./ProgressBar.stories";
+
+<Meta of={ProgressBarStories} />
+
+# ProgressBar
+
+A completion meter. `mode` picks between two kinds of coloring:
+
+- **Scaled** (`"negative-to-positive"` or `"positive-to-negative"`) — the fill color is driven by `value` itself. This is a deliberate read of Figma's own component: its 25/50/75% samples are red/yellow/green, not one fixed color, so this reads as "how healthy/complete is this" rather than "how far along is this download."
+- **Fixed** (`"info"` / `"positive"` / `"notice"` / `"negative"`) — one color, ignoring `value` entirely.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- **Scaled, `"negative-to-positive"`** (the default): higher is better — profile completion, a health/quality score.
+- **Scaled, `"positive-to-negative"`**: higher is worse — error rate, risk score, storage usage nearing a limit. Same red/yellow/green bands as the default, just inverted, so a high number still reads as alarming rather than accidentally looking "good" because it's mostly filled.
+- **Fixed, `"info"`**: a plain "in progress, no judgment" indicator — a file upload, a multi-step wizard — where the percentage isn't good or bad, just how far along it is.
+- **Fixed, `"positive"` / `"notice"` / `"negative"`**: force a color a scaled mode would otherwise choose automatically — e.g. always showing red for a specific known-bad state regardless of the exact percentage.
+
+## When NOT to use
+
+- An indeterminate/unknown-duration loading state — this component always needs a `value`; use a spinner instead.
+
+## Implementation
+
+```tsx
+import { ProgressBar } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<ProgressBar value={75} label="Profile completion" />
+```
+
+### Scaled: negative → positive (default)
+
+Higher is better. Red below 34%, yellow below 67%, green at 67%+.
+
+<Canvas of={ProgressBarStories.NegativeToPositive} />
+
+### Scaled: positive → negative
+
+Higher is worse. Same bands, inverted.
+
+```tsx
+<ProgressBar mode="positive-to-negative" value={80} label="Error rate" />
+```
+
+<Canvas of={ProgressBarStories.PositiveToNegative} />
+
+### Fixed color (non-graded)
+
+```tsx
+<ProgressBar mode="info" value={40} label="Uploading…" />
+```
+
+<Canvas of={ProgressBarStories.FixedColor} />
+<Canvas of={ProgressBarStories.AllFixedColors} />
+
+### Inline
+
+Label, bar, and value in one row instead of stacked.
+
+<Canvas of={ProgressBarStories.Inline} />
+
+### Without value or label
+
+<Canvas of={ProgressBarStories.WithoutValue} />
+<Canvas of={ProgressBarStories.WithoutLabel} />
+
+## Accessibility
+
+- Renders `role="progressbar"` with `aria-valuenow`/`aria-valuemin`/`aria-valuemax` set automatically from `value`.
+- When `label` is set, it's automatically wired as the progressbar's accessible name via `aria-labelledby` (using a generated id) — no extra markup needed on your end.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

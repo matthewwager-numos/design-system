@@ -1,0 +1,64 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as PaginationStories from "./Pagination.stories";
+
+<Meta of={PaginationStories} />
+
+# Pagination
+
+Prev/next icon buttons around a real, editable page-number field — matches Figma's Pagination exactly. Compact by design: no row of numbered page buttons, just where you are ("N of Total") and a field you can type a page into directly.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Navigating a large, ordered result set page by page — a table, a search results list — where jumping straight to a known page number is at least as useful as stepping one page at a time.
+
+## Implementation
+
+```tsx
+import { Pagination } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+```
+
+<Canvas of={PaginationStories.Default} />
+
+## The page field is real, not a label
+
+Figma builds this from its own Text Input component, not a static number — so this is a genuine `<input>`: type a page number and press Enter (or click away) to jump there, clamped to `[1, totalPages]`. Typing is tracked as its own draft text separate from the committed page, so entering "1" while typing "12" doesn't briefly clamp/jump to page 1 before the second digit lands. Escape reverts to the current page without committing.
+
+## Controlled vs. uncontrolled
+
+`defaultPage` (default `1`) for an uncontrolled Pagination that tracks its own current page — fine for a demo, or anywhere nothing else needs to know which page it's on. Pass `page`/`onPageChange` together once something else does (typically whatever's fetching/rendering the paginated data):
+
+<Canvas of={PaginationStories.Controlled} />
+
+## Boundaries
+
+Prev disables on page 1, Next disables on the last page — confirmed directly from Figma's own example (page 1 of 25: Prev genuinely disabled, Next genuinely enabled), not just visually implied. Notice the two use different confirmed colors (`Content/Disabled` vs. `Content/Brand Primary`), not one icon color faded by opacity.
+
+<Canvas of={PaginationStories.FirstPage} />
+<Canvas of={PaginationStories.LastPage} />
+
+A single page disables both:
+
+<Canvas of={PaginationStories.SinglePage} />
+
+## Disabled
+
+Disables Prev, Next, and the page field together — e.g. while the page being paginated is still loading.
+
+<Canvas of={PaginationStories.Disabled} />
+
+## Accessibility
+
+- The whole control is a `<nav aria-label="Pagination">`.
+- Prev/Next are real `<button aria-label="Previous page"/"Next page">`s using native `disabled`, not a styled-to-look-disabled div.
+- The page field has a visually-hidden `<label>` plus an `aria-label` stating the current position (e.g. "Page, 1 of 25"), so a screen reader gets full context even though "of 25" is a separate, unlabeled sibling element visually.
+
+## Props
+
+`page`, `defaultPage` (default `1`), `totalPages` (required), `onPageChange`, `disabled`, `className`.

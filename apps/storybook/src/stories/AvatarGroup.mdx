@@ -1,0 +1,64 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as AvatarGroupStories from "./AvatarGroup.stories";
+
+<Meta of={AvatarGroupStories} />
+
+# AvatarGroup
+
+Lays out a row or column of `<Avatar>`s with each one overlapping the last — the "N people on this task" pattern. Not a Figma component; a composition helper built around `<Avatar>`'s own ring, which is specifically what makes overlapping avatars show a visible seam instead of blending into one shape.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Showing a small set of people/entities associated with something (assignees, collaborators, members) in a compact space.
+
+## When NOT to use
+
+- More than ~5-6 avatars — consider showing a fixed number plus a "+N" overflow indicator instead (not something this component does for you yet).
+
+## Implementation
+
+```tsx
+import { Avatar, AvatarGroup } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<AvatarGroup>
+  <Avatar name="Maya Chen" />
+  <Avatar name="Sam Ortiz" />
+  <Avatar name="Priya Nair" />
+</AvatarGroup>
+```
+
+## Orientation
+
+`orientation="vertical"` stacks downward instead of across.
+
+<Canvas of={AvatarGroupStories.Vertical} />
+
+## Overlap
+
+`overlap` is in pixels — how much each avatar shifts toward the previous one. Negative values space them apart instead.
+
+<Canvas of={AvatarGroupStories.NoOverlap} />
+<Canvas of={AvatarGroupStories.HeavyOverlap} />
+
+## Randomized colors
+
+`randomizeColors` assigns each avatar a random color from the full status palette (`info`/`positive`/`notice`/`negative`/`neutral`/`alt-negative`) — useful for quickly telling people apart in a group where everyone would otherwise be the same brand-blue. It's randomized once per mount, not on every re-render, so avatars don't visibly reshuffle while the group stays on screen — but it is genuinely random, not derived from the name, so the same group can land on different colors the next time it mounts.
+
+<Canvas of={AvatarGroupStories.RandomizedColors} />
+
+Any `<Avatar>` that already sets its own `color` keeps it — randomization only fills in the ones left unset.
+
+<Canvas of={AvatarGroupStories.ExplicitColorsWin} />
+
+## Accessibility
+
+- Purely a layout wrapper — it renders a `<div>` and clones its `<Avatar>` children as-is. All of Avatar's own accessibility behavior (image `alt` text, etc.) is unchanged.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

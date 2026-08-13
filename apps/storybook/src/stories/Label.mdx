@@ -1,0 +1,64 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as LabelStories from "./Label.stories";
+
+<Meta of={LabelStories} />
+
+# Label
+
+A status tag/chip. Use it to show a discrete state — active, pending, failed, draft — next to or inside another element like a table row or card.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Tagging a state on a row, card, or list item (`"Active"`, `"Pending"`, `"Failed"`).
+- Categorizing content (a topic, a type) where `status="neutral"` reads as a plain, unopinionated tag.
+
+## When NOT to use
+
+- For a live count — use `<Badge>` instead, it's sized for a digit or two and supports a plain-dot mode.
+- As a clickable filter/toggle — Label isn't interactive. Build a button-like affordance instead if it needs to respond to clicks.
+
+## Implementation
+
+```tsx
+import { Label } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Label status="positive">Active</Label>
+```
+
+### With an icon
+
+```tsx
+import { Check } from "lucide-react";
+
+<Label status="positive" leadingIcon={<Check size={16} />}>
+  Verified
+</Label>
+```
+
+<Canvas of={LabelStories.WithIcon} />
+
+## Statuses
+
+<Canvas of={LabelStories.Neutral} />
+<Canvas of={LabelStories.Positive} />
+<Canvas of={LabelStories.Negative} />
+<Canvas of={LabelStories.Notice} />
+<Canvas of={LabelStories.Info} />
+
+## Sizes
+
+<Canvas of={LabelStories.Sizes} />
+
+## Accessibility
+
+- Renders a `<span>` — it's presentational, not interactive or focusable.
+- Label conveys status via color and text together, so unlike Badge it doesn't need an `aria-label` fallback — the text content already describes the state.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

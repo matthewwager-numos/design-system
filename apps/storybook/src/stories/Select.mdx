@@ -1,0 +1,100 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as SelectStories from "./Select.stories";
+
+<Meta of={SelectStories} />
+
+# Select
+
+A single-choice field. Built on `<DropdownMenu>` — the trigger is styled identically to `<TextInput>` (same tokens, same states), and the options list is a `<DropdownMenuContent>` full of `<DropdownMenuItem>`s.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Choosing one value from a list of options in a form.
+- Use `status="error"` / `"success"` with `helpText` for validation feedback, exactly like `<TextInput>`.
+
+## When NOT to use
+
+- For more than ~10-ish options, or when users need to search — a `<Combobox>` (typeahead) fits better.
+- For 2-5 always-visible options — `<RadioButton>` or `<SegmentedControl>` avoids the extra click to see the choices.
+- For choosing more than one value — that's a checkbox list or a multi-select variant, neither of which this component does (yet).
+
+## Implementation
+
+```tsx
+import { Select } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+const options = [
+  { value: "apple", label: "Apple" },
+  { value: "banana", label: "Banana" },
+  { value: "cherry", label: "Cherry" },
+];
+
+<Select label="Fruit" placeholder="Select a fruit" options={options} />
+```
+
+### Controlled
+
+```tsx
+const [value, setValue] = useState<string>();
+
+<Select label="Fruit" options={options} value={value} onChange={setValue} />
+```
+
+### In a native `<form>`
+
+Pass `name` to render a hidden input alongside the trigger, so the selected value shows up in `FormData` like any other field:
+
+```tsx
+<Select name="fruit" label="Fruit" options={options} />
+```
+
+### With validation
+
+```tsx
+<Select
+  label="Fruit"
+  options={options}
+  status="error"
+  helpText="Please choose a fruit."
+/>
+```
+
+## Examples
+
+<Canvas of={SelectStories.Default} />
+<Canvas of={SelectStories.WithSelection} />
+<Canvas of={SelectStories.Error} />
+<Canvas of={SelectStories.Success} />
+<Canvas of={SelectStories.Disabled} />
+
+## Sizes
+
+<Canvas of={SelectStories.Sizes} />
+
+## Width
+
+Fills its container's width by default, same as `<TextInput>`/`<Textarea>` — not sized to the selected option's own text. That took an explicit fix: `<Select>` is built on `<DropdownMenu>`, whose root wrapper is `display: inline-block` (correct for a plain dropdown trigger button, which shouldn't stretch on its own) — scoped to `.ds-select`, it's overridden to fill the field's width instead.
+
+## Options
+
+Each option is `{ value, label, disabled?, leadingIcon? }`. `disabled` options are unclickable and skipped by keyboard navigation — both handled by `<DropdownMenuItem>`, not reimplemented here.
+
+## Behavior
+
+Everything interactive — open/close, outside-click, Escape, Arrow/Home/End navigation, the open/close transition — comes directly from `<DropdownMenu>`. Select only adds: a field-styled trigger showing the selected label (or placeholder), a chevron that flips when open, and turning a click into a selected value. See the DropdownMenu docs for the full behavior contract, including its one known gap (no viewport collision detection).
+
+## Accessibility
+
+- The trigger is a real `<button>`, labeled via a native `<label htmlFor>` — clicking the label focuses/activates it, same as `<TextInput>`.
+- Sets `aria-invalid="true"` automatically when `status="error"`.
+- Disabled uses the native `disabled` attribute on the trigger button.
+- Options inherit `<DropdownMenu>`'s `role="menu"`/`role="menuitem"` structure. Note this is the ARIA *menu* pattern, not the dedicated *listbox* pattern a native `<select>` uses — screen reader announcements will differ slightly from a native select. Worth knowing if you're auditing against a strict listbox spec.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

@@ -1,0 +1,257 @@
+/*
+ * Cell styles — pure token-driven CSS. Matches Figma's Cell exactly across
+ * all types; confirmed via get_design_context/get_variable_defs rather
+ * than guessed. Header types (columnHead/sorted/checkboxColumnHead) share
+ * one `.ds-cell--header` modifier — their bg/border/height/shadow are
+ * identical across all three in Figma, only the inner content differs.
+ */
+
+.ds-cell {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 3.25rem;
+  padding: var(--space-4);
+  background: var(--background-default);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ds-cell--end {
+  justify-content: flex-end;
+}
+
+.ds-cell--header {
+  height: 3rem;
+  background: var(--background-secondary);
+  border-bottom-color: var(--border-base);
+  /* Figma's own raw drop-shadow value — not bound to a named token there either. */
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Text-based types (text / numeric / emphasis / null) ──────────────── */
+
+.ds-cell__text {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+
+.ds-cell--end .ds-cell__text {
+  text-align: right;
+}
+
+.ds-cell__text--emphasis {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-cell__text--null {
+  color: var(--content-disabled);
+}
+
+/* ── Loading ───────────────────────────────────────────────────────── */
+
+.ds-cell__skeleton {
+  flex: 1 0 0;
+  min-width: 0;
+  height: 1rem;
+  border-radius: var(--radius-full);
+  background: var(--background-element);
+  animation: ds-cell-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ds-cell-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ── Slot ──────────────────────────────────────────────────────────── */
+
+.ds-cell__slot {
+  flex: 1 0 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Double ────────────────────────────────────────────────────────── */
+
+.ds-cell__double {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ds-cell__double-primary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-cell__double-secondary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+
+/* ── Progress ──────────────────────────────────────────────────────── */
+
+.ds-cell__progress {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ds-cell__progress-bar {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.ds-cell__progress-value {
+  flex-shrink: 0;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+
+/* ── Label ─────────────────────────────────────────────────────────── */
+
+.ds-cell__label {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--background-element);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-placeholder);
+}
+
+/* ── Avatar ────────────────────────────────────────────────────────── */
+
+.ds-cell__avatar-row {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ds-cell__avatar-text {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-cell__avatar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+
+.ds-cell__avatar-sublabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+
+/* ── Row actions (icon) ────────────────────────────────────────────── */
+
+.ds-cell__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ds-cell__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: var(--space-1);
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--content-link-default);
+  cursor: pointer;
+}
+.ds-cell__icon-button:hover:not(:disabled) {
+  background: var(--background-hover);
+}
+.ds-cell__icon-button:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-cell__count {
+  flex-shrink: 0;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-placeholder);
+}
+
+/* ── Header content (columnHead / sorted) ─────────────────────────── */
+
+.ds-cell__head-label {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-base);
+}
+
+.ds-cell__sort {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--content-emphasis);
+}
+
+.ds-cell__sort-label {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+  color: var(--content-emphasis);
+}

@@ -1,0 +1,88 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as DropdownMenuStories from "./DropdownMenu.stories";
+
+<Meta of={DropdownMenuStories} />
+
+# DropdownMenu
+
+A menu of actions or options that opens from a trigger. This is the shared foundation `<Select>` is built on — a styled trigger paired with this same menu panel.
+
+## When to use
+
+- A list of actions attached to a button (row actions, a "more" menu, a user menu).
+- As the popover half of a custom select-like control.
+
+## When NOT to use
+
+- For a plain multi-choice form field — use `<Select>` once it ships; it wraps this same menu with a field-styled trigger and keyboard/typeahead behavior tuned for forms.
+- For persistent navigation — use `<Navigation>`.
+
+## Implementation
+
+This is a compound component: `<DropdownMenu>` (root, owns open state) wraps a `<DropdownMenuTrigger>` (clones its child — pass any single interactive element) and a `<DropdownMenuContent>` (the panel, only rendered while open) containing `<DropdownMenuItem>`s.
+
+```tsx
+import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@numosai/ui";
+import { User, Settings, LogOut } from "lucide-react";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<DropdownMenu>
+  <DropdownMenuTrigger>
+    <Button variant="secondary">Open menu</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuItem leadingIcon={<User size={16} />}>Profile</DropdownMenuItem>
+    <DropdownMenuItem leadingIcon={<Settings size={16} />}>Settings</DropdownMenuItem>
+    <DropdownMenuItem leadingIcon={<LogOut size={16} />}>Log out</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+Click the trigger below to open it — it's a real, live component, not a screenshot.
+
+<Canvas of={DropdownMenuStories.Default} />
+
+### Controlled open state
+
+For cases where something else needs to open/close the menu (e.g. a parent form), skip `defaultOpen` and control it directly:
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<DropdownMenu open={open} onOpenChange={setOpen}>
+  ...
+</DropdownMenu>
+```
+
+### Active and disabled items
+
+`active` renders Figma's filled "Active" state — useful for marking the currently selected option (exactly what `<Select>` will use it for). `disabled` skips both pointer and keyboard interaction.
+
+<Canvas of={DropdownMenuStories.WithActiveAndDisabled} />
+
+## Sizes
+
+Size is set once on `<DropdownMenuContent size="sm" | "md" | "lg">` and cascades to every item — you don't set it per item. Pair it with the same size on the trigger.
+
+<Canvas of={DropdownMenuStories.Sizes} />
+
+## Placement
+
+`<DropdownMenuContent placement="bottom" | "top">` (defaults to `"bottom"`) is which side of the trigger the panel opens toward — always left-aligned either way. Added for triggers pinned near the bottom of the viewport (e.g. `<Navigation>`'s `<NavUser>` account menu), where opening downward would push the panel off-screen.
+
+```tsx
+<DropdownMenuContent placement="top">...</DropdownMenuContent>
+```
+
+## Behavior
+
+- **Closes on**: clicking outside, selecting an item (unless `closeOnSelect={false}` is passed to that `<DropdownMenuItem>`), or pressing Escape (which also returns focus to the trigger).
+- **Transition**: the panel fades and scales in/out (`--duration-fast`) on open/close. It stays mounted for the duration of the close animation rather than disappearing instantly — implemented with plain CSS + a mount/visible state split, no animation library.
+- **Keyboard**: Arrow Down/Up move between items (wrapping), Home/End jump to the first/last, Enter/Space activate the focused item — all native `<button>` behavior, nothing custom.
+- **Not handled yet**: viewport collision detection. `placement` is a fixed choice you make, not an automatic one — the panel doesn't flip from bottom to top (or vice versa) on its own when there's no room, so picking the right `placement` for a trigger near a viewport edge is still on you.
+
+## Accessibility
+
+- Trigger gets `aria-haspopup="menu"` and `aria-expanded` automatically via `<DropdownMenuTrigger>`.
+- Panel is a real `role="menu"` with `role="menuitem"` children in `role="none"` list items, per the WAI-ARIA menu pattern.
+- Opening the menu moves focus to the first enabled item; Escape returns focus to the trigger.

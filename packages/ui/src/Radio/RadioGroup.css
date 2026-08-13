@@ -1,0 +1,44 @@
+.ds-radio-group {
+  display: flex;
+  flex-direction: column;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ds-radio-group__label {
+  /* Explicit margin rather than the fieldset's own flex `gap` — <legend>
+     has historically not participated cleanly in a flex parent's gap, even
+     when the fieldset itself is display:flex, so this is the more reliable
+     way to get the space/s (8px) Figma actually specifies here. */
+  margin: 0 0 var(--space-2) 0;
+  padding: 0;
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-radio-group__options {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.ds-radio-group__options--vertical {
+  flex-direction: column;
+}
+
+.ds-radio-group__options--horizontal {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.ds-radio-group__help {
+  margin-top: var(--space-2);
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+.ds-radio-group__help--error {
+  color: var(--content-negative);
+}

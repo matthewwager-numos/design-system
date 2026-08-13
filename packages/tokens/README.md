@@ -10,7 +10,7 @@ Design tokens — the single source of truth for color, spacing, typography, rad
 @import "@numosai/tokens/tokens.css";
 
 .my-button {
-  background: var(--color-primary);
+  background: var(--button-primary-default);
   border-radius: var(--radius-md);
   padding: var(--space-2) var(--space-4);
 }
@@ -21,7 +21,7 @@ Design tokens — the single source of truth for color, spacing, typography, rad
 ```ts
 import { tokens } from "@numosai/tokens";
 
-<div style={{ background: tokens.color.primary }} />
+<div style={{ background: tokens.color.button.primaryDefault }} />
 ```
 
 ## Future: sync from Figma

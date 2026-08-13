@@ -34,7 +34,7 @@ const meta: Meta<typeof BlobDemo> = {
     randomness: 0.35,
     seed: 42,
     radius: 120,
-    fill: "var(--color-primary)",
+    fill: "var(--content-brand-primary)",
   },
 };
 

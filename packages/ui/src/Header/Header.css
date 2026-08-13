@@ -1,0 +1,115 @@
+/*
+ * Header styles — pure token-driven CSS. Two variants, matching Figma
+ * exactly: "app" (larger title, icon slot, trailing close) and "modal"
+ * (smaller title, no icon, leading close, full-width sub-nav actions).
+ */
+
+.ds-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  background: var(--background-default);
+  /* One border for the whole header — separating it from whatever content
+     follows on the page — rather than an internal divider between the
+     title row and the sub-nav row. Confirmed as --border-disabled from
+     Figma's Form/Modal header dividers, which use this exact same style. */
+  border-bottom: 1px solid var(--border-disabled);
+}
+
+.ds-header--app {
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+}
+
+.ds-header--modal {
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+/* ── Title row ─────────────────────────────────────────────────────── */
+
+.ds-header__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-1) 0;
+}
+
+.ds-header__icon {
+  display: flex;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  overflow: hidden;
+}
+
+.ds-header__title {
+  flex: 1;
+  min-width: 0;
+  color: var(--content-brand-primary);
+  margin: 0;
+}
+
+.ds-header--app .ds-header__title {
+  font: var(--type-heading-xl);
+  letter-spacing: var(--type-heading-xl-tracking);
+}
+
+.ds-header--modal .ds-header__title {
+  font: var(--type-heading-l);
+  letter-spacing: var(--type-heading-l-tracking);
+}
+
+.ds-header__title-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+/* ── Sub-nav row ───────────────────────────────────────────────────── */
+
+.ds-header__subnav-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.ds-header__subnav {
+  flex: 1;
+  min-width: 0;
+}
+
+.ds-header--app .ds-header__actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ds-header--modal .ds-header__actions {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Icon button (close) ───────────────────────────────────────────── */
+
+.ds-header__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-2);
+  color: var(--content-subtle);
+  cursor: pointer;
+}
+.ds-header__icon-button:hover {
+  background: var(--background-hover);
+  color: var(--content-base);
+}

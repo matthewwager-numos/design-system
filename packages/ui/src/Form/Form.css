@@ -1,0 +1,95 @@
+/*
+ * Form styles — pure token-driven CSS. Matches Figma's Form/FormHeader/
+ * FormBody/FormFooter exactly, including the card elevation shadow
+ * (--overlay-default-25, added to tokens.css for this — Figma's own
+ * "Overlay/Default 25" variable, the 25%-opacity sibling of the existing
+ * 50%-opacity --overlay-default-50).
+ */
+
+.ds-form {
+  display: flex;
+  flex-direction: column;
+  background: var(--background-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px var(--overlay-default-25);
+  overflow: hidden;
+}
+
+/* ── Header ────────────────────────────────────────────────────────── */
+
+.ds-form-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--background-default);
+  border-bottom: 1px solid var(--border-disabled);
+}
+
+.ds-form-header__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font: var(--type-heading-l);
+  letter-spacing: var(--type-heading-l-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-form-header__actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ds-form-header__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-1);
+  color: var(--content-subtle);
+  cursor: pointer;
+}
+.ds-form-header__icon-button:hover {
+  background: var(--background-hover);
+  color: var(--content-base);
+}
+.ds-form-header__icon-button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ── Body ──────────────────────────────────────────────────────────── */
+
+.ds-form-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-4);
+}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+
+.ds-form-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--background-default);
+  /* Confirmed via get_variable_defs on FormFooter's own Figma instance
+     (Border/Subdued, #e0dacd) — distinct from FormHeader's Border/Disabled
+     border, not a copy-paste of it. */
+  border-top: 1px solid var(--border-subtle);
+}
+
+.ds-form-footer__actions {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

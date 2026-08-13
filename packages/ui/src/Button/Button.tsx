@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
 import "./Button.css";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonVariant = "primary" | "secondary" | "accent" | "destructive" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -21,8 +21,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 /**
  * The primary action component. Variants map 1:1 to the Figma component
- * variants; sizes too. Everything else (color, radius, spacing) is driven
- * by tokens — so updating tokens.css restyles every Button automatically.
+ * variants (Primary/Secondary/Accent/Destructive/Link); sizes too. Everything
+ * else (color, radius, spacing) is driven by tokens — so updating tokens.css
+ * restyles every Button automatically.
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {

@@ -1,0 +1,187 @@
+/*
+ * Textarea styles — mirrors TextInput.css's tokens/scale exactly (confirmed
+ * against Figma: same padding, radius, and type tokens at every size), with
+ * two differences: the field aligns content to the top (flex-start) instead
+ * of center, since a multi-line field's first line is the anchor point, not
+ * its vertical middle; and the control resizes vertically.
+ *
+ * Figma's Hover/Focus/Filled/Disabled "states" map to real CSS here rather
+ * than modifier classes, same as TextInput. Only validation state
+ * (default/error/success) is a prop-driven class.
+ */
+
+.ds-textarea {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.ds-textarea__label {
+  color: var(--content-emphasis);
+}
+
+.ds-textarea:has(.ds-textarea__control:disabled) .ds-textarea__label {
+  color: var(--content-disabled);
+}
+
+.ds-textarea__field {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  width: 100%;
+  border: 1px solid transparent;
+  background: var(--background-element);
+  color: var(--content-subtle);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-textarea__field:hover:not(:focus-within):not(.ds-textarea__field--error):not(.ds-textarea__field--success):not(:has(:disabled)) {
+  background: var(--background-hover);
+}
+
+.ds-textarea__field:focus-within {
+  background: var(--background-default);
+  border-color: var(--border-brand);
+  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+}
+
+.ds-textarea__field:has(:disabled) {
+  background: var(--background-secondary);
+}
+
+.ds-textarea__field--error {
+  background: var(--background-default);
+  border-color: var(--border-negative);
+  box-shadow: 0 0 0 2px var(--background-negative);
+}
+.ds-textarea__field--error:focus-within {
+  border-color: var(--border-negative);
+  box-shadow: 0 0 0 2px var(--background-negative);
+}
+.ds-textarea__field--error .ds-textarea__control {
+  color: var(--content-emphasis);
+}
+
+.ds-textarea__field--success {
+  background: var(--background-default);
+  border-color: var(--border-positive);
+  box-shadow: 0 0 0 2px var(--background-positive);
+}
+.ds-textarea__field--success:focus-within {
+  border-color: var(--border-positive);
+  box-shadow: 0 0 0 2px var(--background-positive);
+}
+.ds-textarea__field--success .ds-textarea__control {
+  color: var(--content-emphasis);
+}
+
+.ds-textarea__control {
+  flex: 1 0 0;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  color: var(--content-base);
+  resize: vertical;
+}
+
+.ds-textarea__control::placeholder {
+  color: var(--content-placeholder);
+}
+
+.ds-textarea__control:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+  resize: none;
+}
+
+.ds-textarea__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ds-textarea__help {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--content-subtle);
+}
+
+.ds-textarea__help--error {
+  color: var(--content-negative);
+}
+
+.ds-textarea__help--success {
+  color: var(--content-positive);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-textarea--lg .ds-textarea__label {
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+}
+.ds-textarea--lg .ds-textarea__field {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+}
+.ds-textarea--lg .ds-textarea__control {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+.ds-textarea--lg .ds-textarea__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-textarea--lg .ds-textarea__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ds-textarea--md .ds-textarea__label {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+}
+.ds-textarea--md .ds-textarea__field {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+.ds-textarea--md .ds-textarea__control {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-textarea--md .ds-textarea__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-textarea--md .ds-textarea__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-textarea--sm .ds-textarea__label {
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+}
+.ds-textarea--sm .ds-textarea__field {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.ds-textarea--sm .ds-textarea__control {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-textarea--sm .ds-textarea__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-textarea--sm .ds-textarea__icon svg {
+  width: 1rem;
+  height: 1rem;
+}

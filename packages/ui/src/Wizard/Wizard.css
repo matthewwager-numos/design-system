@@ -1,0 +1,171 @@
+/*
+ * Wizard styles — pure token-driven CSS, matching Figma's Wizard exactly
+ * (WizardHeader / StepPanel / WizardStepHeading / FormFooter). Confirmed
+ * via get_variable_defs on the live Figma instances rather than guessed:
+ * WizardHeader's own divider is Border/Disabled, StepPanel's is
+ * Border/Subdued, and the header icon/title share Content/Brand Primary —
+ * three real, deliberately different values, not one token reused everywhere.
+ */
+
+.ds-wizard {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  height: 100%;
+  /* Confirmed via Figma: only WizardHeader/StepPanel/FormFooter are
+     explicitly background-default — the rest (this root, and the step
+     content between them) is background-secondary. */
+  background: var(--background-secondary);
+}
+
+/* ── Header ────────────────────────────────────────────────────────── */
+
+.ds-wizard-header {
+  display: flex;
+  flex-direction: column;
+  background: var(--background-default);
+}
+
+.ds-wizard-header__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-disabled);
+}
+
+.ds-wizard-header__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--content-brand-primary);
+  cursor: pointer;
+}
+.ds-wizard-header__icon-button:hover {
+  background: var(--background-hover);
+}
+
+.ds-wizard-header__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font: var(--type-heading-m);
+  letter-spacing: var(--type-heading-m-tracking);
+  color: var(--content-brand-primary);
+}
+
+.ds-wizard-header__save-exit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  padding: 0;
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-link-default);
+  cursor: pointer;
+}
+.ds-wizard-header__save-exit:hover {
+  color: var(--content-brand-primary);
+}
+
+.ds-wizard-header__progress {
+  width: 100%;
+  height: var(--space-1);
+  background: var(--background-element);
+  overflow: hidden;
+}
+
+.ds-wizard-header__progress-fill {
+  height: 100%;
+  background: var(--background-brand-base);
+  transition: width var(--duration-base) var(--ease-out);
+}
+
+/* ── Body ──────────────────────────────────────────────────────────── */
+
+.ds-wizard-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  background: var(--background-secondary);
+}
+
+.ds-wizard-step-panel {
+  box-sizing: border-box;
+  width: 12.5rem;
+  flex-shrink: 0;
+  padding: var(--space-6);
+  background: var(--background-default);
+  border-right: 1px solid var(--border-subtle);
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition:
+    width var(--duration-base) var(--ease-out),
+    padding var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+
+.ds-wizard-step-panel--collapsed {
+  width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  border-right-color: transparent;
+}
+
+.ds-wizard-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-5);
+  overflow-y: auto;
+}
+
+.ds-wizard-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.ds-wizard-step__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.ds-wizard-step__title {
+  margin: 0;
+  font: var(--type-heading-xl);
+  letter-spacing: var(--type-heading-xl-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-wizard-step__description {
+  margin: 0 auto;
+  max-width: 20rem;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}
+
+/* Figma's step fields sit in a fixed-width column centered in Content,
+   not full width — <FormBody>'s own padding is for its usual home inside
+   <Form>, redundant here since .ds-wizard-content already provides it. */
+.ds-wizard .ds-form-body {
+  width: 100%;
+  max-width: 22rem;
+  margin: 0 auto;
+  padding: 0;
+}

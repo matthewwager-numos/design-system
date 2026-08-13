@@ -1,0 +1,115 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as NavigationStories from "./Navigation.stories";
+
+<Meta of={NavigationStories} />
+
+# Navigation
+
+A container for navigation links; these can be to other pages (e.g. main site navigation) or to elements within the current page (e.g. a table of contents). Built almost entirely from other components in this library: `<Avatar>`, `<Tooltip>`, and `<DropdownMenu>`.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- The primary way to move between a product's top-level sections — this is a persistent sidebar, not a one-off menu.
+
+## When NOT to use
+
+- For breadcrumbs or a table of contents within a page — use `<Breadcrumbs>`.
+- For a short, temporary list of actions attached to a button — use `<DropdownMenu>` directly.
+
+## Always dark
+
+Unlike every other component in this library, Navigation doesn't follow the page's light/dark mode — it hardcodes `data-theme="dark"` on itself. Figma's Navigation component has no light-mode variant at all, so this isn't a "defaults to dark, can be made light" situation the way `<Tooltip>` inverts relative to the current theme; it's simply always dark, with no `variant` prop to change that.
+
+## Implementation
+
+```tsx
+import { Navigation, NavSection, NavItem, NavUser, DropdownMenuItem } from "@numosai/ui";
+import { SquareCheckBig, Receipt, Settings, LogOut } from "lucide-react";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Navigation>
+  <NavSection grow>
+    <NavItem icon={<SquareCheckBig size={24} />} href="/tasks">Tasks</NavItem>
+    <NavItem icon={<Receipt size={24} />} href="/accruals" selected>Accruals</NavItem>
+  </NavSection>
+  <NavSection>
+    <NavUser name="Matthew Wager">
+      <DropdownMenuItem>Profile</DropdownMenuItem>
+      <DropdownMenuItem>Sign out</DropdownMenuItem>
+    </NavUser>
+    <NavItem icon={<Settings size={24} />}>Settings</NavItem>
+    <NavItem icon={<LogOut size={24} />}>Sign Out</NavItem>
+  </NavSection>
+</Navigation>
+```
+
+Collapse it with the arrow in the header below — it's a real, live component, not a screenshot.
+
+<Canvas of={NavigationStories.Default} />
+
+## Sections
+
+`<NavSection grow>` is the main scrollable list (Figma's top group) — it fills remaining height and scrolls independently. A plain `<NavSection>` (no `grow`) stays pinned at its natural height, matching Figma's bottom group (`<NavUser>` plus account links). Most navs use exactly one of each, in that order.
+
+## Collapse
+
+Click the arrow-left button in the header to collapse Navigation to an icon-only rail; click the logomark (which takes its place) to expand it back — this exact swap is what Figma's own collapsed header does. The rail's width transitions (`--duration-base`); labels themselves still mount/unmount instantly rather than fading, since animating them in sync with the width without leaving a stray gap around the icon turned out to be more fragile than it's worth. Collapsed, every `<NavItem>`'s label moves into a `<Tooltip placement="right">` instead of disappearing, and `<NavUser>` falls back to `<Avatar>`'s own built-in tooltip — both work correctly even for items inside the scrollable top section, since `<Tooltip>` portals to `document.body` rather than rendering inline (a scrollable ancestor would otherwise clip it).
+
+```tsx
+<Navigation defaultExpanded={false}>...</Navigation>
+```
+
+<Canvas of={NavigationStories.Collapsed} />
+
+For cases where something else needs to control it (e.g. a layout-wide "collapse all panels" toggle), skip `defaultExpanded` and control it directly with `expanded`/`onExpandedChange` — same pattern as `<DropdownMenu>`/`<Tabs>`.
+
+## Expandable groups
+
+Pass `items` to a `<NavItem>` to turn it into a disclosure instead of a link — matching Figma's "Expanded" Nav Item state. Its sub-items visually match `<Tab>`'s vertical selected style (a left-border indicator via `active`), without actually being `<Tab>`s — `role="tab"` would be the wrong semantics for a navigation link.
+
+```tsx
+<NavItem
+  icon={<Receipt size={24} />}
+  items={[
+    { label: "Recurring", href: "/accruals/recurring", active: true },
+    { label: "One-time", href: "/accruals/one-time" },
+  ]}
+>
+  Accruals
+</NavItem>
+```
+
+<Canvas of={NavigationStories.WithExpandableGroup} />
+
+Only shown while Navigation is expanded — collapsed, there's no room for a flyout yet, so the item falls back to a plain icon + tooltip like any other `<NavItem>`. That's a real gap, not a design choice: closing it means adding flyout/popover support, which doesn't exist yet.
+
+## NavUser and the account menu
+
+`<NavUser>` doesn't hardcode what the chevron opens — you pass `<DropdownMenuItem>`s as children, same as `<DropdownMenu>` anywhere else. Because the row sits at the *bottom* of the sidebar, its menu opens upward: `<DropdownMenuContent placement="top">`, a new prop added to `<DropdownMenu>` alongside this component (previously it only ever opened downward, which would've pushed the account menu off-screen here). See `<DropdownMenu>`'s own docs for the full placement/keyboard/accessibility behavior.
+
+## Colors
+
+Two color decisions here don't trace back to a confirmed value in Figma's Foundations semantic doc table, and are called out in `Navigation.css` where they're used:
+
+- **Default (unselected) item text/icon** uses `Brand/400` directly — the live Figma instance is bound to that, not the dark-mode value of the generic `--content-brand-primary` token (`Brand/200`). Likely an intentional per-instance contrast tweak against this specific dark background rather than a token error, so it's used as-is rather than "corrected" to match the token.
+- **Hover background** uses `--background-hover`. Figma's standalone "Hover" Nav Item symbol was authored against a light background (it resolves to plain `--background-default`, which would be invisible on Navigation's dark surface) — there's no composed example showing hover inside the actual dark sidebar to confirm against, so this is an inferred stand-in.
+
+Everything else (`--background-brand-subdued` selected fill, `--content-emphasis` selected text, `--border-brand` sub-item indicator) matched Figma's live dark-mode values exactly.
+
+## Accessibility
+
+- Collapsed items keep their accessible name via `<Tooltip>`'s `aria-describedby` wiring — icon-only buttons/links aren't unlabeled.
+- Selected `<NavItem>`s get `aria-current="page"`.
+- Expandable groups get `aria-expanded` on their toggle button.
+- `<NavUser>`'s trigger inherits `<DropdownMenuTrigger>`'s `aria-haspopup`/`aria-expanded` wiring automatically.
+
+## Props
+
+`<Navigation>`: `expanded`, `defaultExpanded`, `onExpandedChange`, `className`.
+`<NavSection>`: `grow`, plus any native `<div>` prop.
+`<NavItem>`: `icon` (required), `href`, `selected`, `disabled`, `onClick`, `items`, `defaultOpen`, `className`.
+`<NavUser>`: `name` (required), `avatarSrc`, `initials`, `children` (the account menu's `<DropdownMenuItem>`s).

@@ -1,0 +1,142 @@
+/*
+ * Checkbox styles — pure token-driven CSS. Figma's Hover/Focus/Checked/
+ * Disabled "states" map to real :hover/:focus-visible/:checked/:disabled
+ * selectors on the actual <input>, not modifier classes — same philosophy
+ * as <TextInput>. Only `error` is a prop-driven class, since a browser has
+ * no way to infer validation state on its own.
+ */
+
+.ds-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.ds-checkbox__control {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  /* Aligns the box against the label's own line — half the gap between the
+     label's line-height (paragraph-s, 20px) and the box (16px) — rather
+     than centering against the whole label+help-text block, which is wrong
+     the moment help text makes that block taller than one line. */
+  margin-top: var(--space-0);
+}
+
+.ds-checkbox__input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.ds-checkbox__input:disabled {
+  cursor: not-allowed;
+}
+
+.ds-checkbox__box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-sm);
+  background: var(--background-default);
+  color: var(--content-base-inverse);
+  pointer-events: none;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-checkbox__icon {
+  display: none;
+  width: 0.8125rem;
+  height: 0.8125rem;
+}
+.ds-checkbox__input:checked ~ .ds-checkbox__box .ds-checkbox__icon--check {
+  display: block;
+}
+.ds-checkbox__input:indeterminate ~ .ds-checkbox__box .ds-checkbox__icon--indeterminate {
+  display: block;
+}
+
+.ds-checkbox__input:hover:not(:disabled) ~ .ds-checkbox__box {
+  background: var(--background-secondary);
+  border-color: var(--border-emphasis);
+}
+
+.ds-checkbox__input:checked ~ .ds-checkbox__box,
+.ds-checkbox__input:indeterminate ~ .ds-checkbox__box {
+  background: var(--button-primary-default);
+  border-color: var(--button-primary-default);
+}
+.ds-checkbox__input:checked:hover:not(:disabled) ~ .ds-checkbox__box,
+.ds-checkbox__input:indeterminate:hover:not(:disabled) ~ .ds-checkbox__box {
+  background: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
+}
+
+.ds-checkbox__input:focus-visible ~ .ds-checkbox__box {
+  border-color: var(--background-brand-base);
+  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+}
+
+.ds-checkbox__input--error ~ .ds-checkbox__box {
+  background: var(--background-default);
+  border-color: var(--background-negative-base);
+}
+.ds-checkbox__input--error:focus-visible ~ .ds-checkbox__box {
+  box-shadow: 0 0 0 2px var(--background-negative);
+}
+.ds-checkbox__input--error:checked ~ .ds-checkbox__box,
+.ds-checkbox__input--error:indeterminate ~ .ds-checkbox__box {
+  background: var(--button-primary-default);
+  border-color: var(--button-primary-default);
+}
+
+.ds-checkbox__input:disabled ~ .ds-checkbox__box {
+  background: var(--background-disabled);
+  border-color: var(--border-disabled);
+}
+.ds-checkbox__input:checked:disabled ~ .ds-checkbox__box,
+.ds-checkbox__input:indeterminate:disabled ~ .ds-checkbox__box {
+  background: var(--background-active);
+  border-color: var(--background-active);
+}
+
+.ds-checkbox__text {
+  display: flex;
+  flex-direction: column;
+  /* Confirmed from Figma: space/none (0) between the label and help text —
+     the visual gap between them is just the label's own line-height. */
+  gap: 0;
+}
+
+.ds-checkbox__label {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+  cursor: pointer;
+}
+.ds-checkbox:has(.ds-checkbox__input:disabled) .ds-checkbox__label {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-checkbox__help {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+.ds-checkbox__help--error {
+  color: var(--content-negative);
+}
+.ds-checkbox__help svg {
+  flex-shrink: 0;
+}

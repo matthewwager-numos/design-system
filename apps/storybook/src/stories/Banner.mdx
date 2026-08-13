@@ -1,0 +1,63 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as BannerStories from "./Banner.stories";
+
+<Meta of={BannerStories} />
+
+# Banner
+
+A static, inline status message. Matches Figma's "Alert" component (internally named "Banner" in the file). Renders in place — no portal, positioning, timers, or transition.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A persistent status message embedded in page content — at the top of a form, inside a card, above a table.
+- Content that should stay visible until the user dismisses it or the underlying condition changes (unlike `<Alert>`, it never times out on its own).
+
+## When NOT to use
+
+- For a transient, self-dismissing notification that floats over the page — use `<Alert>` instead. It renders this exact same visual, just portaled to a screen edge with a slide-in/out transition and an optional auto-dismiss timer.
+
+## Implementation
+
+```tsx
+import { Banner } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Banner
+  status="negative"
+  title="Payment failed"
+  description="Your card was declined."
+/>
+```
+
+### Dismissible
+
+```tsx
+const [visible, setVisible] = useState(true);
+
+{visible && (
+  <Banner
+    title="Trial ending soon"
+    description="Your trial ends in 3 days."
+    onDismiss={() => setVisible(false)}
+  />
+)}
+```
+
+`onDismiss` fires immediately on click — there's no exit animation to wait for (that's specifically what `<Alert>` adds). Pass `dismissible={false}` to hide the close button entirely.
+
+## Statuses
+
+<Canvas of={BannerStories.AllStatuses} />
+
+## Accessibility
+
+- Renders with `role="alert"`, so screen readers announce it when it appears (an ARIA live region, assertive by default).
+- The close button has `aria-label="Dismiss"` since it has no visible text.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

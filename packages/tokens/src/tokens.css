@@ -1,30 +1,187 @@
 /*
- * Design tokens — single source of truth for color, spacing, type, radius.
+ * Design tokens — single source of truth for color, spacing, type, radii,
+ * motion, and elevation. Everything downstream (ui components, illustrate
+ * tools, playgrounds) reads from these CSS variables — NEVER hard-code
+ * values.
  *
- * This file will eventually be GENERATED from Figma via Tokens Studio + Style
- * Dictionary. For now it's hand-written so you can iterate in code.
- *
- * Everything downstream (ui components, illustrate tools, playgrounds) reads
- * from these CSS variables — NEVER hard-code values.
+ * Color follows Figma's own two-layer model (see the "🛠️ Foundations"
+ * page): Primitive (raw ramps) → Semantic (aliases a primitive, carries a
+ * light/dark pair). Semantic tokens are the only ones components should
+ * reach for directly — primitives exist so semantics have something to
+ * alias.
  */
 
 :root {
-  /* ── Color ───────────────────────────────────────────────────────── */
-  --color-bg: oklch(99% 0 0);
-  --color-fg: oklch(20% 0.02 270);
-  --color-muted: oklch(60% 0.02 270);
-  --color-border: oklch(90% 0.01 270);
+  /* ── Color / Primitive ───────────────────────────────────────────── */
+  --beige-100: #fdfdfd;
+  --beige-200: #fcfbfa;
+  --beige-300: #fcfbfa;
+  --beige-400: #f9f9f7;
+  --beige-500: #f9f8f5;
+  --beige-600: #f7f6f3;
+  --beige-700: #f3f0e9;
+  --beige-800: #e0dacd;
+  --beige-900: #d6cbb3;
+  --beige-1000: #c3b597;
+  --beige-1100: #a79672;
 
-  --color-primary: oklch(60% 0.18 270);
-  --color-primary-fg: oklch(99% 0 0);
-  --color-primary-hover: oklch(55% 0.2 270);
+  --brand-100: #e3f2ff;
+  --brand-200: #cce7ff;
+  --brand-300: #afd9ff;
+  --brand-400: #9ccfff;
+  --brand-500: #87c5ff;
+  --brand-600: #7abfff;
+  --brand-700: #65a8e6;
+  --brand-800: #5492cc;
+  --brand-900: #447eb3;
+  --brand-1000: #366a99;
+  --brand-1100: #2e5d87;
+  --brand-dark-blue: #183d64;
 
-  --color-accent: oklch(75% 0.18 50);
-  --color-success: oklch(65% 0.17 145);
-  --color-warning: oklch(78% 0.15 80);
-  --color-danger: oklch(60% 0.22 25);
+  --gray-100: #8698a8;
+  --gray-200: #6a7e91;
+  --gray-300: #4d6177;
+  --gray-400: #334a64;
+  --gray-500: #13324f;
+  --gray-600: #001d3d;
+  --gray-700: #001a37;
+  --gray-800: #00142b;
+  --gray-900: #000f1f;
+  --gray-1000: #000912;
+  --gray-1100: #000306;
+
+  --green-100: #e4fdf4;
+  --green-200: #d0f8ec;
+  --green-300: #bcf4e3;
+  --green-400: #a1efd7;
+  --green-500: #93edd1;
+  --green-600: #78e8c6;
+  --green-700: #64d1b0;
+  --green-800: #52ba9a;
+  --green-900: #3aa284;
+  --green-1000: #238b6b;
+  --green-1100: #1a7a5c;
+
+  --magenta-100: #fbe9f7;
+  --magenta-200: #f8d8f1;
+  --magenta-300: #f4bee8;
+  --magenta-400: #efa3df;
+  --magenta-500: #ec92d9;
+  --magenta-600: #e878d0;
+  --magenta-700: #cb4ea3;
+  --magenta-800: #bd3893;
+  --magenta-900: #a22f7d;
+  --magenta-1000: #872869;
+  --magenta-1100: #62194b;
+
+  --red-100: #f9e6e7;
+  --red-200: #f3cdce;
+  --red-300: #eeb5b6;
+  --red-400: #e89c9d;
+  --red-500: #e28385;
+  --red-600: #dc6a6c;
+  --red-700: #d65053;
+  --red-800: #c22e30;
+  --red-900: #952325;
+  --red-1000: #67181a;
+  --red-1100: #3a0e0e;
+
+  --yellow-100: #fff8e3;
+  --yellow-200: #ffefba;
+  --yellow-300: #ffe58f;
+  --yellow-400: #ffdc68;
+  --yellow-500: #ffd035;
+  --yellow-600: #ffc403;
+  --yellow-700: #e8b307;
+  --yellow-800: #d1a102;
+  --yellow-900: #b88c02;
+  --yellow-1000: #9c7800;
+  --yellow-1100: #856704;
+
+  --black: #000000;
+  --white: #ffffff;
+
+  /* ── Color / Semantic (light = Figma Mode 1) ────────────────────── */
+  --background-active: var(--beige-900);
+  /* "Alt Negative" — added to Figma after the rest of this file was built
+     from its Foundations page; confirmed directly from the user reading
+     the real variable values off the Figma variables panel. */
+  --background-alt-negative: var(--magenta-100);
+  --background-alt-negative-base: var(--magenta-700);
+  --background-brand-base: var(--brand-700);
+  --background-brand-subdued: var(--brand-100);
+  --background-default: var(--beige-100);
+  /* Always the opposite of the current scheme's default background —
+     for components like Tooltip that stay visually "inverted"
+     regardless of light/dark mode. Confirmed from Figma's Foundations
+     semantic doc table (Background/Default Inverse). */
+  --background-default-inverse: var(--gray-600);
+  --background-disabled: var(--beige-600);
+  --background-element: var(--beige-700);
+  --background-hover: var(--beige-800);
+  --background-negative: var(--red-100);
+  --background-negative-base: var(--red-700);
+  --background-notice: var(--yellow-100);
+  --background-notice-base: var(--yellow-700);
+  --background-positive: var(--green-100);
+  --background-positive-base: var(--green-700);
+  --background-secondary: var(--beige-400);
+  --background-selected: var(--brand-100);
+
+  --border-alt-negative: var(--magenta-700);
+  --border-base: var(--beige-900);
+  --border-brand: var(--brand-700);
+  --border-disabled: var(--beige-700);
+  --border-emphasis: var(--beige-1000);
+  --border-negative: var(--red-700);
+  --border-notice: var(--yellow-700);
+  --border-positive: var(--green-700);
+  --border-subtle: var(--beige-800);
+
+  --content-alt-negative: var(--magenta-1000);
+  --content-base: var(--gray-500);
+  --content-base-inverse: var(--brand-100);
+  --content-brand-inverse: var(--brand-100);
+  --content-brand-primary: var(--brand-1100);
+  --content-disabled: var(--gray-100);
+  --content-emphasis: var(--gray-1100);
+  --content-emphasis-inverse: var(--white);
+  --content-info: var(--brand-1100);
+  --content-link-active: var(--brand-1100);
+  --content-link-default: var(--brand-900);
+  --content-link-hover: var(--brand-1000);
+  --content-negative: var(--red-1000);
+  --content-notice: var(--yellow-1100);
+  --content-placeholder: var(--beige-1100);
+  --content-positive: var(--green-1100);
+  --content-subtle: var(--gray-200);
+  --content-subtle-inverse: var(--gray-100);
+
+  /* Button/Accent/* corrected to the Green ramp — the Foundations doc page
+     lists Yellow, but the live Button component in Figma is bound to Green.
+     Dark values below are confirmed from the same doc table (Mode 2). */
+  --button-accent-active: var(--green-700);
+  --button-accent-content: var(--gray-600);
+  --button-accent-default: var(--green-600);
+  --button-accent-hover: var(--green-500);
+  --button-destructive-active: var(--red-900);
+  --button-destructive-default: var(--red-700);
+  --button-destructive-hover: var(--red-800);
+  --button-disabled: var(--beige-800);
+  --button-primary-active: var(--brand-1000);
+  --button-primary-default: var(--brand-dark-blue);
+  --button-primary-hover: var(--brand-1100);
+
+  --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
+  --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);
+  --overlay-inverse-50: color-mix(in srgb, var(--beige-100) 50%, transparent);
 
   /* ── Spacing (4px scale) ─────────────────────────────────────────── */
+  /* --space-0 is a half-step below the scale proper — confirmed from
+     Figma's "space/2xs" (2px), used to nudge a small control (e.g.
+     Checkbox/Radio's box) to align with one line of a taller multi-line
+     label, rather than every other spacing need in this file. */
+  --space-0: 0.125rem;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -41,17 +198,74 @@
   --radius-xl: 1rem;
   --radius-full: 9999px;
 
-  /* ── Typography ──────────────────────────────────────────────────── */
+  /* ── Typography / Primitive ─────────────────────────────────────── */
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+
+  --tracking-tight: 0;
+  --tracking-sm: 0.5px;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
+  --text-l: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.5rem;
+  --text-4xl: 3rem;
+  --text-5xl: 3.75rem;
+
+  --leading-xs: 0.75rem;
+  --leading-sm: 1rem;
+  --leading-md: 1.25rem;
+  --leading-lg: 1.5rem;
+  --leading-xl: 1.75rem;
+  --leading-2xl: 2.25rem;
+  --leading-3xl: 2.75rem;
+  --leading-4xl: 3rem;
+  --leading-5xl: 3.75rem;
+
+  /* ── Typography / Semantic ──────────────────────────────────────── */
+  /* Composite text styles, one per Figma text style. Consume both halves:
+     font: var(--type-x); letter-spacing: var(--type-x-tracking); */
+  --type-heading-5xl: var(--font-weight-medium) var(--text-5xl) / var(--leading-5xl) var(--font-sans);
+  --type-heading-5xl-tracking: var(--tracking-tight);
+  --type-heading-4xl: var(--font-weight-medium) var(--text-4xl) / var(--leading-4xl) var(--font-sans);
+  --type-heading-4xl-tracking: var(--tracking-tight);
+  --type-heading-3xl: var(--font-weight-medium) var(--text-3xl) / var(--leading-3xl) var(--font-sans);
+  --type-heading-3xl-tracking: var(--tracking-tight);
+  --type-heading-2xl: var(--font-weight-medium) var(--text-2xl) / var(--leading-2xl) var(--font-sans);
+  --type-heading-2xl-tracking: var(--tracking-tight);
+  --type-heading-xl: var(--font-weight-medium) var(--text-xl) / var(--leading-xl) var(--font-sans);
+  --type-heading-xl-tracking: var(--tracking-tight);
+  --type-heading-l: var(--font-weight-medium) var(--text-l) / var(--leading-lg) var(--font-sans);
+  --type-heading-l-tracking: var(--tracking-tight);
+  --type-heading-m: var(--font-weight-medium) var(--text-base) / var(--leading-md) var(--font-sans);
+  --type-heading-m-tracking: var(--tracking-tight);
+  --type-heading-s: var(--font-weight-medium) var(--text-sm) / var(--leading-sm) var(--font-sans);
+  --type-heading-s-tracking: var(--tracking-tight);
+  --type-heading-xs: var(--font-weight-medium) var(--text-xs) / var(--leading-xs) var(--font-sans);
+  --type-heading-xs-tracking: var(--tracking-tight);
+
+  --type-paragraph-l-medium: var(--font-weight-medium) var(--text-l) / var(--leading-lg) var(--font-sans);
+  --type-paragraph-l-medium-tracking: var(--tracking-sm);
+  --type-paragraph-l-regular: var(--font-weight-regular) var(--text-l) / var(--leading-lg) var(--font-sans);
+  --type-paragraph-l-regular-tracking: var(--tracking-sm);
+  --type-paragraph-m-medium: var(--font-weight-medium) var(--text-base) / var(--leading-lg) var(--font-sans);
+  --type-paragraph-m-medium-tracking: var(--tracking-sm);
+  --type-paragraph-m-regular: var(--font-weight-regular) var(--text-base) / var(--leading-lg) var(--font-sans);
+  --type-paragraph-m-regular-tracking: var(--tracking-sm);
+  --type-paragraph-s-medium: var(--font-weight-medium) var(--text-sm) / var(--leading-md) var(--font-sans);
+  --type-paragraph-s-medium-tracking: var(--tracking-sm);
+  --type-paragraph-s-regular: var(--font-weight-regular) var(--text-sm) / var(--leading-md) var(--font-sans);
+  --type-paragraph-s-regular-tracking: var(--tracking-sm);
+  --type-paragraph-xs-medium: var(--font-weight-medium) var(--text-xs) / var(--leading-sm) var(--font-sans);
+  --type-paragraph-xs-medium-tracking: var(--tracking-sm);
+  --type-paragraph-xs-regular: var(--font-weight-regular) var(--text-xs) / var(--leading-sm) var(--font-sans);
+  --type-paragraph-xs-regular-tracking: var(--tracking-sm);
 
   /* ── Motion ──────────────────────────────────────────────────────── */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -67,9 +281,207 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: oklch(15% 0.01 270);
-    --color-fg: oklch(95% 0.01 270);
-    --color-muted: oklch(60% 0.02 270);
-    --color-border: oklch(25% 0.02 270);
+    /* ── Color / Semantic (dark = Figma Mode 2) ─────────────────────── */
+    --background-active: var(--gray-300);
+    --background-alt-negative: var(--magenta-1000);
+    --background-alt-negative-base: var(--magenta-500);
+    --background-brand-base: var(--brand-500);
+    --background-brand-subdued: var(--brand-1100);
+    --background-default: var(--gray-600);
+    --background-default-inverse: var(--beige-100);
+    --background-disabled: var(--gray-700);
+    --background-element: var(--gray-500);
+    --background-hover: var(--gray-400);
+    --background-negative: var(--red-1100);
+    --background-negative-base: var(--red-500);
+    --background-notice: var(--yellow-1100);
+    --background-notice-base: var(--yellow-500);
+    --background-positive: var(--green-1100);
+    --background-positive-base: var(--green-500);
+    --background-secondary: var(--gray-500);
+    --background-selected: var(--brand-1100);
+
+    --border-alt-negative: var(--magenta-500);
+    --border-base: var(--gray-200);
+    --border-brand: var(--brand-500);
+    --border-disabled: var(--gray-400);
+    --border-emphasis: var(--gray-100);
+    --border-negative: var(--red-500);
+    --border-notice: var(--yellow-500);
+    --border-positive: var(--green-500);
+    --border-subtle: var(--gray-300);
+
+    --content-alt-negative: var(--magenta-100);
+    --content-base: var(--brand-100);
+    --content-base-inverse: var(--gray-600);
+    --content-brand-inverse: var(--brand-1100);
+    --content-brand-primary: var(--brand-200);
+    --content-disabled: var(--gray-200);
+    --content-emphasis: var(--white);
+    --content-emphasis-inverse: var(--gray-1100);
+    --content-info: var(--brand-200);
+    --content-link-active: var(--brand-100);
+    --content-link-default: var(--brand-300);
+    --content-link-hover: var(--brand-200);
+    --content-negative: var(--red-100);
+    --content-notice: var(--yellow-100);
+    --content-placeholder: var(--gray-100);
+    --content-positive: var(--green-100);
+    --content-subtle: var(--gray-100);
+    --content-subtle-inverse: var(--gray-200);
+
+    --button-accent-active: var(--green-300);
+    --button-accent-content: var(--brand-dark-blue);
+    --button-accent-default: var(--green-500);
+    --button-accent-hover: var(--green-500);
+    --button-destructive-active: var(--red-300);
+    --button-destructive-default: var(--red-500);
+    --button-destructive-hover: var(--red-400);
+    --button-disabled: var(--gray-300);
+    --button-primary-active: var(--brand-600);
+    --button-primary-default: var(--brand-400);
+    --button-primary-hover: var(--brand-500);
+
+    --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
+    --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);
+    --overlay-inverse-50: color-mix(in srgb, var(--beige-100) 50%, transparent);
   }
+}
+
+/* ── Manual theme override ──────────────────────────────────────────────
+ * Same Mode 1 / Mode 2 semantic values as above, scoped to an explicit
+ * [data-theme] attribute instead of the OS-level media query — lets a
+ * container force light or dark regardless of system preference (used by
+ * Storybook's side-by-side light/dark preview).
+ */
+[data-theme="light"] {
+  --background-active: var(--beige-900);
+  --background-alt-negative: var(--magenta-100);
+  --background-alt-negative-base: var(--magenta-700);
+  --background-brand-base: var(--brand-700);
+  --background-brand-subdued: var(--brand-100);
+  --background-default: var(--beige-100);
+  --background-default-inverse: var(--gray-600);
+  --background-disabled: var(--beige-600);
+  --background-element: var(--beige-700);
+  --background-hover: var(--beige-800);
+  --background-negative: var(--red-100);
+  --background-negative-base: var(--red-700);
+  --background-notice: var(--yellow-100);
+  --background-notice-base: var(--yellow-700);
+  --background-positive: var(--green-100);
+  --background-positive-base: var(--green-700);
+  --background-secondary: var(--beige-400);
+  --background-selected: var(--brand-100);
+
+  --border-alt-negative: var(--magenta-700);
+  --border-base: var(--beige-900);
+  --border-brand: var(--brand-700);
+  --border-disabled: var(--beige-700);
+  --border-emphasis: var(--beige-1000);
+  --border-negative: var(--red-700);
+  --border-notice: var(--yellow-700);
+  --border-positive: var(--green-700);
+  --border-subtle: var(--beige-800);
+
+  --content-alt-negative: var(--magenta-1000);
+  --content-base: var(--gray-500);
+  --content-base-inverse: var(--brand-100);
+  --content-brand-inverse: var(--brand-100);
+  --content-brand-primary: var(--brand-1100);
+  --content-disabled: var(--gray-100);
+  --content-emphasis: var(--gray-1100);
+  --content-emphasis-inverse: var(--white);
+  --content-info: var(--brand-1100);
+  --content-link-active: var(--brand-1100);
+  --content-link-default: var(--brand-900);
+  --content-link-hover: var(--brand-1000);
+  --content-negative: var(--red-1000);
+  --content-notice: var(--yellow-1100);
+  --content-placeholder: var(--beige-1100);
+  --content-positive: var(--green-1100);
+  --content-subtle: var(--gray-200);
+  --content-subtle-inverse: var(--gray-100);
+
+  --button-accent-active: var(--green-700);
+  --button-accent-content: var(--gray-600);
+  --button-accent-default: var(--green-600);
+  --button-accent-hover: var(--green-500);
+  --button-destructive-active: var(--red-900);
+  --button-destructive-default: var(--red-700);
+  --button-destructive-hover: var(--red-800);
+  --button-disabled: var(--beige-800);
+  --button-primary-active: var(--brand-1000);
+  --button-primary-default: var(--brand-dark-blue);
+  --button-primary-hover: var(--brand-1100);
+
+  --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
+  --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);
+  --overlay-inverse-50: color-mix(in srgb, var(--beige-100) 50%, transparent);
+}
+
+[data-theme="dark"] {
+  --background-active: var(--gray-300);
+  --background-alt-negative: var(--magenta-1000);
+  --background-alt-negative-base: var(--magenta-500);
+  --background-brand-base: var(--brand-500);
+  --background-brand-subdued: var(--brand-1100);
+  --background-default: var(--gray-600);
+  --background-default-inverse: var(--beige-100);
+  --background-disabled: var(--gray-700);
+  --background-element: var(--gray-500);
+  --background-hover: var(--gray-400);
+  --background-negative: var(--red-1100);
+  --background-negative-base: var(--red-500);
+  --background-notice: var(--yellow-1100);
+  --background-notice-base: var(--yellow-500);
+  --background-positive: var(--green-1100);
+  --background-positive-base: var(--green-500);
+  --background-secondary: var(--gray-500);
+  --background-selected: var(--brand-1100);
+
+  --border-alt-negative: var(--magenta-500);
+  --border-base: var(--gray-200);
+  --border-brand: var(--brand-500);
+  --border-disabled: var(--gray-400);
+  --border-emphasis: var(--gray-100);
+  --border-negative: var(--red-500);
+  --border-notice: var(--yellow-500);
+  --border-positive: var(--green-500);
+  --border-subtle: var(--gray-300);
+
+  --content-alt-negative: var(--magenta-100);
+  --content-base: var(--brand-100);
+  --content-base-inverse: var(--gray-600);
+  --content-brand-inverse: var(--brand-1100);
+  --content-brand-primary: var(--brand-200);
+  --content-disabled: var(--gray-200);
+  --content-emphasis: var(--white);
+  --content-emphasis-inverse: var(--gray-1100);
+  --content-info: var(--brand-200);
+  --content-link-active: var(--brand-100);
+  --content-link-default: var(--brand-300);
+  --content-link-hover: var(--brand-200);
+  --content-negative: var(--red-100);
+  --content-notice: var(--yellow-100);
+  --content-placeholder: var(--gray-100);
+  --content-positive: var(--green-100);
+  --content-subtle: var(--gray-100);
+  --content-subtle-inverse: var(--gray-200);
+
+  --button-accent-active: var(--green-300);
+  --button-accent-content: var(--brand-dark-blue);
+  --button-accent-default: var(--green-500);
+  --button-accent-hover: var(--green-500);
+  --button-destructive-active: var(--red-300);
+  --button-destructive-default: var(--red-500);
+  --button-destructive-hover: var(--red-400);
+  --button-disabled: var(--gray-300);
+  --button-primary-active: var(--brand-600);
+  --button-primary-default: var(--brand-400);
+  --button-primary-hover: var(--brand-500);
+
+  --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
+  --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);
+  --overlay-inverse-50: color-mix(in srgb, var(--beige-100) 50%, transparent);
 }

@@ -1,0 +1,275 @@
+/*
+ * SearchInput styles — pure token-driven CSS. The field itself mirrors
+ * <TextInput>'s exact anatomy at every size (confirmed size-for-size
+ * against Figma's own Search Input, not assumed) — duplicated under this
+ * component's own class names rather than imported, same as <Textarea>'s
+ * relationship to <TextInput>. The listbox mirrors <DropdownMenu>'s
+ * confirmed Dropdown/Dropdown Option styling for the same reason.
+ */
+
+.ds-search-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.ds-search-input__label {
+  color: var(--content-emphasis);
+}
+
+.ds-search-input:has(.ds-search-input__control:disabled) .ds-search-input__label {
+  color: var(--content-disabled);
+}
+
+/* Anchors the listbox to the field specifically, not the label/help text. */
+.ds-search-input__anchor {
+  position: relative;
+  width: 100%;
+}
+
+.ds-search-input__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  border: 1px solid transparent;
+  background: var(--background-element);
+  color: var(--content-subtle);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-search-input__field:hover:not(:focus-within):not(.ds-search-input__field--error):not(.ds-search-input__field--success):not(:has(:disabled)) {
+  background: var(--background-hover);
+}
+
+.ds-search-input__field:focus-within {
+  background: var(--background-default);
+  border-color: var(--border-brand);
+  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+}
+
+.ds-search-input__field:has(:disabled) {
+  background: var(--background-secondary);
+}
+
+.ds-search-input__field--error {
+  background: var(--background-default);
+  border-color: var(--border-negative);
+  box-shadow: 0 0 0 2px var(--background-negative);
+}
+.ds-search-input__field--error:focus-within {
+  border-color: var(--border-negative);
+  box-shadow: 0 0 0 2px var(--background-negative);
+}
+
+.ds-search-input__field--success {
+  background: var(--background-default);
+  border-color: var(--border-positive);
+  box-shadow: 0 0 0 2px var(--background-positive);
+}
+.ds-search-input__field--success:focus-within {
+  border-color: var(--border-positive);
+  box-shadow: 0 0 0 2px var(--background-positive);
+}
+
+.ds-search-input__control {
+  flex: 1 0 0;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  color: var(--content-base);
+}
+
+.ds-search-input__control::placeholder {
+  color: var(--content-placeholder);
+}
+
+.ds-search-input__control:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-search-input__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Shares .ds-search-input__icon's per-size svg sizing below — it's the
+   trailing-icon slot Figma's own field anatomy already reserves, just put
+   to use as a clear button instead of left empty. */
+.ds-search-input__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--content-subtle);
+  cursor: pointer;
+}
+.ds-search-input__clear:hover {
+  color: var(--content-base);
+}
+
+.ds-search-input__help {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--content-subtle);
+}
+.ds-search-input__help--error {
+  color: var(--content-negative);
+}
+.ds-search-input__help--success {
+  color: var(--content-positive);
+}
+
+/* ── Listbox ───────────────────────────────────────────────────────── */
+
+.ds-search-input__listbox {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  width: 100%;
+  max-height: 14rem;
+  overflow-y: auto;
+  background: var(--background-default);
+  border: 1px solid var(--border-brand);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+}
+
+.ds-search-input__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  color: var(--content-base);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-search-input__option--highlighted {
+  background: var(--background-selected);
+}
+
+.ds-search-input__option--disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-search-input__option-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ds-search-input__option-label {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-search-input--lg .ds-search-input__label {
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+}
+.ds-search-input--lg .ds-search-input__field {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+}
+.ds-search-input--lg .ds-search-input__control {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+.ds-search-input--lg .ds-search-input__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-search-input--lg .ds-search-input__icon svg,
+.ds-search-input--lg .ds-search-input__clear svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.ds-search-input--lg .ds-search-input__option {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+
+.ds-search-input--md .ds-search-input__label {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+}
+.ds-search-input--md .ds-search-input__field {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+.ds-search-input--md .ds-search-input__control {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-search-input--md .ds-search-input__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-search-input--md .ds-search-input__icon svg,
+.ds-search-input--md .ds-search-input__clear svg {
+  width: 1rem;
+  height: 1rem;
+}
+.ds-search-input--md .ds-search-input__option {
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+
+.ds-search-input--sm .ds-search-input__label {
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+}
+.ds-search-input--sm .ds-search-input__field {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.ds-search-input--sm .ds-search-input__control {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-search-input--sm .ds-search-input__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-search-input--sm .ds-search-input__icon svg,
+.ds-search-input--sm .ds-search-input__clear svg {
+  width: 1rem;
+  height: 1rem;
+}
+.ds-search-input--sm .ds-search-input__option {
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}

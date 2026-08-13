@@ -1,0 +1,81 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as MobileNavStories from "./MobileNav.stories";
+
+<Meta of={MobileNavStories} />
+
+# MobileNav
+
+The mobile counterpart to `<Navigation>` — matches Figma's MobileNav exactly: a persistent compact top bar that expands into a full nav panel. Expanded, it's nearly identical to `<Navigation>` itself — same background/shadow, same `<NavSection>`/`<NavItem>`/`<NavUser>` components, same account `<DropdownMenu>`. The one real difference is the head's collapse arrow becomes an **×** — a full close, not a shrink-to-icon-rail, since a mobile drawer has no collapsed-but-still-visible state to shrink into.
+
+<Canvas of={MobileNavStories.Default} />
+
+## When to use
+
+- The mobile/narrow-viewport counterpart to `<Navigation>`, in a responsive layout that swaps between a sidebar and a top bar + drawer depending on screen size.
+
+## One nav definition, two components
+
+`children` takes the *exact same* `<NavSection>`/`<NavItem>`/`<NavUser>` tree you'd pass to `<Navigation>` — not an approximation of it, the identical elements:
+
+```tsx
+import { MobileNav, NavItem, NavSection, NavUser, DropdownMenuItem } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<MobileNav name="Matthew Wager" accountMenu={<>
+  <DropdownMenuItem>Profile</DropdownMenuItem>
+  <DropdownMenuItem>Sign out</DropdownMenuItem>
+</>}>
+  <NavSection grow>
+    <NavItem icon={<SquareCheckBig size={24} />} href="#tasks">Tasks</NavItem>
+    <NavItem icon={<Receipt size={24} />} href="#accruals" selected>Accruals</NavItem>
+  </NavSection>
+  <NavSection>
+    <NavUser name="Matthew Wager">
+      <DropdownMenuItem>Profile</DropdownMenuItem>
+      <DropdownMenuItem>Sign out</DropdownMenuItem>
+    </NavUser>
+    <NavItem icon={<Settings size={24} />}>Settings</NavItem>
+  </NavSection>
+</MobileNav>
+```
+
+This works because MobileNav's expanded panel provides the same `expanded: true` context `<Navigation>` does — `<NavItem>`/`<NavSection>`/`<NavUser>` don't know or care which one they're rendered inside. None of their CSS is duplicated here either; it's `<Navigation>`'s own `.ds-nav-item`/`.ds-nav-user` styles, reused directly.
+
+## The account dropdown
+
+Tapping the chevron in `<NavUser>` opens a real `<DropdownMenu>` — exactly as it does on desktop, not an inline disclosure. The collapsed bar's own avatar opens the same menu content, via a separate `accountMenu` prop: the bar can't reach into `children` to reuse the `<NavUser>` instance buried inside it, so this is typically the same `<DropdownMenuItem>`s repeated in both places.
+
+<Canvas of={MobileNavStories.Expanded} />
+
+Omit `accountMenu` for a plain, non-interactive avatar in the collapsed bar (the account section inside `children` still works normally, if you include one):
+
+<Canvas of={MobileNavStories.WithoutAccountMenu} />
+
+## Closing
+
+Four ways, deliberately overlapping with how `<Navigation>`'s own collapsed rail expands and how a mobile drawer is expected to behave:
+
+- The **×** button.
+- Tapping the wordmark — mirroring how tapping the logomark is also how `<Navigation>`'s collapsed rail re-expands itself.
+- **Escape**.
+- **Picking any real nav destination** — a `<NavItem>` link, a sub-item, a `<DropdownMenuItem>` in the account menu. This isn't wired per-item; a single delegated click handler on the panel closes it whenever the clicked element is a real `<a>`/`<button>` *without* `aria-expanded` — which is exactly what excludes the two things that shouldn't close it (`<NavItem>`'s own sub-menu toggle, and `<NavUser>`'s dropdown trigger) while still catching every actual destination.
+
+## Behavior
+
+- **Portaled** to `document.body` and `position: fixed`, so the expanded panel always covers the full viewport regardless of where `<MobileNav>` is mounted — the same reasoning `<Modal>` portals for.
+- **Background scroll locks** while the panel is open, and unlocks when it closes.
+- **Focus moves into the panel** on open and **is trapped there** (Tab/Shift+Tab cycle within it) until it closes, returning focus to whatever opened it afterward.
+- **Transition** mirrors `<Navigation>`'s own collapse/expand animation: a single dimension (there, rail `width`; here, panel `height`) animating with the same duration/easing tokens, growing from the collapsed edge — a sidebar grows wider from its collapsed rail, this panel grows downward from the bar.
+
+## Controlled vs. uncontrolled
+
+`defaultExpanded` (default `false`) for an uncontrolled MobileNav that manages its own open state. Pass `expanded`/`onExpandedChange` together if something else needs to know or control whether it's open.
+
+## Accessibility
+
+- The panel is `role="dialog"` with `aria-modal="true"` and `aria-label="Navigation"`.
+- The logomark button, wordmark button, close button, and account-menu avatar all have real `aria-label`s, since none has visible text of its own to announce otherwise.
+
+## Props
+
+`children` (required), `name` (required), `avatarSrc`, `initials`, `accountMenu`, `onNotificationsClick`, `expanded`, `defaultExpanded` (default `false`), `onExpandedChange`, `className`.

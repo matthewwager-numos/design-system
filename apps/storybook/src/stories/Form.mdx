@@ -1,0 +1,82 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as FormStories from "./Form.stories";
+
+<Meta of={FormStories} />
+
+# Form
+
+A card-like container for a `<FormHeader>`, `<FormBody>`, and `<FormFooter>` — the shell Figma composes around `<TextInput>`, `<Select>`, `<CheckboxGroup>`, `<RadioGroup>`, `<SegmentedControl>`, and `<Toggle>`. `<Form>` itself renders a real `<form>`: Enter-to-submit and native `FormData` collection on submit, since everything it's meant to contain is a real form control.
+
+## When to use
+
+- A self-contained set of fields with a clear title and a Cancel/Submit-style action pair — a "New project" dialog, a settings panel, a create/edit form.
+
+## When NOT to use
+
+- For a single field inline in a page (not in its own card) — just use the field component directly (`<TextInput>`, `<Select>`, etc.) without wrapping it in `<Form>`.
+
+## Implementation
+
+```tsx
+import {
+  Form, FormHeader, FormBody, FormFooter,
+  TextInput, Select, ButtonGroup, Button,
+} from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+function handleSubmit(event) {
+  event.preventDefault();
+  const data = new FormData(event.currentTarget);
+  // ...
+}
+
+<Form onSubmit={handleSubmit}>
+  <FormHeader>New project</FormHeader>
+  <FormBody>
+    <TextInput name="name" label="Name" size="md" />
+  </FormBody>
+  <FormFooter>
+    <ButtonGroup>
+      <Button variant="secondary" type="button">Cancel</Button>
+      <Button variant="primary" type="submit">Submit</Button>
+    </ButtonGroup>
+  </FormFooter>
+</Form>
+```
+
+Fill in the fields and hit Submit below — it's a real, live `<form>`, not a screenshot; the panel underneath shows the actual `FormData` collected.
+
+<Canvas of={FormStories.Default} />
+
+## Fields participate for real
+
+Every field in the example above is (or renders) a real native input, so it shows up in `FormData` on submit with no extra wiring:
+
+- `<TextInput>` / `<Textarea>` — real `<input>`/`<textarea>`.
+- `<Select>` — a hidden `<input type="hidden" name={name}>` tracks the chosen value.
+- `<Checkbox>` / `<Radio>` — real `<input type="checkbox">`/`<input type="radio">`; give same-`name` checkboxes different `value`s to collect them all under one key.
+- `<SegmentedControl name="...">` — same hidden-input pattern as `<Select>`.
+- `<Toggle>` — real `<input type="checkbox" role="switch">`.
+
+## FormHeader
+
+`children` is the title; `actions` is a trailing row of icon buttons (Figma's example: a close button) — pass your own, styled however fits your use case, same as `<Header>`'s `titleActions`.
+
+## FormFooter
+
+`children` is the main (usually right-aligned) actions — typically a `<ButtonGroup>`. `secondaryAction` is a separate, left-aligned slot for something that shouldn't be grouped with Cancel/Submit — Figma's own example uses a `<Button variant="link">` there ("Reset").
+
+## Without header actions
+
+`actions` and `secondaryAction` are both optional:
+
+<Canvas of={FormStories.TitleOnly} />
+
+## Accessibility
+
+- `<Form>` is a real `<form>` — submitting via Enter in a text field works the way it would in any native form.
+- Every field keeps its own accessibility behavior (labels, `aria-invalid`, fieldset/legend grouping) — `<Form>` doesn't add or override any of it.
+
+## Props
+
+`<Form>`: any native `<form>` prop (`onSubmit`, etc.). `<FormHeader>`: `children` (title, required), `actions`. `<FormBody>`: any native `<div>` prop. `<FormFooter>`: `secondaryAction`, `children` (required).

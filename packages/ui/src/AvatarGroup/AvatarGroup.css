@@ -1,0 +1,21 @@
+/*
+ * AvatarGroup styles — layout only. Avatar's own box-shadow ring (matching
+ * its background) is what creates the visible seam between overlapping
+ * avatars — nothing extra needed here for that.
+ */
+
+.ds-avatar-group {
+  display: flex;
+}
+
+.ds-avatar-group--horizontal {
+  flex-direction: row;
+}
+
+.ds-avatar-group--vertical {
+  flex-direction: column;
+}
+
+.ds-avatar-group__item {
+  display: inline-flex;
+}

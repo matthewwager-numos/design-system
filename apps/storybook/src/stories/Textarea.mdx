@@ -1,0 +1,63 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as TextareaStories from "./Textarea.stories";
+
+<Meta of={TextareaStories} />
+
+# Textarea
+
+A labeled multi-line text field — `<TextInput>`'s structure and token scale, unchanged, with a `<textarea>` in place of the `<input>`. Confirmed directly against Figma: Textarea's `L` size uses the exact same padding, radius, and type tokens as `TextInput`'s `lg`, so this mirrors it rather than inventing a parallel scale.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Free-form text longer than a single line — a description, a comment, notes.
+
+## When NOT to use
+
+- For a single line of text — use `<TextInput>`.
+
+## Implementation
+
+```tsx
+import { Textarea } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Textarea label="Description" placeholder="What's this project about?" />
+```
+
+Figma's Hover/Focus/Filled/Disabled "states" aren't separate props — they're real `:hover`, `:focus-within`, `::placeholder`, and `:has(:disabled)` behavior, same as `<TextInput>`. Only validation state (`status`) is a prop.
+
+<Canvas of={TextareaStories.Default} />
+
+## Sizes
+
+`size`: `"sm" | "md" | "lg"` (defaults to `"lg"`) — the same three steps as `<TextInput>`.
+
+<Canvas of={TextareaStories.Sizes} />
+
+## Validation
+
+`status`: `"default" | "error" | "success"`, same as `<TextInput>` — also styles `helpText` and adds its icon.
+
+<Canvas of={TextareaStories.ErrorState} />
+<Canvas of={TextareaStories.SuccessState} />
+
+## Disabled
+
+<Canvas of={TextareaStories.Disabled} />
+
+## Resizing
+
+The control resizes vertically (`resize: vertical`) by default, and not at all while disabled. `rows` defaults to `3`.
+
+## Accessibility
+
+- `label` renders as a real `<label htmlFor>`.
+- `status="error"` sets `aria-invalid` on the textarea.
+
+## Props
+
+`label`, `helpText`, `status`, `size`, `leadingIcon`, `trailingIcon`, plus any native `<textarea>` prop.

@@ -1,0 +1,85 @@
+/*
+ * Badge styles — pure token-driven CSS. No hard-coded colors or sizes.
+ * Update tokens.css to restyle every Badge in every app.
+ */
+
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-xs);
+  line-height: var(--leading-sm);
+  letter-spacing: var(--tracking-sm);
+  white-space: nowrap;
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-badge--sm {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.ds-badge--md {
+  min-width: 1rem;
+  height: 1rem;
+  padding: var(--space-1);
+}
+
+.ds-badge--lg {
+  min-width: 1.5rem;
+  padding: var(--space-1) var(--space-2);
+}
+
+/* ── Status colors ─────────────────────────────────────────────────── */
+
+.ds-badge--neutral {
+  background: var(--background-element);
+  color: var(--content-placeholder);
+}
+
+.ds-badge--positive,
+.ds-badge--complete {
+  background: var(--background-positive-base);
+  color: var(--background-positive);
+}
+
+.ds-badge--negative,
+.ds-badge--error {
+  background: var(--background-negative-base);
+  color: var(--background-negative);
+}
+
+.ds-badge--notice {
+  background: var(--background-notice-base);
+  color: var(--background-notice);
+}
+
+.ds-badge--info {
+  background: var(--content-info);
+  color: var(--content-brand-inverse);
+}
+
+/* ── Icon (Complete/Error) ─────────────────────────────────────────── */
+/* Fixed square + border-radius:full = a true circle — overriding the size
+   classes above, which use min-width + asymmetric padding sized for text
+   content (a count badge like "12" should be a pill, not forced square).
+   An icon-only badge has no text to size around, so it should always be a
+   circle regardless of `size`, matching Figma (which only ever shows
+   Complete/Error at one fixed circular size). */
+.ds-badge--complete,
+.ds-badge--error {
+  width: 1.5rem;
+  height: 1.5rem;
+  min-width: 0;
+  padding: 0;
+}
+
+.ds-badge__icon svg {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}

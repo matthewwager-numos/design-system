@@ -1,0 +1,102 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as WizardStories from "./Wizard.stories";
+
+<Meta of={WizardStories} />
+
+# Wizard
+
+A multi-step "create object" flow — a persistent header (flow title, a step-panel toggle, an optional "Save & Exit", and a progress bar), a step panel (a vertical `<ProgressIndicator>`) beside the current step's heading and fields, and a footer that navigates Back/Continue/Finish. Matches Figma's Wizard exactly — `WizardHeader`, `StepPanel`, `WizardStepHeading`, and `FormFooter` are all real pieces of it, not approximated.
+
+<Primary />
+
+## When to use
+
+- Creating an object whose fields naturally group into a handful of ordered steps — onboarding a new record, a setup flow — where showing one step at a time, with a sense of overall progress, reduces how much someone has to take in at once.
+
+## When NOT to use
+
+- A short form with a handful of fields that fit comfortably on one screen — that's just `<Form>` (see its own docs), no steps needed.
+- Viewing, editing, or deleting *existing* records in bulk — that's tabular CRUD (a data table + `<Modal>`), which depends on table cell/row/column components this library doesn't have yet.
+
+## Implementation
+
+```tsx
+import { Wizard } from "@numosai/ui";
+import type { WizardStep } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+const steps: WizardStep[] = [
+  {
+    id: "details",
+    label: "Details", // shown in the step panel's progress list
+    heading: "Employee details", // shown above this step's fields
+    description: "Basic information used across the rest of the flow.",
+    content: (
+      <>
+        <TextInput name="fullName" label="Full name" required />
+        <TextInput name="email" label="Email" type="email" required />
+      </>
+    ),
+  },
+  // ...more steps
+];
+
+<Wizard
+  title="Add employee"
+  steps={steps}
+  onFinish={(event) => {
+    const data = new FormData(event.currentTarget);
+    // create the object with data
+  }}
+/>
+```
+
+`steps` is the whole outline — Wizard supplies the structure (header, progress, panel, footer navigation); you supply each step's heading, description, and fields. Adding, removing, or reordering steps needs nothing else.
+
+<Canvas of={WizardStories.Default} />
+
+Every story on this page lives inside the padded, light/dark split canvas every component gets, which caps Wizard to a fixed preview height rather than the full viewport it actually fills next to `<Navigation>`. To see it at real size, open **"Full viewport (open in new tab)"** in its own tab (the toolbar icon above its canvas) — that story opts out of the split specifically so a new tab shows Wizard filling the whole browser viewport.
+
+## One `<form>`, every step mounted
+
+`<Wizard>` renders one real `<form>`. Every step's `content` is mounted the entire time — only the current step's is visible, the rest get a `hidden` attribute instead of being unmounted. That's deliberate: an uncontrolled `<TextInput>`/`<Select>`/`<RadioGroup>`/etc. keeps whatever value someone entered once they move past its step, since it's never actually removed from the DOM. `onFinish` receives the same `<form>`'s submit event on the last step, so `new FormData(event.currentTarget)` collects every step's fields together in one read — no per-field React state required.
+
+A side effect worth knowing: the HTML spec excludes non-rendered controls (anything with a `hidden` attribute, on itself or an ancestor) from constraint validation. So a `required` field on a step you've already moved past doesn't block submitting a *later* step — but it does still block advancing past its own step, which is exactly the validation behavior a wizard wants.
+
+## The step panel
+
+The step panel shows a vertical `<ProgressIndicator>` — one entry per step, `state: "completed"` for everything before the current one — toggled open/closed by the header's leading icon button. `defaultStepPanelExpanded` sets its initial state (defaults to open); `stepPanelExpanded`/`onStepPanelExpandedChange` control it yourself if the surrounding page needs to know.
+
+<Canvas of={WizardStories.PanelCollapsedByDefault} />
+
+## Labels
+
+`nextLabel` (default "Continue") and `finishLabel` (default "Finish") — the same button, just its label and what submitting it does change on the last step.
+
+<Canvas of={WizardStories.CustomLabels} />
+
+## Save & Exit
+
+Pass `onSaveExit` to show a "Save & Exit" action in the header — omit it and the header just won't render one, the same optional-affordance pattern as `<Modal>`'s `onClose`.
+
+## Composing with app chrome
+
+Figma's Wizard sits next to `<Navigation>`, but Wizard doesn't render `<Navigation>` itself — that's ordinary page chrome the surrounding app composes around it, the same reasoning `<Header>` doesn't own `<Navigation>` either:
+
+```tsx
+<div style={{ display: "flex", height: "100vh" }}>
+  <Navigation>...</Navigation>
+  <Wizard title="Add employee" steps={steps} onFinish={handleFinish} />
+</div>
+```
+
+## Accessibility
+
+- The progress bar is a real `role="progressbar"` with `aria-valuenow`/`aria-valuemin`/`aria-valuemax` and an `aria-label` stating which step it's on.
+- The step-panel toggle is a real `<button>` with `aria-expanded` and a label that flips between "Collapse step panel"/"Expand step panel".
+
+## Props
+
+`title` (required), `steps` (required — `{ id, label, heading, description?, content }[]`), `onFinish` (required), `stepIndex`, `defaultStepIndex`, `onStepIndexChange`, `stepPanelExpanded`, `defaultStepPanelExpanded`, `onStepPanelExpandedChange`, `onSaveExit`, `secondaryAction`, `nextLabel`, `finishLabel`, `className`.
+
+<Controls />

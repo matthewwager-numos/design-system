@@ -1,0 +1,131 @@
+/*
+ * ProgressIndicator styles — pure token-driven CSS. Matches Figma's
+ * confirmed three step states (completed/default/error) and both
+ * orientations exactly, including the detail that the first step never
+ * gets a leading connector.
+ */
+
+.ds-progress-indicator {
+  display: flex;
+}
+
+.ds-progress-indicator--horizontal {
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.ds-progress-indicator--vertical {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ── Badge ─────────────────────────────────────────────────────────── */
+/* The badge's own look (circle, color, icon) is entirely <Badge>'s —
+   nothing to restyle here. This wrapper just positions the visually-hidden
+   status text next to it and keeps the badge from shrinking. */
+
+.ds-progress-badge {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+/* <Badge>'s "neutral" status (used for the numbered default step) sizes
+   itself around its text content — right for a count badge like "12", but
+   this needs every step's badge to be the same fixed circle regardless of
+   how many digits its number has, matching Figma. Scoped to this component
+   rather than changed in Badge.css, since Badge's own flexible-width
+   behavior is correct everywhere else it's used. */
+.ds-progress-indicator .ds-badge {
+  width: 1.5rem;
+  height: 1.5rem;
+  min-width: 0;
+  padding: 0;
+}
+
+/* ── Connector ─────────────────────────────────────────────────────── */
+
+.ds-progress-connector {
+  flex: 1 1 0%;
+}
+
+.ds-progress-indicator--horizontal .ds-progress-connector {
+  height: 2px;
+  min-width: 0.25rem;
+}
+
+.ds-progress-connector--vertical {
+  width: 2px;
+  min-height: 0.25rem;
+}
+
+.ds-progress-connector--completed {
+  background: var(--background-positive-base);
+}
+
+.ds-progress-connector--default {
+  background: var(--background-element);
+}
+
+.ds-progress-connector--error {
+  background: var(--background-negative-base);
+}
+
+/* ── Vertical step (track + label) ────────────────────────────────── */
+
+.ds-progress-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.ds-progress-step--grow {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
+.ds-progress-step__track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.ds-progress-step__label {
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-progress-step__label--completed {
+  color: var(--content-positive);
+}
+
+.ds-progress-step__label--default {
+  color: var(--content-placeholder);
+}
+
+.ds-progress-step__label--error {
+  color: var(--content-negative);
+}
+
+/* ── Accessibility ─────────────────────────────────────────────────── */
+
+.ds-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

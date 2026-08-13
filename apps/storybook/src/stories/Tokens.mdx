@@ -8,20 +8,166 @@ The single source of truth for color, spacing, type, radii, motion, and elevatio
 
 ## Color
 
-<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "1rem", marginTop: "1rem" }}>
+Follows Figma's own two-layer model: **Primitive** (raw ramps) → **Semantic** (aliases a primitive, and swaps to a different primitive in dark mode — toggle your OS/browser color scheme to see it). Components should only ever reach for semantic tokens; primitives exist so semantics have something to alias.
+
+### Color primitives
+
+<div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginTop: "1rem" }}>
   {[
-    "primary", "primary-fg", "primary-hover",
-    "bg", "fg", "muted", "border",
-    "accent", "success", "warning", "danger",
+    ["Beige", ["100", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1100"]],
+    ["Brand", ["100", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1100", "dark-blue"]],
+    ["Gray", ["100", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1100"]],
+    ["Green", ["100", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1100"]],
+    ["Magenta", ["100", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1100"]],
+    ["Red", ["100", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1100"]],
+    ["Yellow", ["100", "200", "300", "400", "500", "600", "700", "800", "900", "1000", "1100"]],
+    ["Defaults", ["black", "white"]],
+  ].map(([family, steps]) => (
+    <div key={family}>
+      <p style={{ fontSize: "var(--text-sm)", color: "var(--content-subtle)", margin: "0 0 0.5rem" }}>{family}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: "0.75rem" }}>
+        {steps.map((step) => {
+          const name = family === "Defaults" ? step : `${family.toLowerCase()}-${step}`;
+          return (
+            <div key={name} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontFamily: "var(--font-mono)", fontSize: "0.7rem" }}>
+              <div style={{
+                background: `var(--${name})`,
+                height: "48px",
+                borderRadius: "var(--radius-md)",
+                border: "1px solid var(--border-base)"
+              }} />
+              <span>--{name}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  ))}
+</div>
+
+### Color semantic
+
+<div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginTop: "1rem" }}>
+  {[
+    ["Background", [
+      "background-active", "background-alt-negative", "background-alt-negative-base",
+      "background-brand-base", "background-brand-subdued", "background-default",
+      "background-default-inverse",
+      "background-disabled", "background-element", "background-hover",
+      "background-negative", "background-negative-base", "background-notice",
+      "background-notice-base", "background-positive", "background-positive-base",
+      "background-secondary", "background-selected",
+    ]],
+    ["Border", [
+      "border-alt-negative", "border-base", "border-brand", "border-disabled", "border-emphasis",
+      "border-negative", "border-notice", "border-positive", "border-subtle",
+    ]],
+    ["Content", [
+      "content-alt-negative", "content-base", "content-base-inverse", "content-brand-inverse", "content-brand-primary",
+      "content-disabled", "content-emphasis", "content-emphasis-inverse", "content-info",
+      "content-link-active", "content-link-default", "content-link-hover", "content-negative",
+      "content-notice", "content-placeholder", "content-positive", "content-subtle", "content-subtle-inverse",
+    ]],
+    ["Button", [
+      "button-accent-active", "button-accent-content", "button-accent-default", "button-accent-hover",
+      "button-destructive-active", "button-destructive-default", "button-destructive-hover", "button-disabled",
+      "button-primary-active", "button-primary-default", "button-primary-hover",
+    ]],
+  ].map(([group, names]) => (
+    <div key={group}>
+      <p style={{ fontSize: "var(--text-sm)", color: "var(--content-subtle)", margin: "0 0 0.5rem" }}>{group}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "0.75rem" }}>
+        {names.map((name) => (
+          <div key={name} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontFamily: "var(--font-mono)", fontSize: "0.7rem" }}>
+            <div style={{
+              background: `var(--${name})`,
+              height: "56px",
+              borderRadius: "var(--radius-md)",
+              border: "1px solid var(--border-base)"
+            }} />
+            <span>--{name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>
+
+## Typography
+
+Same two-layer model as Color: **Primitive** (raw size/line-height/weight/tracking scale) → **Semantic** (a named text style — Heading or Paragraph — that combines several primitives). Figma's `PP Neue Montreal` typeface isn't licensed/loaded in this repo yet, so specimens below render in `--font-sans` instead — see `Button.css` for the same caveat.
+
+### Typography primitives
+
+| Token         | Value    |
+| ------------- | -------- |
+| `--text-xs`   | 0.75rem  |
+| `--text-sm`   | 0.875rem |
+| `--text-base` | 1rem     |
+| `--text-l`    | 1.25rem  |
+| `--text-xl`   | 1.5rem   |
+| `--text-2xl`  | 2rem     |
+| `--text-3xl`  | 2.5rem   |
+| `--text-4xl`  | 3rem     |
+| `--text-5xl`  | 3.75rem  |
+
+| Token           | Value   |
+| --------------- | ------- |
+| `--leading-xs`  | 0.75rem |
+| `--leading-sm`  | 1rem    |
+| `--leading-md`  | 1.25rem |
+| `--leading-lg`  | 1.5rem  |
+| `--leading-xl`  | 1.75rem |
+| `--leading-2xl` | 2.25rem |
+| `--leading-3xl` | 2.75rem |
+| `--leading-4xl` | 3rem    |
+| `--leading-5xl` | 3.75rem |
+
+| Token                   | Value |
+| ----------------------- | ----- |
+| `--font-weight-regular` | 400   |
+| `--font-weight-medium`  | 500   |
+| `--tracking-tight`      | 0     |
+| `--tracking-sm`         | 0.5px |
+
+### Typography semantic
+
+Each row applies its token as `font: var(--type-x)` plus `letter-spacing: var(--type-x-tracking)`.
+
+<div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "1rem" }}>
+  {[
+    "heading-5xl", "heading-4xl", "heading-3xl", "heading-2xl", "heading-xl",
+    "heading-l", "heading-m", "heading-s", "heading-xs",
   ].map((name) => (
-    <div key={name} style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontFamily: "var(--font-mono)", fontSize: "0.75rem" }}>
-      <div style={{
-        background: `var(--color-${name})`,
-        height: "64px",
-        borderRadius: "var(--radius-md)",
-        border: "1px solid var(--color-border)"
-      }} />
-      <span>--color-{name}</span>
+    <div key={name} style={{ display: "flex", alignItems: "baseline", gap: "1rem" }}>
+      <span style={{
+        font: `var(--type-${name})`,
+        letterSpacing: `var(--type-${name}-tracking)`,
+      }}>
+        Numos design system
+      </span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--content-subtle)", whiteSpace: "nowrap" }}>
+        --type-{name}
+      </span>
+    </div>
+  ))}
+</div>
+
+<div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "1.5rem" }}>
+  {[
+    "paragraph-l-medium", "paragraph-l-regular", "paragraph-m-medium", "paragraph-m-regular",
+    "paragraph-s-medium", "paragraph-s-regular", "paragraph-xs-medium", "paragraph-xs-regular",
+  ].map((name) => (
+    <div key={name} style={{ display: "flex", alignItems: "baseline", gap: "1rem" }}>
+      <span style={{
+        font: `var(--type-${name})`,
+        letterSpacing: `var(--type-${name}-tracking)`,
+      }}>
+        Numos design system
+      </span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--content-subtle)", whiteSpace: "nowrap" }}>
+        --type-{name}
+      </span>
     </div>
   ))}
 </div>

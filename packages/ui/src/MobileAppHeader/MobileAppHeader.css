@@ -1,0 +1,62 @@
+/*
+ * MobileAppHeader styles — pure token-driven CSS. `.ds-tab`/`.ds-tab-list`
+ * styling isn't duplicated here at all — it's `<Tabs>`'s own CSS, reused
+ * directly since this component renders the identical `<Tabs>`/`<TabList>`/
+ * `<Tab>` components. Confirmed color-for-color against a live Figma
+ * instance to already match exactly, with nothing overridden.
+ */
+
+.ds-mobile-app-header {
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  background: var(--background-default);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ds-mobile-app-header__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  /* Figma's own literal rgba() value — same subtle "raised chrome" shadow
+     already used by <MobileNav>'s collapsed bar and <Cell>'s header types. */
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.ds-mobile-app-header__title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  padding-right: var(--space-2);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.ds-mobile-app-header__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.ds-mobile-app-header__title {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-brand-primary);
+  white-space: nowrap;
+}
+
+.ds-mobile-app-header__tabs {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ds-mobile-app-header__tab-list {
+  overflow-x: auto;
+}
+
+.ds-mobile-app-header__actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}

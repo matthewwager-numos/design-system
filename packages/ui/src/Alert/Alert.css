@@ -1,0 +1,77 @@
+/*
+ * Alert styles — positioning and transition only. The visual card itself
+ * (colors, icon, title, description, close button) is <Banner>'s CSS —
+ * Alert renders a <Banner> and layers these classes on the same element.
+ */
+
+.ds-alert {
+  width: 100%;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+
+.ds-alert--top {
+  transform: translateY(-100%);
+}
+
+.ds-alert--bottom {
+  transform: translateY(100%);
+}
+
+.ds-alert--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Viewport (one shared per position, alerts stack inside it) ──────── */
+
+.ds-alert-viewport {
+  position: fixed;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  width: max-content;
+  max-width: min(24rem, calc(100vw - 2 * var(--space-4)));
+  pointer-events: none;
+}
+.ds-alert-viewport > * {
+  pointer-events: auto;
+}
+
+.ds-alert-viewport--top-left {
+  top: 0;
+  left: 0;
+  align-items: flex-start;
+}
+.ds-alert-viewport--top-center {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+}
+.ds-alert-viewport--top-right {
+  top: 0;
+  right: 0;
+  align-items: flex-end;
+}
+.ds-alert-viewport--bottom-left {
+  bottom: 0;
+  left: 0;
+  align-items: flex-start;
+  flex-direction: column-reverse;
+}
+.ds-alert-viewport--bottom-center {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+  flex-direction: column-reverse;
+}
+.ds-alert-viewport--bottom-right {
+  bottom: 0;
+  right: 0;
+  align-items: flex-end;
+  flex-direction: column-reverse;
+}

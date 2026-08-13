@@ -1,0 +1,159 @@
+/*
+ * Modal styles — pure token-driven CSS. Matches Figma's Modal (Default/
+ * Drawer types) exactly: background-default panel, radius-xl + min 320px
+ * box for "default", no radius + edge-to-edge for "drawer", and the same
+ * overlay-default-25 shadow Form's own card uses (just a larger offset/blur
+ * here — Figma's "L3" effect vs. Form's "L1").
+ *
+ * Positioning is flexbox-based (the overlay centers or edge-anchors the
+ * panel via align-items/justify-content) rather than manually computed
+ * fixed coordinates — simpler, and the panel's own transform is then free
+ * to carry only the enter/exit animation (scale for "default", slide for
+ * "drawer"), not also double as a positioning mechanism.
+ */
+
+.ds-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  background: var(--overlay-default-50);
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+.ds-modal-overlay--visible {
+  opacity: 1;
+}
+
+.ds-modal-overlay--default {
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.ds-modal-overlay--drawer-top,
+.ds-modal-overlay--drawer-bottom {
+  flex-direction: column;
+  align-items: stretch;
+}
+.ds-modal-overlay--drawer-top {
+  justify-content: flex-start;
+}
+.ds-modal-overlay--drawer-bottom {
+  justify-content: flex-end;
+}
+
+.ds-modal-overlay--drawer-left,
+.ds-modal-overlay--drawer-right {
+  align-items: stretch;
+}
+.ds-modal-overlay--drawer-left {
+  justify-content: flex-start;
+}
+.ds-modal-overlay--drawer-right {
+  justify-content: flex-end;
+}
+
+/* ── Panel ─────────────────────────────────────────────────────────── */
+
+.ds-modal {
+  display: flex;
+  flex-direction: column;
+  min-width: 20rem;
+  background: var(--background-default);
+  box-shadow: 0 4px 8px var(--overlay-default-25);
+  overflow: hidden;
+  outline: none;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out);
+}
+.ds-modal--visible {
+  opacity: 1;
+}
+
+.ds-modal--default {
+  width: 40rem;
+  min-height: 20rem;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: var(--radius-xl);
+  transform: scale(0.95);
+}
+.ds-modal--default.ds-modal--visible {
+  transform: scale(1);
+}
+
+.ds-modal--drawer-left,
+.ds-modal--drawer-right {
+  width: 40rem;
+  max-width: 100%;
+  height: 100%;
+}
+
+.ds-modal--drawer-top,
+.ds-modal--drawer-bottom {
+  height: 24rem;
+  max-height: 100%;
+  width: 100%;
+}
+
+.ds-modal--drawer-right {
+  transform: translateX(100%);
+}
+.ds-modal--drawer-right.ds-modal--visible {
+  transform: translateX(0);
+}
+
+.ds-modal--drawer-left {
+  transform: translateX(-100%);
+}
+.ds-modal--drawer-left.ds-modal--visible {
+  transform: translateX(0);
+}
+
+.ds-modal--drawer-top {
+  transform: translateY(-100%);
+}
+.ds-modal--drawer-top.ds-modal--visible {
+  transform: translateY(0);
+}
+
+.ds-modal--drawer-bottom {
+  transform: translateY(100%);
+}
+.ds-modal--drawer-bottom.ds-modal--visible {
+  transform: translateY(0);
+}
+
+/* ── Body ──────────────────────────────────────────────────────────── */
+
+.ds-modal-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: var(--space-5);
+  padding: var(--space-4);
+  overflow-y: auto;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+
+.ds-modal-footer {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--background-default);
+  border-top: 1px solid var(--border-disabled);
+}
+
+.ds-modal-footer__actions {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

@@ -1,0 +1,43 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as ColumnStories from "./Column.stories";
+
+<Meta of={ColumnStories} />
+
+# Column
+
+One column of a table: a header `<Cell>` above a stack of body `<Cell>`s — matches Figma's Column exactly. A pure layout wrapper, not a styled component of its own — every visual detail (backgrounds, row dividers, header shading) already belongs to `<Cell>` itself, the same relationship `<ButtonGroup>` has to real `<Button>`s.
+
+<Canvas of={ColumnStories.Default} />
+
+## When to use
+
+- Composing a data table alongside `<Cell>` (and, later, `<Row>`/`<Table>`, once they exist) — `<Column>` is the vertical arrangement; a full table lays several of these side by side.
+
+## Implementation
+
+```tsx
+import { Cell, Column } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Column header={<Cell type="columnHead">Company</Cell>}>
+  <Cell type="text">Acme Corp</Cell>
+  <Cell type="text">Globex</Cell>
+  <Cell type="text">Initech</Cell>
+</Column>
+```
+
+`header` takes any of `<Cell>`'s three header types (`columnHead`, `sorted`, `checkboxColumnHead`) — `<Column>` doesn't care which, it just renders whatever it's given above the body cells.
+
+## Sorted
+
+<Canvas of={ColumnStories.Sorted} />
+
+## Width
+
+Omit `width` and a `<Column>` fills the available space evenly with its neighbors (`flex: 1 0 0`) — the common case for a table that should fill its container. Pass a number (pixels) or any CSS length to fix a column's width instead, e.g. a narrow checkbox column next to flexible content columns:
+
+<Canvas of={ColumnStories.MultipleColumns} />
+
+## Props
+
+`header` (required), `children` (required), `width`, `className`.
