@@ -17,6 +17,18 @@ a {
   color: var(--content-link-default);
 }
 
+:root {
+  /* Pre-JS fallback only — `useMeasuredHeightVar` (see App.tsx/
+     EmployeesApp.tsx) overwrites these with the real rendered height of
+     the mobile nav bar / app header the instant they mount, via
+     ResizeObserver. Hand-typing an assumed constant here turned out to be
+     unreliable (confirmed: MobileAppHeader actually renders at 75px, not
+     the ~40px its padding + content alone would suggest), so these values
+     just need to be "close enough to avoid a visible jump," not exact. */
+  --mobile-nav-height: 3.5rem;
+  --mobile-app-header-height: 4.75rem;
+}
+
 .app-shell {
   display: flex;
   /* Mobile-first: bar on top, page below. Overridden to row (sidebar beside
@@ -25,12 +37,6 @@ a {
   height: 100vh;
   overflow: hidden;
   background: var(--background-secondary);
-  /* Confirmed 4px margin around the whole shell and 4px gap between
-     Navigation and the content card — applies to both the mobile bar and
-     the desktop sidebar, so it lives on the shared .app-shell rule rather
-     than being duplicated per breakpoint. */
-  padding: 0.25rem;
-  gap: 0.25rem;
 }
 
 .app-shell__desktop-nav {
@@ -40,6 +46,15 @@ a {
 .app-shell__mobile-nav {
   width: 100%;
   flex-shrink: 0;
+  /* Confirmed from Figma: the mobile Head (nav + app header) is fixed to
+     the viewport, not just pinned by flex order — it no longer scrolls
+     away with the page, and the viewport itself has no padding around it
+     (full-bleed edge to edge) below the desktop breakpoint. */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
 }
 
 .app-shell__main {
@@ -51,20 +66,11 @@ a {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  /* Not the scroll container itself — a header (desktop or mobile,
-     rendered by whichever page needs one) stays pinned above a
-     scrollable .app-body, rather than the whole card scrolling as one
-     unit and taking the header/tabs out of view with it. `hidden` here
-     is what keeps the rounded corners below actually clipped. */
   overflow: hidden;
-  /* Re-confirmed via a closer Figma read: this "Content" frame itself has
-     no fill of its own (transparent, revealing the page's own
-     background-secondary underneath) — only its Header child is explicitly
-     background-default. Radius/shadow are this frame's own, for clipping
-     and separating it from the page canvas. */
   background: var(--background-secondary);
-  border-radius: var(--radius-md);
-  box-shadow: 0 1px 2px var(--overlay-default-25);
+  /* The mobile nav bar above is now fixed (out of flow), so without this
+     the page's own content would render underneath it instead of below it. */
+  padding-top: var(--mobile-nav-height);
 }
 
 /* Below this width: mobile top bar + drawer.
@@ -72,6 +78,11 @@ a {
 @media (min-width: 48rem) {
   .app-shell {
     flex-direction: row;
+    /* Confirmed 4px margin around the whole shell and 4px gap between
+       Navigation and the content card — desktop only; the mobile viewport
+       itself now has no padding at all. */
+    padding: 0.25rem;
+    gap: 0.25rem;
   }
 
   .app-shell__desktop-nav {
@@ -82,6 +93,19 @@ a {
 
   .app-shell__mobile-nav {
     display: none;
+  }
+
+  .app-shell__main {
+    padding-top: 0;
+    /* Re-confirmed via a closer Figma read: this "Content" frame itself has
+       no fill of its own (transparent, revealing the page's own
+       background-secondary underneath) — only its Header child is
+       explicitly background-default. Radius/shadow are this frame's own,
+       for clipping and separating it from the page canvas — desktop only;
+       the mobile Body fills the full-bleed viewport with no surrounding
+       gap to reveal rounded corners against. */
+    border-radius: var(--radius-md);
+    box-shadow: 0 1px 2px var(--overlay-default-25);
   }
 }
 
@@ -94,6 +118,13 @@ a {
 }
 .mobile-app-header {
   display: block;
+  /* Stacks directly below the fixed mobile nav bar, and is itself fixed
+     for the same reason — see .app-shell__mobile-nav above. */
+  position: fixed;
+  top: var(--mobile-nav-height);
+  left: 0;
+  right: 0;
+  z-index: 30;
 }
 @media (min-width: 48rem) {
   .desktop-app-header {
@@ -136,8 +167,30 @@ a {
 .app-body {
   flex: 1;
   min-height: 0;
-  padding: var(--space-6);
+  /* Confirmed from Figma: the mobile Body's own padding is space-xs (4px),
+     not the desktop space-6 (24px) — individual content (e.g. a
+     SettingsCard) supplies its own generous internal padding instead of
+     relying on Body's outer gutter for that. Desktop keeps the original
+     24px below. */
+  padding: var(--space-1);
   overflow-y: auto;
+}
+
+/* Extra top clearance specifically for a tab body that sits below a fixed
+   .mobile-app-header (adjacent sibling in EmployeesApp's own markup) — a
+   page with no app header (e.g. HomePage) only needs .app-shell__main's
+   own nav-bar clearance, not this. */
+.mobile-app-header + .app-body {
+  padding-top: calc(var(--space-1) + var(--mobile-app-header-height));
+}
+
+@media (min-width: 48rem) {
+  .app-body {
+    padding: var(--space-6);
+  }
+  .mobile-app-header + .app-body {
+    padding-top: var(--space-6);
+  }
 }
 
 .page {
@@ -283,6 +336,27 @@ a {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+}
+
+.emp-card__identity-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+.emp-card__identity-button:hover .emp-card__name {
+  color: var(--content-link-default);
+}
+.emp-card__identity-button:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .emp-card__identity {

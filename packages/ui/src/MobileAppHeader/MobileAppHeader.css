@@ -8,6 +8,11 @@
 
 .ds-mobile-app-header {
   width: 100%;
+  /* Explicit, not just implied by padding + content — a consuming app
+     fixing this header to the viewport below <MobileNav> (as apps/demo now
+     does) needs a real, stable height to offset scrolled content by. */
+  box-sizing: border-box;
+  min-height: 2.5rem;
   padding: var(--space-2) var(--space-4);
   background: var(--background-default);
   border-bottom: 1px solid var(--border-subtle);

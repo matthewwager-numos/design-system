@@ -4,10 +4,12 @@ import { NavContent, accountMenu } from "./NavContent";
 import { HomePage } from "./pages/HomePage";
 import { EmployeesApp } from "./apps/employees/EmployeesApp";
 import { ToastProvider } from "./toast/ToastProvider";
+import { useMeasuredHeightVar } from "./useMeasuredHeightVar";
 import type { PageId } from "./pages";
 
 export default function App() {
   const [page, setPage] = useState<PageId>("home");
+  const mobileNavRef = useMeasuredHeightVar<HTMLDivElement>("--mobile-nav-height");
 
   function handleSignOut() {
     // No real auth in this demo — just a stand-in for where a sign-out
@@ -24,7 +26,7 @@ export default function App() {
           </Navigation>
         </div>
 
-        <div className="app-shell__mobile-nav">
+        <div className="app-shell__mobile-nav" ref={mobileNavRef}>
           <MobileNav name="Matthew Wager" accountMenu={accountMenu(handleSignOut)}>
             <NavContent active={page} onNavigate={setPage} onSignOut={handleSignOut} />
           </MobileNav>

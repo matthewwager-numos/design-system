@@ -3,6 +3,7 @@ import { Users } from "lucide-react";
 import { Header, MobileAppHeader, Tab, TabList, Tabs } from "@numosai/ui";
 import { EmployeesProvider, useEmployees } from "../../data/useEmployees";
 import { useToast } from "../../toast/ToastProvider";
+import { useMeasuredHeightVar } from "../../useMeasuredHeightVar";
 import { OverviewTab } from "./OverviewTab";
 import { ObjectManagementTab } from "./ObjectManagementTab";
 import { HistoryTab } from "./HistoryTab";
@@ -36,6 +37,7 @@ function EmployeesAppContent() {
   const [adding, setAdding] = useState(false);
   const { addEmployee } = useEmployees();
   const showToast = useToast();
+  const mobileHeaderRef = useMeasuredHeightVar<HTMLDivElement>("--mobile-app-header-height");
 
   // Confirmed from Figma: the Wizard fills this whole content container
   // edge-to-edge (Navigation stays put beside it) — it doesn't sit nested
@@ -77,7 +79,7 @@ function EmployeesAppContent() {
         />
       </div>
 
-      <div className="mobile-app-header">
+      <div className="mobile-app-header" ref={mobileHeaderRef}>
         <MobileAppHeader
           icon={
             <span className="app-icon-tile app-icon-tile--sm">

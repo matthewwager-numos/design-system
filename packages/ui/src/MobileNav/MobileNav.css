@@ -35,8 +35,16 @@
   justify-content: space-between;
   gap: var(--space-4);
   width: 100%;
+  /* Explicit, not just implied by padding + content — a consuming app
+     fixing this bar to the viewport (as apps/demo now does) needs a real,
+     stable height to offset everything below it by. */
+  box-sizing: border-box;
+  min-height: 3.5rem;
   padding: var(--space-2);
-  border-radius: var(--radius-md);
+  /* Confirmed via Figma: the collapsed bar itself has no radius — it's a
+     full-bleed edge-to-edge fixed strip now, not a floating rounded card.
+     Only its inner nav-item icon buttons keep their own radius. */
+  border-radius: 0;
 }
 
 .ds-mobile-nav-bar__logo {
