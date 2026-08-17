@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Check, ChevronDown, TriangleAlert } from "lucide-react";
 import { clsx } from "clsx";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../DropdownMenu";
+import { FieldLabel } from "../FieldLabel";
 import "./Select.css";
 
 export type SelectSize = "sm" | "md" | "lg";
@@ -70,9 +71,9 @@ export function Select({
   return (
     <div className={clsx("ds-select", `ds-select--${size}`, className)}>
       {label ? (
-        <label className="ds-select__label" htmlFor={fieldId}>
+        <FieldLabel size={size} htmlFor={fieldId} className="ds-select__label">
           {label}
-        </label>
+        </FieldLabel>
       ) : null}
 
       <DropdownMenu open={open} onOpenChange={setOpen}>

@@ -1,0 +1,42 @@
+/*
+ * FieldLabel styles — pure token-driven CSS. Matches Figma's FieldLabel
+ * exactly: S/M/L map to Paragraph XS/S/M Medium respectively, all
+ * `content-emphasis`. Every consumer keeps its own component-specific class
+ * alongside `ds-field-label` for state-dependent overrides (disabled color,
+ * cursor, etc.) that have nothing to do with size — this only owns the
+ * shared text style itself.
+ */
+
+.ds-field-label {
+  margin: 0;
+  padding: 0;
+  border: none;
+  color: var(--content-emphasis);
+}
+
+.ds-field-label--sm {
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+}
+
+.ds-field-label--md {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+}
+
+.ds-field-label--lg {
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+}
+
+/* Below this width, "md"/"sm" render at "lg"'s font regardless of `size` —
+   the one place every input's mobile-width label bump now lives, instead
+   of each of them repeating it. Matches the breakpoint `apps/demo` uses for
+   its own mobile/desktop switch (`48rem`/768px). */
+@media (max-width: 767px) {
+  .ds-field-label--md,
+  .ds-field-label--sm {
+    font: var(--type-paragraph-m-medium);
+    letter-spacing: var(--type-paragraph-m-medium-tracking);
+  }
+}

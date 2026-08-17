@@ -140,3 +140,47 @@
 .ds-checkbox__help svg {
   flex-shrink: 0;
 }
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+/* "md" (above) is Figma's one original size. "lg" is new — bigger box/icon/
+   label/help text, for contexts (like small mobile viewports) that want a
+   larger tap target and more legible text, not just a scaled-up checkbox. */
+
+.ds-checkbox--lg .ds-checkbox__control {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.ds-checkbox--lg .ds-checkbox__icon {
+  width: 1rem;
+  height: 1rem;
+}
+.ds-checkbox--lg .ds-checkbox__label {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+.ds-checkbox--lg .ds-checkbox__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+
+/* Below this width, every size renders at "lg" metrics regardless of the
+   `size` prop — matches the same breakpoint `apps/demo` uses for its own
+   mobile/desktop layout switch (`48rem`/768px). */
+@media (max-width: 767px) {
+  .ds-checkbox__control {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .ds-checkbox__icon {
+    width: 1rem;
+    height: 1rem;
+  }
+  .ds-checkbox__label {
+    font: var(--type-paragraph-m-regular);
+    letter-spacing: var(--type-paragraph-m-regular-tracking);
+  }
+  .ds-checkbox__help {
+    font: var(--type-paragraph-s-regular);
+    letter-spacing: var(--type-paragraph-s-regular-tracking);
+  }
+}

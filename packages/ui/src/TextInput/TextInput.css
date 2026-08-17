@@ -15,10 +15,6 @@
   width: 100%;
 }
 
-.ds-text-input__label {
-  color: var(--content-emphasis);
-}
-
 .ds-text-input:has(.ds-text-input__control:disabled) .ds-text-input__label {
   color: var(--content-disabled);
 }
@@ -119,10 +115,6 @@
 
 /* ── Sizes ─────────────────────────────────────────────────────────── */
 
-.ds-text-input--lg .ds-text-input__label {
-  font: var(--type-paragraph-m-medium);
-  letter-spacing: var(--type-paragraph-m-medium-tracking);
-}
 .ds-text-input--lg .ds-text-input__field {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
@@ -140,10 +132,6 @@
   height: 1.5rem;
 }
 
-.ds-text-input--md .ds-text-input__label {
-  font: var(--type-paragraph-s-medium);
-  letter-spacing: var(--type-paragraph-s-medium-tracking);
-}
 .ds-text-input--md .ds-text-input__field {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
@@ -161,10 +149,6 @@
   height: 1rem;
 }
 
-.ds-text-input--sm .ds-text-input__label {
-  font: var(--type-paragraph-xs-medium);
-  letter-spacing: var(--type-paragraph-xs-medium-tracking);
-}
 .ds-text-input--sm .ds-text-input__field {
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
@@ -180,4 +164,35 @@
 .ds-text-input--sm .ds-text-input__icon svg {
   width: 1rem;
   height: 1rem;
+}
+
+/* Below this width, "md"/"sm" render at "lg" metrics regardless of the
+   `size` prop — both because 16px+ control text is what keeps iOS Safari
+   from auto-zooming the whole page on focus (it zooms on any focused field
+   under 16px), and because the bigger tap target is generally better for a
+   touch viewport. Matches the same breakpoint `apps/demo` uses for its own
+   mobile/desktop layout switch (`48rem`/768px). Repeats "lg"'s selectors
+   (rather than a lower-specificity generic one) so it actually overrides
+   the "md"/"sm" rules above at equal specificity. */
+@media (max-width: 767px) {
+  .ds-text-input--md .ds-text-input__field,
+  .ds-text-input--sm .ds-text-input__field {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+  .ds-text-input--md .ds-text-input__control,
+  .ds-text-input--sm .ds-text-input__control {
+    font: var(--type-paragraph-m-regular);
+    letter-spacing: var(--type-paragraph-m-regular-tracking);
+  }
+  .ds-text-input--md .ds-text-input__help,
+  .ds-text-input--sm .ds-text-input__help {
+    font: var(--type-paragraph-s-regular);
+    letter-spacing: var(--type-paragraph-s-regular-tracking);
+  }
+  .ds-text-input--md .ds-text-input__icon svg,
+  .ds-text-input--sm .ds-text-input__icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }

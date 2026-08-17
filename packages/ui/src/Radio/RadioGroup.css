@@ -6,16 +6,16 @@
   padding: 0;
 }
 
-.ds-radio-group__label {
+/* Element-qualified so this reliably wins over `<FieldLabel>`'s own
+   `margin: 0` at equal (one-class) specificity, regardless of CSS import
+   order. */
+legend.ds-radio-group__label {
   /* Explicit margin rather than the fieldset's own flex `gap` — <legend>
      has historically not participated cleanly in a flex parent's gap, even
      when the fieldset itself is display:flex, so this is the more reliable
-     way to get the space/s (8px) Figma actually specifies here. */
+     way to get the space/s (8px) Figma actually specifies here. Font/color
+     come from `<FieldLabel>` itself, not this class. */
   margin: 0 0 var(--space-2) 0;
-  padding: 0;
-  font: var(--type-paragraph-s-medium);
-  letter-spacing: var(--type-paragraph-s-medium-tracking);
-  color: var(--content-emphasis);
 }
 
 .ds-radio-group__options {
@@ -41,4 +41,18 @@
 }
 .ds-radio-group__help--error {
   color: var(--content-negative);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-radio-group--lg .ds-radio-group__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+
+@media (max-width: 767px) {
+  .ds-radio-group__help {
+    font: var(--type-paragraph-s-regular);
+    letter-spacing: var(--type-paragraph-s-regular-tracking);
+  }
 }

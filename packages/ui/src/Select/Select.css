@@ -23,10 +23,6 @@
   width: 100%;
 }
 
-.ds-select__label {
-  color: var(--content-emphasis);
-}
-
 .ds-select:has(.ds-select__field:disabled) .ds-select__label {
   color: var(--content-disabled);
 }
@@ -138,10 +134,6 @@
 
 /* ── Sizes ─────────────────────────────────────────────────────────── */
 
-.ds-select--lg .ds-select__label {
-  font: var(--type-paragraph-m-medium);
-  letter-spacing: var(--type-paragraph-m-medium-tracking);
-}
 .ds-select--lg .ds-select__field {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
@@ -159,10 +151,6 @@
   height: 1.5rem;
 }
 
-.ds-select--md .ds-select__label {
-  font: var(--type-paragraph-s-medium);
-  letter-spacing: var(--type-paragraph-s-medium-tracking);
-}
 .ds-select--md .ds-select__field {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
@@ -180,10 +168,6 @@
   height: 1rem;
 }
 
-.ds-select--sm .ds-select__label {
-  font: var(--type-paragraph-xs-medium);
-  letter-spacing: var(--type-paragraph-xs-medium-tracking);
-}
 .ds-select--sm .ds-select__field {
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
@@ -199,4 +183,33 @@
 .ds-select--sm .ds-select__icon svg {
   width: 1rem;
   height: 1rem;
+}
+
+/* Below this width, "md"/"sm" render at "lg" metrics regardless of the
+   `size` prop — for touch-target consistency with `<TextInput>`'s own
+   mobile override, not because of iOS's zoom-on-focus bug: `<Select>` is a
+   custom dropdown with only a hidden native input for form submission, so
+   there's no real focusable text field here for iOS to zoom on in the
+   first place. Matches the same breakpoint `apps/demo` uses (`48rem`/768px). */
+@media (max-width: 767px) {
+  .ds-select--md .ds-select__field,
+  .ds-select--sm .ds-select__field {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+  .ds-select--md .ds-select__value,
+  .ds-select--sm .ds-select__value {
+    font: var(--type-paragraph-m-regular);
+    letter-spacing: var(--type-paragraph-m-regular-tracking);
+  }
+  .ds-select--md .ds-select__help,
+  .ds-select--sm .ds-select__help {
+    font: var(--type-paragraph-s-regular);
+    letter-spacing: var(--type-paragraph-s-regular-tracking);
+  }
+  .ds-select--md .ds-select__icon svg,
+  .ds-select--sm .ds-select__icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }

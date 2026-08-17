@@ -10,6 +10,8 @@ export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   helpText?: ReactNode;
   /** Validation state — a prop for the same reason `<TextInput>`'s `status` and `<Checkbox>`'s `error` are: real app state a browser can't infer. */
   error?: boolean;
+  /** Normally inherited from the enclosing `<RadioGroup>` — only needed explicitly to override one radio's size within a group (rare) or for the undocumented standalone case. Defaults to "md". */
+  size?: "md" | "lg";
 }
 
 /**
@@ -23,7 +25,7 @@ export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
  * though nothing here technically prevents it.
  */
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
-  { label, helpText, error = false, className, id, value, checked, onChange, name, ...rest },
+  { label, helpText, error = false, size: sizeProp, className, id, value, checked, onChange, name, ...rest },
   ref,
 ) {
   const generatedId = useId();
@@ -32,6 +34,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
 
   const resolvedChecked = group ? group.value === value : checked;
   const resolvedName = name ?? group?.name;
+  const size = sizeProp ?? group?.size ?? "md";
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     onChange?.(event);
@@ -39,7 +42,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
   }
 
   return (
-    <div className={clsx("ds-radio", className)}>
+    <div className={clsx("ds-radio", `ds-radio--${size}`, className)}>
       <span className="ds-radio__control">
         <input
           ref={ref}

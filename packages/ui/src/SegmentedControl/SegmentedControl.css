@@ -103,3 +103,16 @@
   font: var(--type-paragraph-xs-medium);
   letter-spacing: var(--type-paragraph-xs-medium-tracking);
 }
+
+/* Defaults to "lg" already, so this only matters if a consumer explicitly
+   opts into "md"/"sm" — kept for consistency with the other inputs' mobile
+   overrides. Not a zoom fix (each option is a real `<button>`, and the only
+   native input is `type="hidden"`), just a bigger tap target. */
+@media (max-width: 767px) {
+  .ds-segmented-control--md .ds-segment,
+  .ds-segmented-control--sm .ds-segment {
+    padding: var(--space-3) var(--space-4);
+    font: var(--type-paragraph-m-medium);
+    letter-spacing: var(--type-paragraph-m-medium-tracking);
+  }
+}

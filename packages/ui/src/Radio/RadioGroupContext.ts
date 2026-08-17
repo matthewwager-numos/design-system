@@ -4,6 +4,7 @@ export interface RadioGroupContextValue {
   name: string;
   value: string | undefined;
   onChange: (value: string) => void;
+  size: "md" | "lg";
 }
 
 export const RadioGroupContext = createContext<RadioGroupContextValue | null>(null);

@@ -1,8 +1,11 @@
-import { forwardRef, useEffect, useRef, useId } from "react";
+import { forwardRef, useContext, useEffect, useRef, useId } from "react";
 import type { InputHTMLAttributes, ReactNode } from "react";
 import { Check, Minus, TriangleAlert } from "lucide-react";
 import { clsx } from "clsx";
+import { CheckboxGroupContext } from "./CheckboxGroupContext";
 import "./Checkbox.css";
+
+export type CheckboxSize = "md" | "lg";
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size"> {
   /** Field label, rendered next to the box. */
@@ -13,6 +16,12 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
   error?: boolean;
   /** A third visual state for "some, not all, of this group's children are checked" — sets the real DOM `indeterminate` property (there's no HTML attribute for it), independent of `checked`. */
   indeterminate?: boolean;
+  /**
+   * Defaults to "md" (Figma's original single size), or whichever size the
+   * enclosing `<CheckboxGroup>` is set to — only needed explicitly for a
+   * standalone `<Checkbox>`, or to override its group's size one-off.
+   */
+  size?: CheckboxSize;
 }
 
 /**
@@ -22,19 +31,21 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
  * what they actually are, same philosophy as `<TextInput>`.
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
-  { label, helpText, error = false, indeterminate = false, className, id, ...rest },
+  { label, helpText, error = false, indeterminate = false, size: sizeProp, className, id, ...rest },
   ref,
 ) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const internalRef = useRef<HTMLInputElement | null>(null);
+  const group = useContext(CheckboxGroupContext);
+  const size = sizeProp ?? group?.size ?? "md";
 
   useEffect(() => {
     if (internalRef.current) internalRef.current.indeterminate = indeterminate;
   }, [indeterminate]);
 
   return (
-    <div className={clsx("ds-checkbox", className)}>
+    <div className={clsx("ds-checkbox", `ds-checkbox--${size}`, className)}>
       <span className="ds-checkbox__control">
         <input
           ref={(node) => {

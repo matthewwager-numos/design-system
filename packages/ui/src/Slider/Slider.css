@@ -125,3 +125,18 @@
   width: 0.75rem;
   height: 0.75rem;
 }
+
+/* Figma doesn't define an "lg" Slider size (see this component's own doc
+   comment), so there's no `size="lg"` to opt into here like there is on
+   TextInput/Select/etc. But the thumb is still a real drag target, so at
+   mobile widths it grows the same amount those "lg" tiers do — without
+   inventing a size value Figma never specified. */
+@media (max-width: 767px) {
+  .ds-slider__track {
+    height: var(--space-2);
+  }
+  .ds-slider__thumb {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}

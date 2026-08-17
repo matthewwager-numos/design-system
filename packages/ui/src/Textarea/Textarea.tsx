@@ -2,6 +2,7 @@ import { forwardRef, useId } from "react";
 import type { ReactNode, TextareaHTMLAttributes } from "react";
 import { Check, TriangleAlert } from "lucide-react";
 import { clsx } from "clsx";
+import { FieldLabel } from "../FieldLabel";
 import "./Textarea.css";
 
 export type TextareaSize = "sm" | "md" | "lg";
@@ -37,9 +38,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   return (
     <div className={clsx("ds-textarea", `ds-textarea--${size}`, className)}>
       {label ? (
-        <label className="ds-textarea__label" htmlFor={inputId}>
+        <FieldLabel size={size} htmlFor={inputId} className="ds-textarea__label">
           {label}
-        </label>
+        </FieldLabel>
       ) : null}
 
       <div className={clsx("ds-textarea__field", `ds-textarea__field--${status}`)}>

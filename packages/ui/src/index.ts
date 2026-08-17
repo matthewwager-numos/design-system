@@ -9,6 +9,9 @@ export type { BadgeProps, BadgeStatus, BadgeSize } from "./Badge";
 export { Label } from "./Label";
 export type { LabelProps, LabelStatus, LabelSize } from "./Label";
 
+export { FieldLabel } from "./FieldLabel";
+export type { FieldLabelProps, FieldLabelSize } from "./FieldLabel";
+
 export { AppIcon } from "./AppIcon";
 export type { AppIconProps, AppIconName } from "./AppIcon";
 
@@ -55,11 +58,14 @@ export type { NavigationProps, NavSectionProps, NavItemProps, NavSubItem, NavUse
 export { Header } from "./Header";
 export type { HeaderProps, HeaderVariant } from "./Header";
 
+export { DetailHeader } from "./DetailHeader";
+export type { DetailHeaderProps } from "./DetailHeader";
+
 export { Checkbox, CheckboxGroup } from "./Checkbox";
-export type { CheckboxProps, CheckboxGroupProps } from "./Checkbox";
+export type { CheckboxProps, CheckboxSize, CheckboxGroupProps, CheckboxGroupSize } from "./Checkbox";
 
 export { Radio, RadioGroup } from "./Radio";
-export type { RadioProps, RadioGroupProps, RadioGroupOrientation } from "./Radio";
+export type { RadioProps, RadioGroupProps, RadioGroupOrientation, RadioGroupSize } from "./Radio";
 
 export { SegmentedControl, SegmentedControlOption } from "./SegmentedControl";
 export type { SegmentedControlProps, SegmentedControlSize, SegmentedControlOptionProps } from "./SegmentedControl";

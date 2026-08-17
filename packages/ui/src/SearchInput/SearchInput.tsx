@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { FocusEvent, InputHTMLAttributes, KeyboardEvent, ReactNode } from "react";
 import { Check, Search, TriangleAlert, X } from "lucide-react";
 import { clsx } from "clsx";
+import { FieldLabel } from "../FieldLabel";
 import "./SearchInput.css";
 
 export type SearchInputSize = "sm" | "md" | "lg";
@@ -202,9 +203,9 @@ export function SearchInput({
   return (
     <div className={clsx("ds-search-input", `ds-search-input--${size}`, className)} ref={rootRef}>
       {label ? (
-        <label className="ds-search-input__label" htmlFor={inputId}>
+        <FieldLabel size={size} htmlFor={inputId} className="ds-search-input__label">
           {label}
-        </label>
+        </FieldLabel>
       ) : null}
 
       <div className="ds-search-input__anchor">

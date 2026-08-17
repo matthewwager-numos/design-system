@@ -17,10 +17,6 @@
   width: 100%;
 }
 
-.ds-textarea__label {
-  color: var(--content-emphasis);
-}
-
 .ds-textarea:has(.ds-textarea__control:disabled) .ds-textarea__label {
   color: var(--content-disabled);
 }
@@ -123,10 +119,6 @@
 
 /* ── Sizes ─────────────────────────────────────────────────────────── */
 
-.ds-textarea--lg .ds-textarea__label {
-  font: var(--type-paragraph-m-medium);
-  letter-spacing: var(--type-paragraph-m-medium-tracking);
-}
 .ds-textarea--lg .ds-textarea__field {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
@@ -144,10 +136,6 @@
   height: 1.5rem;
 }
 
-.ds-textarea--md .ds-textarea__label {
-  font: var(--type-paragraph-s-medium);
-  letter-spacing: var(--type-paragraph-s-medium-tracking);
-}
 .ds-textarea--md .ds-textarea__field {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
@@ -165,10 +153,6 @@
   height: 1rem;
 }
 
-.ds-textarea--sm .ds-textarea__label {
-  font: var(--type-paragraph-xs-medium);
-  letter-spacing: var(--type-paragraph-xs-medium-tracking);
-}
 .ds-textarea--sm .ds-textarea__field {
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
@@ -184,4 +168,31 @@
 .ds-textarea--sm .ds-textarea__icon svg {
   width: 1rem;
   height: 1rem;
+}
+
+/* Below this width, "md"/"sm" render at "lg" metrics regardless of the
+   `size` prop — same reasoning as `<TextInput>`'s own mobile override
+   (avoids iOS's auto-zoom-on-focus below 16px, and gives a bigger tap
+   target). Matches the same breakpoint `apps/demo` uses (`48rem`/768px). */
+@media (max-width: 767px) {
+  .ds-textarea--md .ds-textarea__field,
+  .ds-textarea--sm .ds-textarea__field {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+  .ds-textarea--md .ds-textarea__control,
+  .ds-textarea--sm .ds-textarea__control {
+    font: var(--type-paragraph-m-regular);
+    letter-spacing: var(--type-paragraph-m-regular-tracking);
+  }
+  .ds-textarea--md .ds-textarea__help,
+  .ds-textarea--sm .ds-textarea__help {
+    font: var(--type-paragraph-s-regular);
+    letter-spacing: var(--type-paragraph-s-regular-tracking);
+  }
+  .ds-textarea--md .ds-textarea__icon svg,
+  .ds-textarea--sm .ds-textarea__icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }

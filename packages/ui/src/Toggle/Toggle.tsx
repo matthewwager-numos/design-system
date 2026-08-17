@@ -1,6 +1,7 @@
 import { forwardRef, useId } from "react";
 import type { InputHTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
+import { FieldLabel } from "../FieldLabel";
 import "./Toggle.css";
 
 export type ToggleSize = "sm" | "md" | "lg";
@@ -30,7 +31,14 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(function Toggle(
   const generatedId = useId();
   const inputId = id ?? generatedId;
 
-  const labelElement = label ? <span className="ds-toggle__label">{label}</span> : null;
+  // `as="span"`, not the default `<label>` — the outer element this
+  // returns is already a real `<label htmlFor>` wrapping the whole control,
+  // and a `<label>` can't nest another `<label>` inside it.
+  const labelElement = label ? (
+    <FieldLabel as="span" size={size} className="ds-toggle__label">
+      {label}
+    </FieldLabel>
+  ) : null;
   const controlElement = (
     <span className="ds-toggle__control">
       <input ref={ref} type="checkbox" role="switch" id={inputId} className="ds-toggle__input" {...rest} />

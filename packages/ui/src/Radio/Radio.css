@@ -134,3 +134,46 @@
 .ds-radio__help svg {
   flex-shrink: 0;
 }
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+/* "md" (above) is Figma's one original size. "lg" is new — bigger box/dot/
+   label/help text, same reasoning as `<Checkbox>`'s own "lg". */
+
+.ds-radio--lg .ds-radio__control {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.ds-radio--lg .ds-radio__box::after {
+  width: 0.625rem;
+  height: 0.625rem;
+}
+.ds-radio--lg .ds-radio__label {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+.ds-radio--lg .ds-radio__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+
+/* Below this width, every size renders at "lg" metrics regardless of the
+   `size` prop — matches the same breakpoint `apps/demo` uses for its own
+   mobile/desktop layout switch (`48rem`/768px). */
+@media (max-width: 767px) {
+  .ds-radio__control {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .ds-radio__box::after {
+    width: 0.625rem;
+    height: 0.625rem;
+  }
+  .ds-radio__label {
+    font: var(--type-paragraph-m-regular);
+    letter-spacing: var(--type-paragraph-m-regular-tracking);
+  }
+  .ds-radio__help {
+    font: var(--type-paragraph-s-regular);
+    letter-spacing: var(--type-paragraph-s-regular-tracking);
+  }
+}

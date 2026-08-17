@@ -2,6 +2,7 @@ import { forwardRef, useId } from "react";
 import type { InputHTMLAttributes, ReactNode } from "react";
 import { Check, TriangleAlert } from "lucide-react";
 import { clsx } from "clsx";
+import { FieldLabel } from "../FieldLabel";
 import "./TextInput.css";
 
 export type TextInputSize = "sm" | "md" | "lg";
@@ -40,9 +41,9 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
   return (
     <div className={clsx("ds-text-input", `ds-text-input--${size}`, className)}>
       {label ? (
-        <label className="ds-text-input__label" htmlFor={inputId}>
+        <FieldLabel size={size} htmlFor={inputId} className="ds-text-input__label">
           {label}
-        </label>
+        </FieldLabel>
       ) : null}
 
       <div className={clsx("ds-text-input__field", `ds-text-input__field--${status}`)}>
