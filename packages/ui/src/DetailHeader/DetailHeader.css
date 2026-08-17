@@ -1,0 +1,123 @@
+/*
+ * DetailHeader styles — pure token-driven CSS, matching Figma's Drawer
+ * header exactly: background-default panel, border-disabled divider (same
+ * as <Header>'s own), breadcrumb in paragraph-xs, title in heading-xl/
+ * content-brand-primary, meta line in paragraph-s/content-subtle with
+ * 1px border-subtle dividers between items.
+ */
+
+.ds-detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  background: var(--background-default);
+  border-bottom: 1px solid var(--border-disabled);
+  padding: var(--space-4) var(--space-6) var(--space-6);
+}
+
+/* ── Breadcrumb row ────────────────────────────────────────────────── */
+
+.ds-detail-header__crumb-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ds-detail-header__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--content-subtle);
+  cursor: pointer;
+}
+.ds-detail-header__icon-button:hover {
+  background: var(--background-hover);
+  color: var(--content-base);
+}
+
+.ds-detail-header__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-detail-header__breadcrumb-link {
+  flex-shrink: 0;
+  color: var(--content-link-default);
+}
+.ds-detail-header__breadcrumb-sep {
+  flex-shrink: 0;
+  color: var(--content-subtle);
+}
+.ds-detail-header__breadcrumb-current {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--content-subtle);
+}
+
+/* ── Title row ─────────────────────────────────────────────────────── */
+
+.ds-detail-header__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.ds-detail-header__avatar {
+  flex-shrink: 0;
+}
+
+.ds-detail-header__title-group {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ds-detail-header__title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-heading-xl);
+  letter-spacing: var(--type-heading-xl-tracking);
+  color: var(--content-brand-primary);
+}
+
+.ds-detail-header__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}
+.ds-detail-header__meta-sep {
+  flex-shrink: 0;
+  width: 1px;
+  height: 1rem;
+  background: var(--border-subtle);
+}
+
+.ds-detail-header__actions {
+  flex-shrink: 0;
+}
+
+/* ── Tabs row ──────────────────────────────────────────────────────── */
+
+.ds-detail-header__tabs {
+  width: 100%;
+}

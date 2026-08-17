@@ -4,20 +4,9 @@ import { Avatar, Button, ButtonGroup, Cell, Column, Header, Modal, ModalBody, Mo
 import { useEmployees } from "../../data/useEmployees";
 import { useToast } from "../../toast/ToastProvider";
 import { avatarColorFor } from "../../data/avatarColor";
-import { departmentLabel } from "../../data/employees";
-import type { Employee, EmploymentType } from "../../data/employees";
-
-const EMPLOYMENT_TYPE_LABEL: Record<EmploymentType, string> = {
-  fulltime: "Full-time",
-  parttime: "Part-time",
-  contract: "Contract",
-};
-
-const ROLE_LABEL: Record<Employee["role"], string> = {
-  member: "Member",
-  admin: "Admin",
-  owner: "Owner",
-};
+import { departmentLabel, employmentTypeLabel, roleLabel } from "../../data/employees";
+import type { Employee } from "../../data/employees";
+import { EmployeeDetailDrawer } from "./EmployeeDetailDrawer";
 
 export interface ObjectManagementTabProps {
   onAddEmployee: () => void;
@@ -25,8 +14,19 @@ export interface ObjectManagementTabProps {
 
 export function ObjectManagementTab({ onAddEmployee }: ObjectManagementTabProps) {
   const { employees, removeEmployee } = useEmployees();
+  // Tracks the id, not the Employee object itself — looking it up fresh
+  // from `employees` below means the drawer keeps showing live data after
+  // an edit, instead of the stale snapshot captured when the row was
+  // clicked.
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = employees.find((employee) => employee.id === selectedId) ?? null;
   const [pendingDelete, setPendingDelete] = useState<Employee | null>(null);
   const showToast = useToast();
+
+  function requestDelete(employee: Employee) {
+    setSelectedId(null);
+    setPendingDelete(employee);
+  }
 
   function confirmDelete() {
     if (!pendingDelete) return;
@@ -60,7 +60,14 @@ export function ObjectManagementTab({ onAddEmployee }: ObjectManagementTabProps)
             >
               <Column header={<Cell type="columnHead">Name</Cell>}>
                 {employees.map((employee) => (
-                  <Cell key={employee.id} type="avatar" name={employee.fullName} sublabel={employee.jobTitle || undefined} color={avatarColorFor(employee.id)}>
+                  <Cell
+                    key={employee.id}
+                    type="avatar"
+                    name={employee.fullName}
+                    sublabel={employee.jobTitle || undefined}
+                    color={avatarColorFor(employee.id)}
+                    onClick={() => setSelectedId(employee.id)}
+                  >
                     {employee.fullName}
                   </Cell>
                 ))}
@@ -75,14 +82,14 @@ export function ObjectManagementTab({ onAddEmployee }: ObjectManagementTabProps)
               <Column header={<Cell type="columnHead">Type</Cell>} width={140}>
                 {employees.map((employee) => (
                   <Cell key={employee.id} type="label">
-                    {EMPLOYMENT_TYPE_LABEL[employee.employmentType]}
+                    {employmentTypeLabel(employee.employmentType)}
                   </Cell>
                 ))}
               </Column>
               <Column header={<Cell type="columnHead">Role</Cell>} width={100}>
                 {employees.map((employee) => (
                   <Cell key={employee.id} type="text">
-                    {ROLE_LABEL[employee.role]}
+                    {roleLabel(employee.role)}
                   </Cell>
                 ))}
               </Column>
@@ -102,11 +109,13 @@ export function ObjectManagementTab({ onAddEmployee }: ObjectManagementTabProps)
             {employees.map((employee) => (
               <div key={employee.id} className="emp-card">
                 <div className="emp-card__row">
-                  <Avatar name={employee.fullName} color={avatarColorFor(employee.id)} />
-                  <div className="emp-card__identity">
-                    <p className="emp-card__name">{employee.fullName}</p>
-                    {employee.jobTitle && <p className="emp-card__sublabel">{employee.jobTitle}</p>}
-                  </div>
+                  <button type="button" className="emp-card__identity-button" onClick={() => setSelectedId(employee.id)}>
+                    <Avatar name={employee.fullName} color={avatarColorFor(employee.id)} />
+                    <div className="emp-card__identity">
+                      <p className="emp-card__name">{employee.fullName}</p>
+                      {employee.jobTitle && <p className="emp-card__sublabel">{employee.jobTitle}</p>}
+                    </div>
+                  </button>
                   <button type="button" className="emp-card__delete" aria-label={`Delete ${employee.fullName}`} onClick={() => setPendingDelete(employee)}>
                     <Trash2 size={16} />
                   </button>
@@ -118,11 +127,11 @@ export function ObjectManagementTab({ onAddEmployee }: ObjectManagementTabProps)
                   </div>
                   <div>
                     <dt>Type</dt>
-                    <dd>{EMPLOYMENT_TYPE_LABEL[employee.employmentType]}</dd>
+                    <dd>{employmentTypeLabel(employee.employmentType)}</dd>
                   </div>
                   <div>
                     <dt>Role</dt>
-                    <dd>{ROLE_LABEL[employee.role]}</dd>
+                    <dd>{roleLabel(employee.role)}</dd>
                   </div>
                 </dl>
               </div>
@@ -149,6 +158,8 @@ export function ObjectManagementTab({ onAddEmployee }: ObjectManagementTabProps)
           </ButtonGroup>
         </ModalFooter>
       </Modal>
+
+      <EmployeeDetailDrawer employee={selected} onClose={() => setSelectedId(null)} onDelete={requestDelete} />
     </div>
   );
 }

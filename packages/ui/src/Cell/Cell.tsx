@@ -66,7 +66,7 @@ export interface CellProps {
   "aria-label"?: string;
   /** `button` / `checkbox` / `checkboxColumnHead` only. */
   disabled?: boolean;
-  /** `button` only. */
+  /** `button` only, or `avatar` — makes the row head itself clickable (e.g. opening a detail view), rendered as a real `<button>` rather than a `<div>`. Omit for a plain, non-interactive avatar cell. */
   onClick?: () => void;
   /** `icon` only — up to 3 row-action buttons, right-aligned. */
   actions?: CellAction[];
@@ -165,15 +165,22 @@ export function Cell({
         </Button>
       )}
 
-      {type === "avatar" && (
-        <div className="ds-cell__avatar-row">
-          <Avatar size="xs" name={name} src={src} initials={initials} color={color} />
-          <div className="ds-cell__avatar-text">
-            <span className="ds-cell__avatar-label">{children}</span>
-            {sublabel && <span className="ds-cell__avatar-sublabel">{sublabel}</span>}
-          </div>
-        </div>
-      )}
+      {type === "avatar" && (() => {
+        const AvatarRow = onClick ? "button" : "div";
+        return (
+          <AvatarRow
+            type={onClick ? "button" : undefined}
+            className={clsx("ds-cell__avatar-row", onClick && "ds-cell__avatar-row--button")}
+            onClick={onClick}
+          >
+            <Avatar size="xs" name={name} src={src} initials={initials} color={color} />
+            <div className="ds-cell__avatar-text">
+              <span className="ds-cell__avatar-label">{children}</span>
+              {sublabel && <span className="ds-cell__avatar-sublabel">{sublabel}</span>}
+            </div>
+          </AvatarRow>
+        );
+      })()}
 
       {(type === "checkbox" || type === "checkboxColumnHead") && (
         <Checkbox checked={checked} onChange={(event) => onCheckedChange?.(event.target.checked)} disabled={disabled} aria-label={ariaLabel} />

@@ -9,11 +9,10 @@ import {
   SegmentedControlOption,
   Select,
   TextInput,
-  Toggle,
   Wizard,
 } from "@numosai/ui";
 import type { WizardStep } from "@numosai/ui";
-import { DEPARTMENT_OPTIONS } from "../../data/employees";
+import { DEPARTMENT_OPTIONS, EMPLOYMENT_TYPE_OPTIONS, ROLE_OPTIONS } from "../../data/employees";
 import type { EmployeeRole, EmploymentType } from "../../data/employees";
 import type { NewEmployee } from "../../data/useEmployees";
 
@@ -101,14 +100,16 @@ export function AddEmployeeWizard({ onFinish, onCancel }: AddEmployeeWizardProps
         <>
           <Select name="department" label="Department" size="md" placeholder="Select a department" options={DEPARTMENT_OPTIONS} />
           <RadioGroup name="role" label="Role" defaultValue="member">
-            <Radio value="member" label="Member" />
-            <Radio value="admin" label="Admin" />
-            <Radio value="owner" label="Owner" />
+            {ROLE_OPTIONS.map((option) => (
+              <Radio key={option.value} value={option.value} label={option.label} />
+            ))}
           </RadioGroup>
           <SegmentedControl name="employmentType" defaultValue="fulltime">
-            <SegmentedControlOption value="fulltime">Full-time</SegmentedControlOption>
-            <SegmentedControlOption value="parttime">Part-time</SegmentedControlOption>
-            <SegmentedControlOption value="contract">Contract</SegmentedControlOption>
+            {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
+              <SegmentedControlOption key={option.value} value={option.value}>
+                {option.label}
+              </SegmentedControlOption>
+            ))}
           </SegmentedControl>
         </>
       ),
@@ -123,7 +124,6 @@ export function AddEmployeeWizard({ onFinish, onCancel }: AddEmployeeWizardProps
             <Checkbox name="notify" value="digest" label="Weekly digest" defaultChecked />
             <Checkbox name="notify" value="mentions" label="Mentions" defaultChecked />
           </CheckboxGroup>
-          <Toggle name="twoFactor" label="Require two-factor authentication" />
         </>
       ),
     },

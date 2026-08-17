@@ -20,6 +20,18 @@ export const DEPARTMENT_OPTIONS = [
   { value: "people", label: "People" },
 ];
 
+export const EMPLOYMENT_TYPE_OPTIONS: { value: EmploymentType; label: string }[] = [
+  { value: "fulltime", label: "Full-time" },
+  { value: "parttime", label: "Part-time" },
+  { value: "contract", label: "Contract" },
+];
+
+export const ROLE_OPTIONS: { value: EmployeeRole; label: string }[] = [
+  { value: "member", label: "Member" },
+  { value: "admin", label: "Admin" },
+  { value: "owner", label: "Owner" },
+];
+
 const SEED: Employee[] = [
   {
     id: "e1",
@@ -75,4 +87,12 @@ export function saveEmployees(employees: Employee[]) {
 
 export function departmentLabel(value: string): string {
   return DEPARTMENT_OPTIONS.find((option) => option.value === value)?.label ?? value;
+}
+
+export function employmentTypeLabel(value: EmploymentType): string {
+  return EMPLOYMENT_TYPE_OPTIONS.find((option) => option.value === value)?.label ?? value;
+}
+
+export function roleLabel(value: EmployeeRole): string {
+  return ROLE_OPTIONS.find((option) => option.value === value)?.label ?? value;
 }
