@@ -28,13 +28,21 @@
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
-.ds-mobile-app-header__title-group {
+/* The one thing that never scrolls — title and tabs scroll together in
+   .ds-mobile-app-header__scroll beside it instead. Reset to a plain
+   button (no border/background of its own) since <AppIcon>/the custom
+   icon it wraps already supplies the visible tile. */
+.ds-mobile-app-header__icon-button {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
   flex-shrink: 0;
+  border: none;
+  background: none;
+  padding: 0;
   padding-right: var(--space-2);
+  margin: 0;
   border-right: 1px solid var(--border-subtle);
+  cursor: pointer;
 }
 
 .ds-mobile-app-header__icon {
@@ -43,7 +51,40 @@
   border-radius: var(--radius-sm);
 }
 
+/* Title and tabs scroll together as one strip — confirmed from Figma: the
+   icon is the only fixed element, not just the tabs. Scrollbar hidden
+   since the edge fade below is the scroll affordance. */
+.ds-mobile-app-header__scroll {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.ds-mobile-app-header__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Soft fade hinting more content in whichever direction actually has more
+   — toggled by real scroll position (see MobileAppHeader.tsx), not always
+   on, so it isn't shown fading content that's already fully in view. */
+.ds-mobile-app-header__scroll[data-fade-start="true"] {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 1.5rem);
+  mask-image: linear-gradient(to right, transparent, black 1.5rem);
+}
+.ds-mobile-app-header__scroll[data-fade-end="true"] {
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 1.5rem), transparent);
+  mask-image: linear-gradient(to right, black calc(100% - 1.5rem), transparent);
+}
+.ds-mobile-app-header__scroll[data-fade-start="true"][data-fade-end="true"] {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 1.5rem, black calc(100% - 1.5rem), transparent);
+  mask-image: linear-gradient(to right, transparent, black 1.5rem, black calc(100% - 1.5rem), transparent);
+}
+
 .ds-mobile-app-header__title {
+  flex-shrink: 0;
   font: var(--type-paragraph-s-medium);
   letter-spacing: var(--type-paragraph-s-medium-tracking);
   color: var(--content-brand-primary);
@@ -51,12 +92,7 @@
 }
 
 .ds-mobile-app-header__tabs {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.ds-mobile-app-header__tab-list {
-  overflow-x: auto;
+  flex-shrink: 0;
 }
 
 .ds-mobile-app-header__actions {

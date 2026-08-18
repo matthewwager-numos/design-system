@@ -73,6 +73,11 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
+  /* Lets the label below actually shrink and truncate instead of forcing
+     this button to grow to its untruncated text width — flex items
+     default to min-width: auto (their content's intrinsic size), which
+     would otherwise prevent that. */
+  min-width: 0;
   border: none;
   background: none;
   cursor: pointer;
@@ -93,6 +98,16 @@
 .ds-tab:disabled {
   color: var(--content-disabled);
   cursor: not-allowed;
+}
+
+/* Truncates with an ellipsis instead of wrapping onto a second line — most
+   visible on vertical tabs in a narrow fixed-width column (e.g. the
+   Settings category list), where a longer label used to wrap. */
+.ds-tab__label {
+  overflow: hidden;
+  min-width: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .ds-tab__icon {

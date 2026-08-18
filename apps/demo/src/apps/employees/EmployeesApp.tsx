@@ -88,6 +88,7 @@ function EmployeesAppContent() {
           title="Employees"
           value={tab}
           onValueChange={(value) => setTab(value as AppTab)}
+          onIconClick={() => setTab("overview")}
         >
           <Tab value="overview">Overview</Tab>
           <Tab value="objectManagement">Object Mgmt</Tab>

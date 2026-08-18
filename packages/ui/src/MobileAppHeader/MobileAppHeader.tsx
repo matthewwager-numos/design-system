@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { clsx } from "clsx";
 import { AppIcon } from "../AppIcon";
@@ -22,6 +23,15 @@ export interface MobileAppHeaderProps {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
+  /**
+   * Called when the icon is tapped, in addition to its own built-in
+   * behavior (scrolling the title/tabs strip back to the start) — typically
+   * selects this app's "overview" tab, e.g. `onIconClick={() =>
+   * setTab("overview")}`. The icon doesn't know which of `children` that
+   * is; that's for the consumer already driving `value`/`onValueChange` to
+   * decide, the same way `<Tabs>` itself doesn't know what any tab means.
+   */
+  onIconClick?: () => void;
   /** Trailing icon button(s) — Figma's own example reserves this slot but hides it by default (nothing to show there in that instance), so it's optional here too. */
   actions?: ReactNode;
   className?: string;
@@ -39,23 +49,76 @@ export interface MobileAppHeaderProps {
  * their existing styling (unselected `content-brand-primary`, selected
  * `content-base`, the sliding `border-brand` indicator).
  *
- * `overflow-x: auto` on the tab row is this component's own addition, not
- * something the static Figma frame could specify — a real phone screen can
- * easily have more tabs than fit, so they scroll horizontally rather than
- * wrapping or overflowing the header.
+ * The icon is the one thing that never scrolls — the title and the tabs
+ * scroll together as a single strip beside it, so a long title doesn't
+ * quietly disappear off-screen the way it would if only the tabs scrolled.
+ * Tapping the icon scrolls that strip back to the start (animated, real
+ * `scrollTo({ behavior: "smooth" })`, not a CSS transition — there's no
+ * single property to transition when the thing moving is scroll position)
+ * and calls `onIconClick`, if given, to let the page also select its
+ * "overview" tab. A soft edge fade (a `mask-image`, toggled by real scroll
+ * position via `data-fade-start`/`data-fade-end`, not always-on) hints
+ * there's more to scroll to in whichever direction actually has more.
  */
-export function MobileAppHeader({ icon, title, children, value, defaultValue, onValueChange, actions, className }: MobileAppHeaderProps) {
+export function MobileAppHeader({
+  icon,
+  title,
+  children,
+  value,
+  defaultValue,
+  onValueChange,
+  onIconClick,
+  actions,
+  className,
+}: MobileAppHeaderProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [fadeStart, setFadeStart] = useState(false);
+  const [fadeEnd, setFadeEnd] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    function updateFade() {
+      // 1px tolerance — subpixel layout can leave scrollLeft/scrollWidth a
+      // hair off an exact match, which would otherwise flicker the fade.
+      setFadeStart(el!.scrollLeft > 1);
+      setFadeEnd(el!.scrollLeft + el!.clientWidth < el!.scrollWidth - 1);
+    }
+
+    updateFade();
+    el.addEventListener("scroll", updateFade, { passive: true });
+    const observer = new ResizeObserver(updateFade);
+    observer.observe(el);
+    return () => {
+      el.removeEventListener("scroll", updateFade);
+      observer.disconnect();
+    };
+    // Re-measure whenever the tabs themselves change — a resize of the
+    // scroll container's own box doesn't fire for that on its own, since
+    // overflow: auto absorbs internal content changes without changing the
+    // container's box.
+  }, [children]);
+
+  function handleIconClick() {
+    scrollRef.current?.scrollTo({ left: 0, behavior: "smooth" });
+    onIconClick?.();
+  }
+
   return (
     <header className={clsx("ds-mobile-app-header", className)}>
       <div className="ds-mobile-app-header__row">
-        <div className="ds-mobile-app-header__title-group">
+        <button type="button" className="ds-mobile-app-header__icon-button" onClick={handleIconClick} aria-label="Back to overview">
           {typeof icon === "string" ? <AppIcon app={icon as AppIconName} className="ds-mobile-app-header__icon" /> : icon}
-          <span className="ds-mobile-app-header__title">{title}</span>
-        </div>
+        </button>
 
-        <Tabs value={value} defaultValue={defaultValue} onValueChange={onValueChange} className="ds-mobile-app-header__tabs">
-          <TabList className="ds-mobile-app-header__tab-list">{children}</TabList>
-        </Tabs>
+        <div ref={scrollRef} className="ds-mobile-app-header__scroll" data-fade-start={fadeStart} data-fade-end={fadeEnd}>
+          <span className="ds-mobile-app-header__title">{title}</span>
+
+          <Tabs value={value} defaultValue={defaultValue} onValueChange={onValueChange} className="ds-mobile-app-header__tabs">
+            <TabList className="ds-mobile-app-header__tab-list">{children}</TabList>
+          </Tabs>
+        </div>
 
         {actions && <div className="ds-mobile-app-header__actions">{actions}</div>}
       </div>
