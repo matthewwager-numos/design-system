@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { clsx } from "clsx";
@@ -7,6 +7,7 @@ import { ButtonGroup } from "../ButtonGroup";
 import { FormBody, FormFooter } from "../Form";
 import { ProgressIndicator } from "../ProgressIndicator";
 import type { ProgressIndicatorStep } from "../ProgressIndicator";
+import { useMeasuredHeightVar } from "../hooks/useMeasuredHeightVar";
 import "./Wizard.css";
 
 export interface WizardStep {
@@ -29,7 +30,7 @@ export interface WizardProps {
   stepIndex?: number;
   defaultStepIndex?: number;
   onStepIndexChange?: (index: number) => void;
-  /** Controlled step-panel visibility, toggled by the header's expand/collapse button. Omit to let Wizard manage its own (defaults to expanded). */
+  /** Controlled step-panel visibility, toggled by the header's expand/collapse button. Omit to let Wizard manage its own (defaults to collapsed). */
   stepPanelExpanded?: boolean;
   defaultStepPanelExpanded?: boolean;
   onStepPanelExpandedChange?: (expanded: boolean) => void;
@@ -75,7 +76,7 @@ export function Wizard({
   defaultStepIndex = 0,
   onStepIndexChange,
   stepPanelExpanded: controlledPanelExpanded,
-  defaultStepPanelExpanded = true,
+  defaultStepPanelExpanded = false,
   onStepPanelExpandedChange,
   onSaveExit,
   secondaryAction,
@@ -89,6 +90,16 @@ export function Wizard({
 
   const [uncontrolledPanelExpanded, setUncontrolledPanelExpanded] = useState(defaultStepPanelExpanded);
   const panelExpanded = controlledPanelExpanded ?? uncontrolledPanelExpanded;
+
+  // The footer is pinned (position: fixed, scoped to this form's own
+  // bounds — see `.ds-wizard`'s `contain: layout` — rather than the whole
+  // viewport, so it doesn't bleed over a sidebar next to Wizard on desktop)
+  // so it's still reachable even if the mobile keyboard shrinks the visual
+  // viewport while a field is focused. Its real height, not a guess, offsets
+  // the scrolling regions above it so their content doesn't end up hidden
+  // underneath it.
+  const formRef = useRef<HTMLFormElement>(null);
+  const footerRef = useMeasuredHeightVar<HTMLDivElement>("--wizard-footer-height", () => formRef.current!);
 
   const isFirstStep = stepIndex === 0;
   const isLastStep = stepIndex === steps.length - 1;
@@ -126,7 +137,7 @@ export function Wizard({
     // validate their own fields and drive TextInput/etc.'s real error
     // state instead, per this design system's own "real state, not a
     // browser guess" philosophy.
-    <form className={clsx("ds-wizard", className)} onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className={clsx("ds-wizard", className)} onSubmit={handleSubmit} noValidate>
       <div className="ds-wizard-header">
         <div className="ds-wizard-header__row">
           <button
@@ -179,7 +190,7 @@ export function Wizard({
         </div>
       </div>
 
-      <FormFooter secondaryAction={secondaryAction}>
+      <FormFooter ref={footerRef} className="ds-wizard-footer" secondaryAction={secondaryAction}>
         <ButtonGroup>
           {!isFirstStep && (
             <Button variant="secondary" type="button" onClick={() => setStepIndex(stepIndex - 1)}>

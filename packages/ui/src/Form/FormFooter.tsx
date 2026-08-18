@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import type { ReactNode } from "react";
 import { clsx } from "clsx";
 
@@ -14,12 +15,17 @@ export interface FormFooterProps {
   className?: string;
 }
 
-/** `<Form>`'s action row: an optional secondary action on the left, primary actions on the right. */
-export function FormFooter({ secondaryAction, children, className }: FormFooterProps) {
+/**
+ * `<Form>`'s action row: an optional secondary action on the left, primary
+ * actions on the right. Forwards its ref to the real footer `<div>` — e.g.
+ * `<Wizard>` measures its own footer this way, to pin it in place without
+ * hand-typing an assumed height.
+ */
+export const FormFooter = forwardRef<HTMLDivElement, FormFooterProps>(function FormFooter({ secondaryAction, children, className }, ref) {
   return (
-    <div className={clsx("ds-form-footer", className)}>
+    <div ref={ref} className={clsx("ds-form-footer", className)}>
       {secondaryAction}
       <div className="ds-form-footer__actions">{children}</div>
     </div>
   );
-}
+});

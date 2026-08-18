@@ -17,6 +17,11 @@
      explicitly background-default — the rest (this root, and the step
      content between them) is background-secondary. */
   background: var(--background-secondary);
+  /* Makes this form itself the containing block for the footer's
+     `position: fixed` below, instead of the true viewport — so the pinned
+     footer stays scoped to Wizard's own box (e.g. beside a desktop sidebar)
+     rather than spanning the whole screen and covering it. */
+  contain: layout;
 }
 
 /* ── Header ────────────────────────────────────────────────────────── */
@@ -105,6 +110,11 @@
   width: 12.5rem;
   flex-shrink: 0;
   padding: var(--space-6);
+  /* Extra bottom clearance so this panel's own independent scroll doesn't
+     end up underneath the fixed footer below — same reasoning as
+     .ds-wizard-content's own padding-bottom. Falls back to a reasonable
+     guess until the real height lands (see .ds-wizard-footer). */
+  padding-bottom: calc(var(--space-6) + var(--wizard-footer-height, 4.5rem));
   background: var(--background-default);
   border-right: 1px solid var(--border-subtle);
   overflow-x: hidden;
@@ -129,6 +139,10 @@
   flex-direction: column;
   gap: var(--space-5);
   padding: var(--space-6) var(--space-5);
+  /* Extra bottom clearance so the last field doesn't end up underneath the
+     fixed footer below — falls back to a reasonable guess until the real
+     height lands (see `.ds-wizard-footer`). */
+  padding-bottom: calc(var(--space-6) + var(--wizard-footer-height, 4.5rem));
   overflow-y: auto;
 }
 
@@ -158,6 +172,23 @@
   font: var(--type-paragraph-s-regular);
   letter-spacing: var(--type-paragraph-s-regular-tracking);
   color: var(--content-subtle);
+}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+
+.ds-wizard-footer {
+  /* Pinned to this form's own bounds (see .ds-wizard's `contain: layout`)
+     rather than left to sit at the natural bottom of a flex column — a
+     plain flex-bottom footer can end up below the visible area once a
+     mobile browser shrinks the *visual* viewport for an on-screen
+     keyboard, even though the *layout* viewport (and this component's own
+     height: 100%) hasn't changed. Fixed positioning keeps it reachable
+     regardless. */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
 }
 
 /* Figma's step fields sit in a fixed-width column centered in Content,

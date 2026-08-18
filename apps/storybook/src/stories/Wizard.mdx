@@ -65,7 +65,7 @@ A side effect worth knowing: the HTML spec excludes non-rendered controls (anyth
 
 ## The step panel
 
-The step panel shows a vertical `<ProgressIndicator>` — one entry per step, `state: "completed"` for everything before the current one — toggled open/closed by the header's leading icon button. `defaultStepPanelExpanded` sets its initial state (defaults to open); `stepPanelExpanded`/`onStepPanelExpandedChange` control it yourself if the surrounding page needs to know.
+The step panel shows a vertical `<ProgressIndicator>` — one entry per step, `state: "completed"` for everything before the current one — toggled open/closed by the header's leading icon button. `defaultStepPanelExpanded` sets its initial state (defaults to collapsed); `stepPanelExpanded`/`onStepPanelExpandedChange` control it yourself if the surrounding page needs to know.
 
 <Canvas of={WizardStories.PanelCollapsedByDefault} />
 

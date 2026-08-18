@@ -116,11 +116,11 @@ export const Default: Story = {
   render: () => <WizardDemo />,
 };
 
-export const PanelCollapsedByDefault: Story = {
-  name: "defaultStepPanelExpanded={false}",
+export const PanelExpandedByDefault: Story = {
+  name: "defaultStepPanelExpanded={true}",
   render: () => (
     <div style={PREVIEW_STYLE}>
-      <Wizard title="Add employee" steps={STEPS} defaultStepPanelExpanded={false} onFinish={() => {}} />
+      <Wizard title="Add employee" steps={STEPS} defaultStepPanelExpanded={true} onFinish={() => {}} />
     </div>
   ),
 };
