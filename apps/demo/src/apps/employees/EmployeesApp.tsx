@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Users } from "lucide-react";
-import { Header, MobileAppHeader, Tab, TabList, Tabs } from "@numosai/ui";
+import { Header, MobileAppHeader, Tab, TabList, Tabs, useMeasuredHeightVar } from "@numosai/ui";
 import { EmployeesProvider, useEmployees } from "../../data/useEmployees";
 import { useToast } from "../../toast/ToastProvider";
-import { useMeasuredHeightVar } from "../../useMeasuredHeightVar";
 import { OverviewTab } from "./OverviewTab";
 import { ObjectManagementTab } from "./ObjectManagementTab";
 import { HistoryTab } from "./HistoryTab";

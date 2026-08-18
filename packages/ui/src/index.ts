@@ -117,3 +117,9 @@ export type { SettingProps, SettingType, SettingOption } from "./Setting";
 
 export { SettingsCard } from "./SettingsCard";
 export type { SettingsCardProps } from "./SettingsCard";
+
+// Not a component — a small utility `<Wizard>` uses internally to pin its
+// own footer, and that consuming apps can reuse for the same "fixed chrome
+// needs a real measured height, not a guess" problem (e.g. a fixed mobile
+// nav bar).
+export { useMeasuredHeightVar } from "./hooks/useMeasuredHeightVar";

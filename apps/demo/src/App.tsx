@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { MobileNav, Navigation } from "@numosai/ui";
+import { MobileNav, Navigation, useMeasuredHeightVar } from "@numosai/ui";
 import { NavContent, accountMenu } from "./NavContent";
 import { HomePage } from "./pages/HomePage";
 import { EmployeesApp } from "./apps/employees/EmployeesApp";
 import { ToastProvider } from "./toast/ToastProvider";
-import { useMeasuredHeightVar } from "./useMeasuredHeightVar";
 import type { PageId } from "./pages";
 
 export default function App() {
