@@ -298,7 +298,7 @@
     --background-notice-base: var(--yellow-500);
     --background-positive: var(--green-1100);
     --background-positive-base: var(--green-500);
-    --background-secondary: var(--gray-1000);
+    --background-secondary: var(--gray-800);
     --background-selected: var(--brand-1100);
 
     --border-alt-negative: var(--magenta-500);
@@ -437,7 +437,7 @@
   --background-notice-base: var(--yellow-500);
   --background-positive: var(--green-1100);
   --background-positive-base: var(--green-500);
-  --background-secondary: var(--gray-1000);
+  --background-secondary: var(--gray-800);
   --background-selected: var(--brand-1100);
 
   --border-alt-negative: var(--magenta-500);
