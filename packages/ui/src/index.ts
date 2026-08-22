@@ -31,6 +31,9 @@ export type {
 export { Select } from "./Select";
 export type { SelectProps, SelectOption, SelectSize, SelectStatus } from "./Select";
 
+export { MultiSelect } from "./MultiSelect";
+export type { MultiSelectProps, MultiSelectOption, MultiSelectSize, MultiSelectStatus } from "./MultiSelect";
+
 export { Banner } from "./Banner";
 export type { BannerProps, BannerStatus } from "./Banner";
 

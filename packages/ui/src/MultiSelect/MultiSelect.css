@@ -1,0 +1,245 @@
+/*
+ * MultiSelect styles — pure token-driven CSS. Mirrors Select.css almost
+ * exactly (same field anatomy in Figma, confirmed size-for-size), plus the
+ * open-state chip row. Chips reuse Label's own `.ds-label`/`.ds-label--info`
+ * classes directly (loaded globally as part of Label.css) rather than the
+ * `<Label>` component — see MultiSelect.tsx's own comment on why.
+ */
+
+.ds-multi-select {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+/* Same reasoning as .ds-select .ds-dropdown-menu-root — see Select.css. */
+.ds-multi-select .ds-dropdown-menu-root {
+  display: block;
+  width: 100%;
+}
+
+.ds-multi-select:has(.ds-multi-select__field--disabled) .ds-multi-select__label {
+  color: var(--content-disabled);
+}
+
+.ds-multi-select__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  border: 1px solid transparent;
+  background: var(--background-element);
+  color: var(--content-base);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-multi-select__field:hover:not(.ds-multi-select__field--disabled):not(.ds-multi-select__field--error):not(.ds-multi-select__field--success) {
+  background: var(--background-hover);
+}
+
+.ds-multi-select__field:focus-visible {
+  background: var(--background-default);
+  border-color: var(--border-brand);
+  box-shadow: var(--shadow-focus-brand);
+  outline: none;
+}
+
+/* A plain div (see MultiSelect.tsx), not a real disabled <button> — needs
+   its own inert treatment. pointer-events: none blocks every click inside,
+   chip remove buttons included, the same as a native disabled control would. */
+.ds-multi-select__field--disabled {
+  background: var(--background-secondary);
+  color: var(--content-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.ds-multi-select__field--error {
+  background: var(--background-default);
+  border-color: var(--border-negative);
+  box-shadow: var(--shadow-focus-negative);
+}
+.ds-multi-select__field--error:focus-visible {
+  border-color: var(--border-negative);
+  box-shadow: var(--shadow-focus-negative);
+}
+.ds-multi-select__field--error .ds-multi-select__value:not(.ds-multi-select__value--placeholder) {
+  color: var(--content-emphasis);
+}
+
+.ds-multi-select__field--success {
+  background: var(--background-default);
+  border-color: var(--border-positive);
+  box-shadow: var(--shadow-focus-positive);
+}
+.ds-multi-select__field--success:focus-visible {
+  border-color: var(--border-positive);
+  box-shadow: var(--shadow-focus-positive);
+}
+.ds-multi-select__field--success .ds-multi-select__value:not(.ds-multi-select__value--placeholder) {
+  color: var(--content-emphasis);
+}
+
+.ds-multi-select__value {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-multi-select__value--placeholder {
+  color: var(--content-placeholder);
+}
+
+.ds-multi-select__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ds-multi-select__chevron {
+  color: var(--content-subtle);
+  transition: transform var(--motion-toggle-fast);
+}
+.ds-multi-select__chevron--open {
+  transform: rotate(180deg);
+}
+
+/* A real <button>, unlike the chevron it replaces once open — clears every
+   selection without closing the panel (see MultiSelect.tsx's `clearAll`). */
+.ds-multi-select__clear {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--content-subtle);
+  cursor: pointer;
+}
+.ds-multi-select__clear:hover {
+  color: var(--content-base);
+}
+
+/* ── Chips (open state) ────────────────────────────────────────────── */
+
+.ds-multi-select__chips {
+  display: flex;
+  flex: 1 0 0;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.ds-multi-select__chip {
+  gap: var(--space-1);
+}
+
+.ds-multi-select__chip-remove {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+}
+.ds-multi-select__chip-remove:hover {
+  color: var(--content-brand-primary);
+}
+
+.ds-multi-select__help {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--content-subtle);
+}
+.ds-multi-select__help--error {
+  color: var(--content-negative);
+}
+.ds-multi-select__help--success {
+  color: var(--content-positive);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-multi-select--lg .ds-multi-select__field {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+}
+.ds-multi-select--lg .ds-multi-select__value {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+.ds-multi-select--lg .ds-multi-select__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-multi-select--lg .ds-multi-select__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ds-multi-select--md .ds-multi-select__field {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+.ds-multi-select--md .ds-multi-select__value {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-multi-select--md .ds-multi-select__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-multi-select--md .ds-multi-select__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-multi-select--sm .ds-multi-select__field {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.ds-multi-select--sm .ds-multi-select__value {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-multi-select--sm .ds-multi-select__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-multi-select--sm .ds-multi-select__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Below this width, "md"/"sm" render at "lg" metrics regardless of the
+   `size` prop — same reasoning (and breakpoint) as <Select>'s own mobile
+   override; see Select.css. */
+@media (max-width: 767px) {
+  .ds-multi-select--md .ds-multi-select__field,
+  .ds-multi-select--sm .ds-multi-select__field {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+  .ds-multi-select--md .ds-multi-select__value,
+  .ds-multi-select--sm .ds-multi-select__value {
+    font: var(--type-paragraph-m-regular);
+    letter-spacing: var(--type-paragraph-m-regular-tracking);
+  }
+  .ds-multi-select--md .ds-multi-select__help,
+  .ds-multi-select--sm .ds-multi-select__help {
+    font: var(--type-paragraph-s-regular);
+    letter-spacing: var(--type-paragraph-s-regular-tracking);
+  }
+  .ds-multi-select--md .ds-multi-select__icon svg,
+  .ds-multi-select--sm .ds-multi-select__icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}

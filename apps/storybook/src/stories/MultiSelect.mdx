@@ -1,0 +1,104 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as MultiSelectStories from "./MultiSelect.stories";
+
+<Meta of={MultiSelectStories} />
+
+# MultiSelect
+
+A multi-choice field — the "checkbox" side of the same distinction `<Select>` draws for a single choice. Built on the same pieces: `<DropdownMenu>` for the panel, `<FieldLabel>` for the label, and `<Label>`'s own token classes for the removable chips.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Choosing any number of values from a list of options in a form.
+- Use `status="error"` / `"success"` with `helpText` for validation feedback, exactly like `<Select>`/`<TextInput>`.
+
+## When NOT to use
+
+- Choosing exactly one value — `<Select>` is the right primitive there, not this component with a 1-item cap bolted on.
+- More than ~10-ish options, or when users need to search — a searchable multi-select (typeahead) fits better; this component doesn't filter its list.
+
+## Implementation
+
+```tsx
+import { MultiSelect } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+const options = [
+  { value: "apple", label: "Apple" },
+  { value: "banana", label: "Banana" },
+  { value: "cherry", label: "Cherry" },
+];
+
+<MultiSelect label="Fruit" placeholder="Select fruit" options={options} />
+```
+
+### Controlled
+
+```tsx
+const [value, setValue] = useState<string[]>([]);
+
+<MultiSelect label="Fruit" options={options} value={value} onChange={setValue} />
+```
+
+### In a native `<form>`
+
+Pass `name` to render one hidden input per selected value (all sharing that `name`), so every value shows up via `FormData.getAll(name)` — the same pattern a checkbox group's own values use, not a single hidden input like `<Select>`'s:
+
+```tsx
+<MultiSelect name="fruit" label="Fruit" options={options} />
+```
+
+### With validation
+
+```tsx
+<MultiSelect
+  label="Fruit"
+  options={options}
+  status="error"
+  helpText="Please choose at least one fruit."
+/>
+```
+
+## Examples
+
+<Canvas of={MultiSelectStories.Default} />
+<Canvas of={MultiSelectStories.WithSelection} />
+<Canvas of={MultiSelectStories.Error} />
+<Canvas of={MultiSelectStories.Success} />
+<Canvas of={MultiSelectStories.Disabled} />
+
+## Sizes
+
+<Canvas of={MultiSelectStories.Sizes} />
+
+## The field shows two different things, depending on open/closed
+
+Confirmed from Figma: closed, the field shows a plain comma-joined text summary of the selected labels (truncated with an ellipsis, exactly like a single `<Select>`'s own value) — not chips. Chips only appear once the panel is open. A field that permanently grows chip-tall for every prior selection would make a long-selected field dominate the rest of the form; collapsing to a one-line summary when closed avoids that, at the cost of the chips' own remove buttons only being reachable while the panel is open.
+
+Each chip is `<Label status="info">`'s own token classes, not the `<Label>` component itself — its `trailingIcon` slot is intentionally `aria-hidden` (correct for a decorative icon), which would make a real "remove" button invisible to assistive tech if used that way. The remove button is a genuine focusable `<button aria-label="Remove {value}">` instead, styled to match.
+
+## Clearing
+
+Once the panel is open with a selection, the trailing chevron is replaced by a "Clear all" button — clicking it empties the selection without closing the panel, so you can immediately pick something else. Removing one chip at a time works the same way, both without toggling the panel closed (each stops its own click from reaching the field, which is what the chevron/trigger click listens for).
+
+## Selected options keep their checkmark, independent of hover
+
+In the open panel, every already-selected option shows a trailing checkmark — not just the one currently hovered or keyboard-focused. Hover/keyboard-focus is its own real `:focus-visible`/`:hover` state on `<DropdownMenuItem>`, unchanged from `<Select>`'s own panel; the checkmark is a second, independent signal for "this one is picked," since more than one can be at once. Clicking an option toggles it in or out of the selection without closing the panel (`closeOnSelect={false}`), unlike `<Select>`, where any click is necessarily final.
+
+## Options
+
+Each option is `{ value, label, disabled? }`. `disabled` options are unclickable and skipped by keyboard navigation — both handled by `<DropdownMenuItem>`, not reimplemented here.
+
+## Accessibility
+
+- The field is a `role="button"` div, not a real `<button>` — same reasoning as `<Card>`: it needs to contain other real interactive controls (each chip's own remove button, and the clear-all button), and a `<button>` can't legally contain another one. `tabIndex`/keyboard handling reproduce real button behavior (Enter and Space both open the panel) without that constraint.
+- Sets `aria-invalid="true"` automatically when `status="error"`, and `aria-disabled="true"` when `disabled` (paired with `pointer-events: none` in CSS, since a plain div has no native `disabled` attribute to fall back on).
+- Options inherit `<DropdownMenu>`'s `role="menu"`/`role="menuitem"` structure — see `<Select>`'s own accessibility notes for the same ARIA *menu* vs. *listbox* caveat.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.
