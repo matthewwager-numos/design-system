@@ -29,10 +29,11 @@
   overflow-y: auto;
   background: var(--background-default);
   border: 1px solid var(--border-brand);
-  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+  box-shadow: var(--shadow-focus-brand);
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  /* Enter/exit ease differently — see Modal.css's own comment on the same pattern. */
+  transition: opacity var(--motion-exit-fast), transform var(--motion-exit-fast);
 }
 
 /* ── Placement ─────────────────────────────────────────────────────── */

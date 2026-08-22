@@ -19,18 +19,29 @@
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
+  /* outline is always "on" (solid, 2px) but invisible at rest — transparent
+     color, 0 offset — so focus only ever transitions outline-color/
+     outline-offset, both genuinely interpolable. `outline-style` itself
+     can't be transitioned (none↔solid is a hard flip, not a fade), which is
+     why this doesn't just add `outline: ...` inside `:focus-visible` alone.
+     --motion-pulse-fast (a slight overshoot, see tokens.css's "Semantic
+     motion" comment) gives the ring a touch of "snap" as it appears. */
+  outline: 2px solid transparent;
+  outline-offset: 0;
   transition:
     background-color var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out),
     border-color var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
+    transform var(--duration-fast) var(--ease-out),
+    outline-color var(--motion-pulse-fast),
+    outline-offset var(--motion-pulse-fast);
   user-select: none;
   white-space: nowrap;
 }
 
 .ds-button:focus-visible {
-  outline: 2px solid var(--button-primary-default);
+  outline-color: var(--button-primary-default);
   outline-offset: 2px;
 }
 
@@ -96,7 +107,7 @@
   color: var(--button-primary-default);
   border-width: 1.5px;
   border-color: var(--content-link-default);
-  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+  box-shadow: var(--shadow-focus-brand);
 }
 
 .ds-button--accent {

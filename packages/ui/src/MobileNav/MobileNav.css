@@ -105,11 +105,13 @@
      panel expands downward from a top bar; a rail expands sideways from
      its collapsed edge). */
   height: 0;
-  transition: height var(--duration-base) var(--ease-out);
+  /* Enter/exit ease differently — see Modal.css's own comment on the same pattern. */
+  transition: height var(--motion-exit);
 }
 
 .ds-mobile-nav-panel--visible {
   height: 100%;
+  transition: height var(--motion-enter);
 }
 
 .ds-mobile-nav-panel__head {

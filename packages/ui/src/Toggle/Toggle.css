@@ -56,13 +56,16 @@
   left: 0;
   border-radius: var(--radius-full);
   background: var(--background-default);
-  transition: transform var(--duration-fast) var(--ease-out);
+  /* Sliding between two persistent resting positions (off/on), not a
+     mount/unmount — --motion-toggle-fast, not the enter/exit split (see
+     tokens.css's own "Semantic motion" comment). */
+  transition: transform var(--motion-toggle-fast);
 }
 
 .ds-toggle__input:checked ~ .ds-toggle__track {
   background: var(--content-brand-primary);
   border-color: var(--content-brand-primary);
-  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+  box-shadow: var(--shadow-focus-brand);
 }
 
 .ds-toggle__input:focus-visible ~ .ds-toggle__track {

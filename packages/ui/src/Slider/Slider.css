@@ -4,6 +4,10 @@
  * real `:hover` here (same philosophy as <TextInput>), confirmed to darken
  * the whole track (not just the thumb): both the track's background and
  * the thumb's border change together on hover.
+ * Focus border-color uses `--border-brand` — the exact pairing Figma's own
+ * "Depth and Focus" swatches use alongside `--shadow-focus-brand`, not
+ * `--background-brand-base` (an easy mix-up: those alias the same
+ * primitive today, so the wrong pairing wasn't visibly broken).
  */
 
 .ds-slider {
@@ -93,8 +97,8 @@
 
 .ds-slider__thumb:focus-visible {
   outline: none;
-  border-color: var(--background-brand-base);
-  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+  border-color: var(--border-brand);
+  box-shadow: var(--shadow-focus-brand);
 }
 
 .ds-slider__thumb--dragging {

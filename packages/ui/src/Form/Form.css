@@ -1,9 +1,7 @@
 /*
  * Form styles — pure token-driven CSS. Matches Figma's Form/FormHeader/
- * FormBody/FormFooter exactly, including the card elevation shadow
- * (--overlay-default-25, added to tokens.css for this — Figma's own
- * "Overlay/Default 25" variable, the 25%-opacity sibling of the existing
- * 50%-opacity --overlay-default-50).
+ * FormBody/FormFooter exactly, including the card elevation shadow —
+ * confirmed as Figma's own "L1" effect style (Depth and Focus page).
  */
 
 .ds-form {
@@ -11,7 +9,7 @@
   flex-direction: column;
   background: var(--background-default);
   border-radius: var(--radius-md);
-  box-shadow: 0 1px 2px var(--overlay-default-25);
+  box-shadow: var(--shadow-l1);
   overflow: hidden;
 }
 

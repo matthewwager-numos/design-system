@@ -25,7 +25,9 @@
   background: var(--background-default);
   border-radius: var(--radius-md);
   box-shadow: 0 0 8px color-mix(in srgb, var(--brand-1100) 10%, transparent);
-  transition: width var(--duration-base) var(--ease-out);
+  /* Toggling between two persistent widths (expanded/collapsed), not a
+     mount/unmount — --motion-toggle (see tokens.css's own "Semantic motion" comment). */
+  transition: width var(--motion-toggle);
 }
 
 .ds-navigation--collapsed {

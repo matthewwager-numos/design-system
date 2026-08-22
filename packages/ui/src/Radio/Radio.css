@@ -2,6 +2,11 @@
  * Radio styles — mirrors Checkbox.css almost exactly (same tokens, same
  * Hover/Focus/Checked/Disabled-as-real-CSS philosophy), just circular and
  * with a solid inner dot instead of a checkmark, and no indeterminate state.
+ * Focus/error border-color use `--border-brand`/`--border-negative` — the
+ * exact pairing Figma's own "Depth and Focus" swatches use alongside
+ * `--shadow-focus-brand`/`-negative`, not `--background-brand-base`/
+ * `-negative-base` (an easy mix-up: those alias the same primitives today,
+ * so the wrong pairing wasn't visibly broken, just not the real token).
  */
 
 .ds-radio {
@@ -76,16 +81,16 @@
 }
 
 .ds-radio__input:focus-visible ~ .ds-radio__box {
-  border-color: var(--background-brand-base);
-  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+  border-color: var(--border-brand);
+  box-shadow: var(--shadow-focus-brand);
 }
 
 .ds-radio__input--error ~ .ds-radio__box {
   background: var(--background-default);
-  border-color: var(--background-negative-base);
+  border-color: var(--border-negative);
 }
 .ds-radio__input--error:focus-visible ~ .ds-radio__box {
-  box-shadow: 0 0 0 2px var(--background-negative);
+  box-shadow: var(--shadow-focus-negative);
 }
 .ds-radio__input--error:checked ~ .ds-radio__box {
   background: var(--button-primary-default);

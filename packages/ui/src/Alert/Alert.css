@@ -2,12 +2,17 @@
  * Alert styles — positioning and transition only. The visual card itself
  * (colors, icon, title, description, close button) is <Banner>'s CSS —
  * Alert renders a <Banner> and layers these classes on the same element.
+ *
+ * Enter and exit deliberately use different easing — `--motion-exit-fast`/
+ * `--motion-enter-fast` (see tokens.css's own "Semantic motion" comment) —
+ * declared on `--visible` itself rather than the base class so removing
+ * that class (exit) reverts to the base rule's own `--motion-exit-fast`.
  */
 
 .ds-alert {
   width: 100%;
   opacity: 0;
-  transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  transition: opacity var(--motion-exit-fast), transform var(--motion-exit-fast);
 }
 
 .ds-alert--top {
@@ -21,6 +26,7 @@
 .ds-alert--visible {
   opacity: 1;
   transform: translateY(0);
+  transition: opacity var(--motion-enter-fast), transform var(--motion-enter-fast);
 }
 
 /* ── Viewport (one shared per position, alerts stack inside it) ──────── */

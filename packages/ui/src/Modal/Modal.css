@@ -19,10 +19,12 @@
   display: flex;
   background: var(--overlay-default-50);
   opacity: 0;
-  transition: opacity var(--duration-base) var(--ease-out);
+  /* Enter/exit ease differently — see .ds-modal's own comment below. */
+  transition: opacity var(--motion-exit);
 }
 .ds-modal-overlay--visible {
   opacity: 1;
+  transition: opacity var(--motion-enter);
 }
 
 .ds-modal-overlay--default {
@@ -61,14 +63,21 @@
   flex-direction: column;
   min-width: 20rem;
   background: var(--background-default);
-  box-shadow: 0 4px 8px var(--overlay-default-25);
+  /* Confirmed as Figma's own "L3" effect style (Depth and Focus page). */
+  box-shadow: var(--shadow-l3);
   overflow: hidden;
   outline: none;
   opacity: 0;
-  transition: opacity var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out);
+  /* Exiting (this rule) eases in — accelerating away; entering
+     (`--visible`'s own transition, below) eases out instead — decelerating
+     into place. Same reasoning for `.ds-modal-overlay` above: a mount/
+     unmount animation, not a toggle between two persistent states, gets
+     this enter/exit split rather than one shared easing for both. */
+  transition: opacity var(--motion-exit), transform var(--motion-exit);
 }
 .ds-modal--visible {
   opacity: 1;
+  transition: opacity var(--motion-enter), transform var(--motion-enter);
 }
 
 .ds-modal--default {

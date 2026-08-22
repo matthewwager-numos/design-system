@@ -42,7 +42,7 @@
 .ds-textarea__field:focus-within {
   background: var(--background-default);
   border-color: var(--border-brand);
-  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+  box-shadow: var(--shadow-focus-brand);
 }
 
 .ds-textarea__field:has(:disabled) {
@@ -52,11 +52,11 @@
 .ds-textarea__field--error {
   background: var(--background-default);
   border-color: var(--border-negative);
-  box-shadow: 0 0 0 2px var(--background-negative);
+  box-shadow: var(--shadow-focus-negative);
 }
 .ds-textarea__field--error:focus-within {
   border-color: var(--border-negative);
-  box-shadow: 0 0 0 2px var(--background-negative);
+  box-shadow: var(--shadow-focus-negative);
 }
 .ds-textarea__field--error .ds-textarea__control {
   color: var(--content-emphasis);
@@ -65,11 +65,11 @@
 .ds-textarea__field--success {
   background: var(--background-default);
   border-color: var(--border-positive);
-  box-shadow: 0 0 0 2px var(--background-positive);
+  box-shadow: var(--shadow-focus-positive);
 }
 .ds-textarea__field--success:focus-within {
   border-color: var(--border-positive);
-  box-shadow: 0 0 0 2px var(--background-positive);
+  box-shadow: var(--shadow-focus-positive);
 }
 .ds-textarea__field--success .ds-textarea__control {
   color: var(--content-emphasis);

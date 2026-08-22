@@ -119,9 +119,15 @@
   border-right: 1px solid var(--border-subtle);
   overflow-x: hidden;
   overflow-y: auto;
+  /* width/padding use --motion-toggle — a toggle between two persistent
+     states (expanded/collapsed), not a mount/unmount, so there's no
+     enter/exit to split (see tokens.css's own "Semantic motion" comment).
+     border-color is a plain fade with no movement, so it stays on the
+     plain --ease-out primitive rather than reaching for any of the four
+     motion verbs — none of them describe a fade with no direction. */
   transition:
-    width var(--duration-base) var(--ease-out),
-    padding var(--duration-base) var(--ease-out),
+    width var(--motion-toggle),
+    padding var(--motion-toggle),
     border-color var(--duration-base) var(--ease-out);
 }
 

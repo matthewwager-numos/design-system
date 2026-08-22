@@ -194,3 +194,133 @@ Each row applies its token as `font: var(--type-x)` plus `letter-spacing: var(--
 | `--radius-lg`  | 0.75rem  |
 | `--radius-xl`  | 1rem     |
 | `--radius-full`| 9999px   |
+
+## Motion
+
+There's no single global "transition everything" rule in this codebase (a blanket `transition: all` is a known anti-pattern — it animates properties that were never meant to, and forces the browser to watch every property on the element). Instead, ~30 components each declare their own explicit list of properties to transition, but all of them reach for the same handful of shared duration/easing tokens below — consistent timing without a blanket rule.
+
+<style>{`
+  .ds-motion-track {
+    position: relative;
+    height: 2.5rem;
+    background: var(--background-secondary);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .ds-motion-dot {
+    position: absolute;
+    top: 50%;
+    left: var(--space-2);
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: -0.75rem;
+    border-radius: var(--radius-full);
+    background: var(--content-brand-primary);
+    animation-name: ds-motion-move;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+  @keyframes ds-motion-move {
+    from { transform: translateX(0); }
+    to { transform: translateX(min(200px, calc(100% - 2 * var(--space-2) - 1.5rem))); }
+  }
+`}</style>
+
+### Duration
+
+`--duration-fast` (150ms) and `--duration-base` (250ms) are both in real use across the library — `fast` for hover/focus feedback, `base` for a layout-affecting reveal (a panel expanding, a card resizing). `--duration-slow` (400ms) is defined for a genuinely larger movement, but nothing reaches for it yet — documented honestly rather than force-fitting it somewhere. The three demos below are slowed to ~8× their real duration so the difference is visible at a glance; the label under each is the token's real value.
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "1.5rem", marginTop: "1rem" }}>
+  {[
+    ["fast", "150ms", "1.2s"],
+    ["base", "250ms", "2s"],
+    ["slow", "400ms", "3.2s"],
+  ].map(([name, real, demo]) => (
+    <div key={name} style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div className="ds-motion-track">
+        <div className="ds-motion-dot" style={{ animationDuration: demo, animationTimingFunction: "var(--ease-out)" }} />
+      </div>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--content-subtle)" }}>--duration-{name} ({real})</span>
+    </div>
+  ))}
+</div>
+
+### Easing
+
+All three share the same "Expo" curve family — `--ease-in`/`--ease-in-out` aren't an unrelated easing, they're the same personality as the original `--ease-out` mirrored for entering vs. exiting, so a component's enter and exit feel like the same motion in reverse rather than two different curves. Duration is fixed at 1.6s across all three below so only the shape of the curve differs.
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "1.5rem", marginTop: "1rem" }}>
+  {["ease-out", "ease-in", "ease-in-out"].map((name) => (
+    <div key={name} style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div className="ds-motion-track">
+        <div className="ds-motion-dot" style={{ animationDuration: "1.6s", animationTimingFunction: `var(--${name})` }} />
+      </div>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--content-subtle)" }}>--{name}</span>
+    </div>
+  ))}
+</div>
+
+### Which easing for what
+
+Grouped by *why* something is moving, not by which way it moves on screen — `<Alert>` can enter by sliding either down (docked to the top) or up (docked to the bottom), so a literal "upward eases out, downward eases in" rule would flip depending on position. What stays constant is whether the movement is a mount/unmount or a toggle between two states that are both already "home":
+
+- **Entering/appearing** — `--ease-out`. Decelerating into place: a `<Modal>`/`<Alert>`/`<Tooltip>`/`<DropdownMenu>` arriving, a `<MobileNav>` panel opening.
+- **Exiting/disappearing** — `--ease-in`. Accelerating away: the same components leaving. Declared on the "visible" class itself (not the base, hidden class) so removing that class — the exit — reverts to the base rule's own `--ease-in`, while adding it — the entrance — picks up `--ease-out`.
+- **Toggling between two persistent states** — `--ease-in-out`. Neither arriving nor leaving, just moving between two "at rest" positions: `<Accordion>`'s chevron and panel, `<Toggle>`'s thumb, `<Navigation>`'s rail width, `<Wizard>`'s step panel, `<Card>`'s `expand`.
+- **Plain color/shadow fades** (hover backgrounds, focus rings) — `--ease-out` by default. They have no direction to speak of, so there's no enter/exit/toggle distinction to make.
+
+## Depth and Focus
+
+Matches Figma's own "Depth and Focus" Foundations page — 9 real Effect styles (all drop shadows), not hand-picked values. `L1`–`L4` are elevation, in increasing offset/blur; `Focus Brand`/`Negative`/`Positive` are the exact same `Background/Brand Subdued`/`Negative`/`Positive` semantic tokens already used as solid fills elsewhere, just as a spread-2 ring instead — components that need a colored focus ring should reach for these rather than reassembling the same box-shadow by hand.
+
+### Elevation
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "2rem", marginTop: "1rem", padding: "2rem 1.5rem", background: "var(--background-secondary)", borderRadius: "var(--radius-md)" }}>
+  {["l1", "l2", "l3", "l4"].map((name) => (
+    <div key={name} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem" }}>
+      <div style={{ width: "72px", height: "72px", background: "var(--background-default)", borderRadius: "var(--radius-md)", boxShadow: `var(--shadow-${name})` }} />
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--content-subtle)" }}>--shadow-{name}</span>
+    </div>
+  ))}
+</div>
+
+### Focus
+
+Applied on `:focus-visible` (and, for `Card`'s `selected` state, as real controlled app state rather than a transient focus) — see `Props`/`Implementation` on each component's own docs page for which state triggers it.
+
+Figma's own swatches always pair the shadow with a matching 1px border — not part of the Effect style itself (a Figma "Effect" is shadow-only; border is a separate stroke property), but a real, consistent pairing across all three swatches, so components should always set both together: `--shadow-focus-brand` with `--border-brand`, `--shadow-focus-negative` with `--border-negative`, `--shadow-focus-positive` with `--border-positive`.
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "2rem", marginTop: "1rem", padding: "2rem 1.5rem", background: "var(--background-secondary)", borderRadius: "var(--radius-md)" }}>
+  {[
+    ["focus-brand", "border-brand"],
+    ["focus-negative", "border-negative"],
+    ["focus-positive", "border-positive"],
+  ].map(([shadow, border]) => (
+    <div key={shadow} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem" }}>
+      <div style={{
+        width: "72px",
+        height: "72px",
+        background: "var(--background-default)",
+        borderRadius: "var(--radius-md)",
+        border: `1px solid var(--${border})`,
+        boxShadow: `var(--shadow-${shadow})`,
+      }} />
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--content-subtle)", textAlign: "center" }}>
+        --shadow-{shadow}<br />+ --{border}
+      </span>
+    </div>
+  ))}
+</div>
+
+### Glow
+
+Not currently used by any component — Figma documents them, but nothing in this library's real screens calls for one yet.
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "2rem", marginTop: "1rem", padding: "2rem 1.5rem", background: "var(--background-secondary)", borderRadius: "var(--radius-md)" }}>
+  {["glow-positive", "glow-brand"].map((name) => (
+    <div key={name} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem" }}>
+      <div style={{ width: "72px", height: "72px", background: "var(--background-default)", borderRadius: "var(--radius-md)", boxShadow: `var(--shadow-${name})` }} />
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--content-subtle)" }}>--shadow-{name}</span>
+    </div>
+  ))}
+</div>

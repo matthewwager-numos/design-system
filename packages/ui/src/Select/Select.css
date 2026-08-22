@@ -51,7 +51,7 @@
 .ds-select__field:focus-visible {
   background: var(--background-default);
   border-color: var(--border-brand);
-  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+  box-shadow: var(--shadow-focus-brand);
   outline: none;
 }
 
@@ -63,11 +63,11 @@
 .ds-select__field--error {
   background: var(--background-default);
   border-color: var(--border-negative);
-  box-shadow: 0 0 0 2px var(--background-negative);
+  box-shadow: var(--shadow-focus-negative);
 }
 .ds-select__field--error:focus-visible {
   border-color: var(--border-negative);
-  box-shadow: 0 0 0 2px var(--background-negative);
+  box-shadow: var(--shadow-focus-negative);
 }
 .ds-select__field--error .ds-select__value:not(.ds-select__value--placeholder) {
   color: var(--content-emphasis);
@@ -76,11 +76,11 @@
 .ds-select__field--success {
   background: var(--background-default);
   border-color: var(--border-positive);
-  box-shadow: 0 0 0 2px var(--background-positive);
+  box-shadow: var(--shadow-focus-positive);
 }
 .ds-select__field--success:focus-visible {
   border-color: var(--border-positive);
-  box-shadow: 0 0 0 2px var(--background-positive);
+  box-shadow: var(--shadow-focus-positive);
 }
 .ds-select__field--success .ds-select__value:not(.ds-select__value--placeholder) {
   color: var(--content-emphasis);

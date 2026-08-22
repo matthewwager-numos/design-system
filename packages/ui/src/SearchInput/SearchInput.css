@@ -45,7 +45,7 @@
 .ds-search-input__field:focus-within {
   background: var(--background-default);
   border-color: var(--border-brand);
-  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+  box-shadow: var(--shadow-focus-brand);
 }
 
 .ds-search-input__field:has(:disabled) {
@@ -55,21 +55,21 @@
 .ds-search-input__field--error {
   background: var(--background-default);
   border-color: var(--border-negative);
-  box-shadow: 0 0 0 2px var(--background-negative);
+  box-shadow: var(--shadow-focus-negative);
 }
 .ds-search-input__field--error:focus-within {
   border-color: var(--border-negative);
-  box-shadow: 0 0 0 2px var(--background-negative);
+  box-shadow: var(--shadow-focus-negative);
 }
 
 .ds-search-input__field--success {
   background: var(--background-default);
   border-color: var(--border-positive);
-  box-shadow: 0 0 0 2px var(--background-positive);
+  box-shadow: var(--shadow-focus-positive);
 }
 .ds-search-input__field--success:focus-within {
   border-color: var(--border-positive);
-  box-shadow: 0 0 0 2px var(--background-positive);
+  box-shadow: var(--shadow-focus-positive);
 }
 
 .ds-search-input__control {
@@ -146,7 +146,7 @@
   background: var(--background-default);
   border: 1px solid var(--border-brand);
   border-radius: var(--radius-lg);
-  box-shadow: 0 0 0 2px var(--background-brand-subdued);
+  box-shadow: var(--shadow-focus-brand);
 }
 
 .ds-search-input__option {

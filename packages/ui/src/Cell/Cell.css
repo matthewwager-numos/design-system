@@ -64,7 +64,11 @@
   height: 1rem;
   border-radius: var(--radius-full);
   background: var(--background-element);
-  animation: ds-cell-pulse 1.5s ease-in-out infinite;
+  /* 1.5s is a deliberately slower, ambient loading rhythm — not part of the
+     fast/base/slow interaction-feedback scale, so it stays a literal value
+     rather than reaching for --duration-slow (400ms, a different thing).
+     The curve itself still reaches for the shared token. */
+  animation: ds-cell-pulse 1.5s var(--ease-in-out) infinite;
 }
 
 @keyframes ds-cell-pulse {

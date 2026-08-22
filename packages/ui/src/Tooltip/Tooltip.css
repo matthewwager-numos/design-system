@@ -27,11 +27,13 @@
   border-radius: var(--radius-sm);
   pointer-events: none;
   opacity: 0;
-  transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  /* Enter/exit ease differently — see Modal.css's own comment on the same pattern. */
+  transition: opacity var(--motion-exit-fast), transform var(--motion-exit-fast);
 }
 
 .ds-tooltip--visible {
   opacity: 1;
+  transition: opacity var(--motion-enter-fast), transform var(--motion-enter-fast);
 }
 
 .ds-tooltip__title {

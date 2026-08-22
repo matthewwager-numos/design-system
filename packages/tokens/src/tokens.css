@@ -268,15 +268,105 @@
   --type-paragraph-xs-regular-tracking: var(--tracking-sm);
 
   /* ── Motion ──────────────────────────────────────────────────────── */
+  /* --duration-slow exists for a genuinely slower/larger movement, but no
+     component reaches for it yet — same "documented even if unused" honesty
+     as --shadow-glow-*.
+     --ease-in/--ease-in-out are the same "Expo" easing family as the
+     original --ease-out (cubic-bezier(0.16, 1, 0.3, 1) is easeOutExpo), not
+     an unrelated curve — an entrance and its matching exit should feel like
+     the same motion in reverse, not two different personalities. Usage
+     (see Storybook's Tokens page for the full reasoning): --ease-out for
+     something entering/appearing (decelerating into place), --ease-in for
+     something exiting/disappearing (accelerating away), --ease-in-out for
+     a toggle between two persistent states that isn't a mount/unmount at
+     all (a width/height reveal, a thumb sliding between two resting
+     positions) — grouped by that enter/exit/toggle distinction, not by
+     literal screen axis, since e.g. Alert can enter by moving either up or
+     down depending on which edge it's docked to. */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.87, 0, 0.13, 1);
+  /* "easeOutBack" — a well-known, widely-used curve (Framer Motion's own
+     default is this family), not one we invented. Overshoots past the
+     target before settling back — one snap, not a repeating bounce. Powers
+     --motion-pulse below; nothing else reaches for it directly. */
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
   --duration-fast: 150ms;
   --duration-base: 250ms;
   --duration-slow: 400ms;
 
-  /* ── Elevation ───────────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.05);
-  --shadow-md: 0 4px 8px oklch(0% 0 0 / 0.08);
-  --shadow-lg: 0 12px 24px oklch(0% 0 0 / 0.12);
+  /* ── Semantic motion ───────────────────────────────────────────────
+   * Named (duration, easing) pairs — plug straight into a `transition`
+   * property list (`transition: opacity var(--motion-enter)`) instead of
+   * spelling out a duration+easing pair by hand at every call site. Each
+   * verb answers *why* something is moving, matching the categories
+   * documented above and on Storybook's Tokens page:
+   *   - enter   → a mount, arriving. Decelerating into place (--ease-out).
+   *   - exit    → an unmount, leaving. Accelerating away (--ease-in).
+   *   - toggle  → moving between two persistent "at rest" states, no
+   *               mount/unmount involved (--ease-in-out).
+   *   - pulse   → a focus ring (or similar) drawing attention as it
+   *               appears — a quick, one-shot snap-into-place
+   *               (--ease-overshoot), not a repeating/looping animation.
+   *               Kept as a plain transition pair like the other three,
+   *               not a new @keyframes mechanism, so it costs nothing more
+   *               than the transition it replaces.
+   * Bare name = --duration-base ("med", the default tier); -fast/-slow
+   * suffixes swap only the duration, never the easing, so a component can
+   * size the *speed* of its motion without changing its *character*.
+   * These don't replace the primitives above — a component with genuinely
+   * unusual timing still composes a --duration and --ease pair directly
+   * (e.g. Card.css's border-color/box-shadow fades, which have no
+   * direction and so don't fit any of these four verbs).
+   */
+  --motion-enter-fast: var(--duration-fast) var(--ease-out);
+  --motion-enter: var(--duration-base) var(--ease-out);
+  --motion-enter-slow: var(--duration-slow) var(--ease-out);
+  --motion-exit-fast: var(--duration-fast) var(--ease-in);
+  --motion-exit: var(--duration-base) var(--ease-in);
+  --motion-exit-slow: var(--duration-slow) var(--ease-in);
+  --motion-toggle-fast: var(--duration-fast) var(--ease-in-out);
+  --motion-toggle: var(--duration-base) var(--ease-in-out);
+  --motion-toggle-slow: var(--duration-slow) var(--ease-in-out);
+  --motion-pulse-fast: var(--duration-fast) var(--ease-overshoot);
+  --motion-pulse: var(--duration-base) var(--ease-overshoot);
+  --motion-pulse-slow: var(--duration-slow) var(--ease-overshoot);
+
+  /* ── Depth and Focus ─────────────────────────────────────────────── */
+  /* Confirmed via get_variable_defs on Figma's own "Depth and Focus"
+     Foundations page — 9 real Effect styles, not hand-picked values.
+     L1–L4 are all Overlay/Default 25 at increasing offset/blur (the same
+     overlay primitive elevation already uses elsewhere, just via a shared
+     name now). Focus Brand/Negative/Positive reuse the exact same
+     Background/Brand Subdued/Negative/Positive semantic tokens already
+     used as solid fills elsewhere — genuinely the same token, just as a
+     spread-2 ring. Glow Positive/Brand aren't aliased to any semantic
+     (Figma's own swatches don't correspond to one), so they alias the
+     matching color primitives directly — Green/1100 and Brand/1000 at
+     Figma's own ~50% alpha.
+     Replaces the old hand-picked --shadow-sm/md/lg, which no real
+     component ever referenced and didn't match this real scale.
+
+     --shadow-focus-* is redeclared in every theme block below (like every
+     other semantic token in this file), NOT left to resolve once via
+     `var()` indirection — a custom property inherits its *computed* value,
+     with any nested var()s already substituted using the cascade at the
+     element that declared it. A `[data-theme="dark"]` div nested under
+     `:root` doesn't retroactively change what `:root`'s own already-baked
+     `--shadow-focus-brand` resolved to, so declaring it once at `:root`
+     silently keeps the light color for any consumer that isn't the true
+     document root. --shadow-l1–l4/glow-* don't need this: they only embed
+     theme-invariant primitives (--overlay-default-25 itself, --green-1100,
+     --brand-1000), so one declaration is genuinely enough. */
+  --shadow-l1: 0 1px 2px 0 var(--overlay-default-25);
+  --shadow-l2: 0 2px 4px 0 var(--overlay-default-25);
+  --shadow-l3: 0 4px 8px 0 var(--overlay-default-25);
+  --shadow-l4: 0 8px 16px 0 var(--overlay-default-25);
+  --shadow-glow-positive: 0 0 16px 0 var(--green-1100);
+  --shadow-glow-brand: 0 0 16px 0 color-mix(in srgb, var(--brand-1000) 50%, transparent);
+  --shadow-focus-brand: 0 0 0 2px var(--background-brand-subdued);
+  --shadow-focus-negative: 0 0 0 2px var(--background-negative);
+  --shadow-focus-positive: 0 0 0 2px var(--background-positive);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -345,6 +435,10 @@
     --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
     --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);
     --overlay-inverse-50: color-mix(in srgb, var(--beige-100) 50%, transparent);
+
+    --shadow-focus-brand: 0 0 0 2px var(--background-brand-subdued);
+    --shadow-focus-negative: 0 0 0 2px var(--background-negative);
+    --shadow-focus-positive: 0 0 0 2px var(--background-positive);
   }
 }
 
@@ -418,6 +512,10 @@
   --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
   --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);
   --overlay-inverse-50: color-mix(in srgb, var(--beige-100) 50%, transparent);
+
+  --shadow-focus-brand: 0 0 0 2px var(--background-brand-subdued);
+  --shadow-focus-negative: 0 0 0 2px var(--background-negative);
+  --shadow-focus-positive: 0 0 0 2px var(--background-positive);
 }
 
 [data-theme="dark"] {
@@ -484,4 +582,8 @@
   --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
   --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);
   --overlay-inverse-50: color-mix(in srgb, var(--beige-100) 50%, transparent);
+
+  --shadow-focus-brand: 0 0 0 2px var(--background-brand-subdued);
+  --shadow-focus-negative: 0 0 0 2px var(--background-negative);
+  --shadow-focus-positive: 0 0 0 2px var(--background-positive);
 }
