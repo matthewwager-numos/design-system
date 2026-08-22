@@ -110,7 +110,7 @@ a {
 }
 
 /* Same idea as .app-shell__desktop-nav/.app-shell__mobile-nav, one level
-   in: each "app" (e.g. Employees) renders both its desktop <Header> and
+   in: each "app" (e.g. People) renders both its desktop <Header> and
    mobile <MobileAppHeader> sharing one tab state, toggled at the same
    breakpoint. */
 .desktop-app-header {
@@ -136,9 +136,9 @@ a {
 }
 
 /* ── App page anatomy ──────────────────────────────────────────────── */
-/* Every "app" (a left-nav item, e.g. Employees) gets this same header +
+/* Every "app" (a left-nav item, e.g. People) gets this same header +
    body shape — confirmed from the List & Detail template as the shared
-   anatomy across Overview/Object Management/History/Settings alike. */
+   anatomy across Overview/People/History/Settings alike. */
 
 .app-icon-tile {
   display: inline-flex;
@@ -300,7 +300,7 @@ a {
   }
 }
 
-/* ── Object Management — mobile employee cards ─────────────────────── */
+/* ── People — mobile employee cards ─────────────────────────────────── */
 /* The Column/Cell table (desktop) assumes room for five columns side by
    side — below the breakpoint that's replaced with one stacked card per
    employee instead of a cramped horizontal scroll. */

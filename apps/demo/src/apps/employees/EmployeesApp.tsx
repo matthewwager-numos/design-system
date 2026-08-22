@@ -12,8 +12,8 @@ import { AddEmployeeWizard } from "./AddEmployeeWizard";
 type AppTab = "overview" | "objectManagement" | "history" | "settings";
 
 /**
- * The "Employees" app — the anatomy every left-nav app shares: a header
- * (icon + title + Overview/Object Management/History/Settings tabs) above
+ * The "People" app — the anatomy every left-nav app shares: a header
+ * (icon + title + Overview/People/History/Settings tabs) above
  * a scrollable body showing whichever tab is selected. Confirmed from the
  * List & Detail Figma template, which shows this exact anatomy.
  *
@@ -64,12 +64,12 @@ function EmployeesAppContent() {
               <Users size={24} />
             </span>
           }
-          title="Employees"
+          title="People"
           subNav={
             <Tabs value={tab} onValueChange={(value) => setTab(value as AppTab)}>
               <TabList>
                 <Tab value="overview">Overview</Tab>
-                <Tab value="objectManagement">Object Management</Tab>
+                <Tab value="objectManagement">People</Tab>
                 <Tab value="history">History</Tab>
                 <Tab value="settings">Settings</Tab>
               </TabList>
@@ -85,13 +85,13 @@ function EmployeesAppContent() {
               <Users size={16} />
             </span>
           }
-          title="Employees"
+          title="People"
           value={tab}
           onValueChange={(value) => setTab(value as AppTab)}
           onIconClick={() => setTab("overview")}
         >
           <Tab value="overview">Overview</Tab>
-          <Tab value="objectManagement">Object Mgmt</Tab>
+          <Tab value="objectManagement">People</Tab>
           <Tab value="history">History</Tab>
           <Tab value="settings">Settings</Tab>
         </MobileAppHeader>

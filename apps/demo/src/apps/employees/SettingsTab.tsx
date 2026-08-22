@@ -31,7 +31,7 @@ const DENSITY_OPTIONS = [
 
 function GeneralCard() {
   const [values, setValues] = useState({
-    name: "Employees",
+    name: "People",
     description: "Manage the people at your company — profiles, roles, and access.",
     recordsPerPage: "25",
     autoArchive: false,
@@ -147,7 +147,7 @@ function DirectoryCard() {
   }
 
   return (
-    <SettingsCard title="Directory display" description="How the employee list looks in Object Management." onSave={handleSave}>
+    <SettingsCard title="Directory display" description="How the employee list looks in the People tab." onSave={handleSave}>
       <Setting label="Row density" type="segmentedControl" name="density" value={values.density} options={DENSITY_OPTIONS} />
       <Setting label="Show job title" type="toggle" name="showJobTitle" checked={values.showJobTitle} />
     </SettingsCard>

@@ -56,7 +56,7 @@ export function EmployeeDetailDrawer({ employee, onClose, onDelete }: EmployeeDe
       {employee && (
         <>
           <DetailHeader
-            breadcrumb="Employees"
+            breadcrumb="People"
             title={employee.fullName}
             avatar={<Avatar name={employee.fullName} size="xl" color={avatarColorFor(employee.id)} />}
             meta={[employee.jobTitle, departmentLabel(employee.department), roleLabel(employee.role)].filter(Boolean)}

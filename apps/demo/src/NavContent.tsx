@@ -22,7 +22,7 @@ export function NavContent({ active, onNavigate, onSignOut }: NavContentProps) {
           Home
         </NavItem>
         <NavItem icon={<Users size={24} />} selected={active === "employees"} onClick={() => onNavigate("employees")}>
-          Employees
+          People
         </NavItem>
       </NavSection>
       <NavSection>
