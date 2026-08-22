@@ -1,0 +1,59 @@
+import { Meta, Canvas, Controls } from "@storybook/blocks";
+import * as AccordionStories from "./Accordion.stories";
+
+<Meta of={AccordionStories} />
+
+# Accordion
+
+A rounded, clipped group of collapsible rows — matches Figma's Accordion/`CollapsableRow` exactly.
+
+<Canvas of={AccordionStories.Default} />
+
+## When to use
+
+- FAQ lists, expandable help sections, or any vertical stack of "tap a title to reveal its content" rows.
+
+## Implementation
+
+```tsx
+import { Accordion, AccordionItem } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Accordion>
+  <AccordionItem title="What's included in the free plan?" defaultExpanded>
+    Every workspace gets unlimited members, up to 3 projects, and 5GB of storage.
+  </AccordionItem>
+  <AccordionItem title="Can I change plans later?">
+    Yes — upgrade or downgrade at any time from Settings → Billing.
+  </AccordionItem>
+</Accordion>
+```
+
+## Each item manages its own state — unless you ask for `exclusive`
+
+Figma's own Accordion example is a plain stack of independently-collapsed rows, not a single-open-at-a-time widget — so by default, `<AccordionItem>` behaves like a standalone `<Toggle>`: uncontrolled by default (`defaultExpanded`), or controlled with `expanded`/`onExpandedChange`.
+
+<Canvas of={AccordionStories.AllCollapsed} />
+
+Set `exclusive` on `<Accordion>` to coordinate them instead — expanding one item collapses any other, the same "radio vs. checkbox" distinction `<RadioGroup>`/`<CheckboxGroup>` already draw. Whichever item has `defaultExpanded` starts open (the first one, if more than one sets it); each item's own `expanded`/`onExpandedChange` are ignored here, since there's one shared source of truth instead.
+
+```tsx
+<Accordion exclusive>
+  <AccordionItem title="..." defaultExpanded>...</AccordionItem>
+  <AccordionItem title="...">...</AccordionItem>
+</Accordion>
+```
+
+<Canvas of={AccordionStories.Exclusive} />
+
+## The collapsed panel is a real divider, not just hidden
+
+Confirmed from Figma: a collapsed row's panel isn't unmounted — it's a 1px sliver that still shows the `border-disabled` divider between rows. This component reproduces that with a CSS grid `fr`-unit height animation (`0fr` ↔ `1fr`) rather than a JS-measured height or `display: none`, so the divider is always there and the expand/collapse is a genuine height transition, not a crossfade.
+
+## Props
+
+**Accordion**: `children` (required — `<AccordionItem>`s), `exclusive` (only one item open at a time), `className`.
+
+**AccordionItem**: `title` (required), `children` (required — the panel content), `expanded`/`onExpandedChange` (ignored when the parent `<Accordion>` has `exclusive`), `defaultExpanded`, `className`.
+
+<Controls of={AccordionStories.Default} />

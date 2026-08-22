@@ -1,0 +1,77 @@
+/*
+ * Card styles — pure token-driven CSS, matching Figma's Card exactly.
+ * Confirmed via get_variable_defs: the default/hover chrome is Figma's own
+ * "L1" effect style (Depth and Focus page) plus, on hover only, a
+ * `Border/Emphasis` outline; `selected` swaps both for a `Border/Brand`
+ * outline and Figma's "Focus Brand" effect instead — two genuinely
+ * different treatments, not a shared one. A 1px transparent border by
+ * default keeps hover/selected from shifting layout by 1px when their
+ * real border color appears. Figma's own "Radius/S" primitive is 8px,
+ * i.e. this codebase's `--radius-md` (not `--radius-sm`, which is 4px) —
+ * confirmed by value.
+ *
+ * `--expand-x`/`--expand-y` fill 100% of whatever the parent gives that
+ * axis — `minWidth`/`maxWidth`/`minHeight`/`maxHeight` (arbitrary CSS
+ * lengths, so they're set inline in Card.tsx, not here) clamp that fill.
+ */
+
+.ds-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  width: 25rem;
+  padding: var(--space-4);
+  background: var(--background-default);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-l1);
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  /* outline is always "on" (solid, 2px) but invisible at rest — see
+     Button.css's own comment on the same pattern (outline-style itself
+     can't be transitioned, only its color/offset once it's already solid). */
+  outline: 2px solid transparent;
+  outline-offset: 0;
+  /* width/height use --motion-toggle — `expand` toggles between two
+     persistent sizes, not a mount/unmount, so there's no enter/exit to
+     split (see tokens.css's own "Semantic motion" comment). border-color/
+     box-shadow are plain fades with no movement, so they stay on the plain
+     --ease-out primitive — none of the four motion verbs describe a fade
+     with no direction. outline-color/outline-offset use --motion-pulse-fast,
+     same reasoning as Button.css. */
+  transition:
+    width var(--motion-toggle),
+    height var(--motion-toggle),
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    outline-color var(--motion-pulse-fast),
+    outline-offset var(--motion-pulse-fast);
+}
+
+.ds-card--expand-x {
+  width: 100%;
+}
+
+.ds-card--expand-y {
+  height: 100%;
+}
+
+.ds-card:hover:not([data-selected="true"]) {
+  border-color: var(--border-emphasis);
+}
+
+/* A plain div, not a `<button>` (see Card.tsx) — needs its own focus ring
+   rather than inheriting a native button's default one. */
+.ds-card:focus-visible {
+  outline-color: var(--button-primary-default);
+  outline-offset: 2px;
+}
+
+.ds-card[data-selected="true"] {
+  border-color: var(--border-brand);
+  box-shadow: var(--shadow-focus-brand);
+}

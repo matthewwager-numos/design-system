@@ -1,0 +1,11 @@
+/*
+ * CardGroup styles — layout only, same as CheckboxGroup's own reasoning:
+ * "multiple" mode shares no selection state, just this wrapping row.
+ */
+
+.ds-card-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  width: 100%;
+}

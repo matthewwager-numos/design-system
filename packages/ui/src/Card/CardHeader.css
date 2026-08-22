@@ -1,0 +1,80 @@
+/*
+ * CardHeader styles — pure token-driven CSS. Confirmed via
+ * get_variable_defs on the live Figma instance: title is Heading S
+ * (content-emphasis), subtitle is Paragraph XS Regular in
+ * `Content/Subdued` — the same #6a7e91 this codebase already has as
+ * `--content-subtle` under a different Figma label, not a new token.
+ */
+
+.ds-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.ds-card-header__lead {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ds-card-header__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ds-card-header__title {
+  margin: 0;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-card-header__subtitle {
+  margin: 0;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.ds-card-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.ds-card-header__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: var(--space-1);
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--content-link-default);
+  cursor: pointer;
+}
+.ds-card-header__icon-button:hover:not(:disabled) {
+  background: var(--background-hover);
+}
+.ds-card-header__icon-button:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}

@@ -1,0 +1,125 @@
+import { Meta, Canvas, Controls } from "@storybook/blocks";
+import * as CardStories from "./Card.stories";
+
+<Meta of={CardStories} />
+
+# Card
+
+A clickable card shell — matches Figma's Card exactly. Composes `<CardHeader>` for its own header row, `<Avatar>` for the lead image, and plain `<Button>`s for any footer actions — nothing about those is reimplemented.
+
+<Canvas of={CardStories.Default} />
+
+## When to use
+
+- A clickable summary tile — a person, an object, an option to pick — where the whole card (not just a button inside it) is the interactive target.
+
+## Implementation
+
+```tsx
+import { Avatar, Card, CardHeader } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Card selected={selected} onClick={() => setSelected(true)}>
+  <CardHeader lead={<Avatar size="xs" name="Maya Chen" />} title="Maya Chen" subtitle="Product Designer" />
+  <p>Explore the latest updates and features designed to enhance your workflow.</p>
+</Card>
+```
+
+## Selected vs. hover
+
+Confirmed from Figma: default and hover both keep the card's drop shadow — hover just adds a `border-emphasis` outline, a real `:hover`, not a prop. `selected` is genuinely unknowable app state, so it's a real prop instead — and it swaps the drop shadow entirely for a `border-brand` outline plus a `background-brand-subdued` focus ring, rather than layering on top of the same shadow.
+
+<Canvas of={CardStories.Selected} />
+
+## Grouping selection with CardGroup
+
+A single `selected`/`onClick` pair is enough for one card, but a *set* of cards — pick one, or pick any number — needs the same "single vs. multiple" coordination `<RadioGroup>`/`<CheckboxGroup>` already give their own children. `<CardGroup>` draws that same line for `<Card>`'s own `selected` state.
+
+`type="single"` (the default) behaves like `<RadioGroup>`: give each `<Card>` a `value`, and selecting one deselects any other — `<CardGroup>` tracks which `value` is selected for you (controlled via `value`/`onValueChange`, or uncontrolled via `defaultValue`).
+
+```tsx
+<CardGroup defaultValue="maya">
+  <Card value="maya">...</Card>
+  <Card value="sam">...</Card>
+</CardGroup>
+```
+
+<Canvas of={CardStories.SingleSelect} />
+
+`type="multiple"` is the `<CheckboxGroup>` side of that distinction: there's no shared value to coordinate, since any number of cards can be selected at once — same as a bare `<Checkbox>`, each `<Card>` just manages its own `selected`/`onClick` independently, exactly as it would standalone. `<CardGroup>` is really just the wrapping layout in this mode.
+
+```tsx
+<CardGroup type="multiple">
+  <Card selected={selectedIds.includes("maya")} onClick={() => toggle("maya")}>...</Card>
+  <Card selected={selectedIds.includes("sam")} onClick={() => toggle("sam")}>...</Card>
+</CardGroup>
+```
+
+<Canvas of={CardStories.MultiSelect} />
+
+## Expanding
+
+Figma's own Card only demonstrates one hardcoded jump (400px → 480px) with no content difference otherwise — not a real spec worth baking in as a fixed value. Instead, `expand` is a generic sizing knob: `"x"`, `"y"`, or `"both"` picks which axis is free to grow, filling 100% of whatever the parent gives it on that axis.
+
+```tsx
+<Card expand="x">...</Card>
+```
+
+<Canvas of={CardStories.ExpandToFill} />
+
+Add `minWidth`/`maxWidth` (or `minHeight`/`maxHeight`, for `expand="y"`) to clamp that fill to a band instead of an unconditional 100% — the card won't shrink below the min or grow past the max, whatever the parent's actual size is:
+
+```tsx
+<Card expand="x" minWidth="18rem" maxWidth="32rem">...</Card>
+```
+
+<Canvas of={CardStories.ExpandWithinBounds} />
+
+### Making a card expandable
+
+`expand`/`minWidth`/`maxWidth` are just plain props — toggling them from your own click handler is what makes a card actually expand and collapse. Two common triggers:
+
+**Clicking the card itself** — natural when the card has no other click behavior to conflict with:
+
+```tsx
+const [expanded, setExpanded] = useState(false);
+
+<Card expand={expanded ? "x" : undefined} maxWidth={expanded ? "40rem" : undefined} onClick={() => setExpanded((v) => !v)}>
+  ...
+</Card>
+```
+
+<Canvas of={CardStories.ExpandableByCardClick} />
+
+**A dedicated icon button** — needed once the card's own click already means something else (e.g. selection, as in the `CardGroup` examples above). `<CardHeader>`'s action buttons already stop their click from reaching the card (see below), so an expand toggle placed there never also fires the card's `onClick`:
+
+```tsx
+const [selected, setSelected] = useState(false);
+const [expanded, setExpanded] = useState(false);
+
+<Card selected={selected} expand={expanded ? "x" : undefined} maxWidth={expanded ? "40rem" : undefined} onClick={() => setSelected((v) => !v)}>
+  <CardHeader
+    title="Maya Chen"
+    actions={[{ icon: expanded ? <Minimize2 /> : <Maximize2 />, label: expanded ? "Collapse" : "Expand", onClick: () => setExpanded((v) => !v) }]}
+  />
+  ...
+</Card>
+```
+
+<Canvas of={CardStories.ExpandableByIconButton} />
+
+## CardHeader
+
+Figma's real Card content instance reuses the same `Card Header` layout twice — once as an actual header (lead image + title/subtitle + actions), once as a plain footer button row — so it's its own component, not something `<Card>` renders for you. `lead`, `subtitle`, and `actions` are all optional; omit any of them for a plainer header.
+
+`<Card>` itself is a `role="button"` div, not a real `<button>`: Figma's own Card is a button, but a `<button>` can't legally contain another interactive control — a nested `<button>` (like `<CardHeader>`'s own action icons) makes the browser silently close the outer one, un-nesting it from the DOM entirely. `tabIndex`/keyboard handling reproduce real button behavior (Enter and Space both activate it) without that constraint. `<CardHeader>`'s own action buttons additionally stop their click from bubbling up, so they never also fire the enclosing card's `onClick`.
+
+## Props
+
+**Card**: `children` (required), `value` (only meaningful inside a `<CardGroup type="single">`), `selected` (ignored inside a `<CardGroup type="single">` when `value` is set), `expand` (`"x"` | `"y"` | `"both"`), `minWidth`/`maxWidth` (only apply when `expand` includes `"x"`), `minHeight`/`maxHeight` (only apply when `expand` includes `"y"`), `onClick`, `className`.
+
+**CardHeader**: `title` (required), `lead`, `subtitle`, `actions` (up to 3 — same `{ icon, label, onClick, disabled }` shape as `<Cell type="icon">`'s row actions), `className`.
+
+**CardGroup**: `children` (required — `<Card>`s), `type` (`"single"` | `"multiple"`, defaults to `"single"`), `value`/`defaultValue`/`onValueChange` (`type="single"` only), `className`.
+
+<Controls of={CardStories.Default} />

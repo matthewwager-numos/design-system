@@ -1,0 +1,75 @@
+/*
+ * Accordion styles — pure token-driven CSS, matching Figma's Accordion/
+ * CollapsableRow exactly. Confirmed via get_variable_defs on the live
+ * instances: Head and Panel share Border/Disabled dividers, Panel is
+ * Background/Secondary (not Default, like Head) — two real, deliberately
+ * different backgrounds, not one reused everywhere. Figma's own "Radius/S"
+ * primitive is 8px, which is this codebase's `--radius-md`, not
+ * `--radius-sm` (4px) — confirmed by value, not label, same naming-offset
+ * this design system has hit before.
+ */
+
+.ds-accordion {
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.ds-accordion-item__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 3rem;
+  padding: var(--space-3) var(--space-4);
+  background: var(--background-default);
+  border: none;
+  border-bottom: 1px solid var(--border-disabled);
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+  color: var(--content-emphasis);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ds-accordion-item__chevron {
+  flex-shrink: 0;
+  color: var(--content-subtle);
+  /* Rotating between two persistent resting states (collapsed/expanded),
+     not a mount/unmount — --motion-toggle (see tokens.css's "Semantic motion" comment). */
+  transition: transform var(--motion-toggle);
+}
+.ds-accordion-item__head[aria-expanded="true"] .ds-accordion-item__chevron {
+  transform: rotate(180deg);
+}
+
+/* Animates to the panel's real content height via the grid `fr`-unit trick
+   (no JS measurement needed) — 0fr collapsed, 1fr expanded. Same
+   ease-in-out reasoning as the chevron above. */
+.ds-accordion-item__panel-track {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--motion-toggle);
+}
+.ds-accordion-item__panel-track[data-expanded="true"] {
+  grid-template-rows: 1fr;
+}
+
+/* Confirmed from Figma: the collapsed panel isn't gone, it's a 1px sliver —
+   `min-height: 0` (so this can actually shrink to the track's 0fr row) plus
+   its own border-bottom is exactly what still shows a divider between
+   collapsed rows, not a bug of the height animation. */
+.ds-accordion-item__panel {
+  min-height: 0;
+  overflow: hidden;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--border-disabled);
+}
+
+.ds-accordion-item__panel-content {
+  padding: var(--space-4);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
