@@ -74,6 +74,30 @@ Size is set once on `<DropdownMenuContent size="sm" | "md" | "lg">` and cascades
 <DropdownMenuContent placement="top">...</DropdownMenuContent>
 ```
 
+## DropdownMenuPanel: any input components
+
+`<DropdownMenuContent>` is a `role="menu"` full of `role="menuitem"` rows — right for a list of actions or options, wrong for a form. Matches Figma's `Dropdown` `type="Filter"` variant: swap it for `<DropdownMenuPanel>` when what opens from the trigger is arbitrary fields (`<Checkbox>`, `<Slider>`, a date field, `<TextInput>`, ...) instead of a list to pick from — same `<DropdownMenu>` root, same open/close/positioning/outside-click, just a plain padded box instead of a menu, so each field keeps its own native keyboard behavior (arrow keys move a slider, not the menu's selection).
+
+```tsx
+import { Button, Checkbox, DropdownMenu, DropdownMenuTrigger, DropdownMenuPanel, Slider, TextInput } from "@numosai/ui";
+import { Filter } from "lucide-react";
+
+<DropdownMenu>
+  <DropdownMenuTrigger>
+    <Button variant="secondary" leadingIcon={<Filter size={16} />}>Filters</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuPanel>
+    <TextInput label="Name contains" placeholder="e.g. invoice" />
+    <Checkbox label="Only overdue" />
+    <Slider label="Minimum amount" defaultValue={40} />
+  </DropdownMenuPanel>
+</DropdownMenu>
+```
+
+<Canvas of={DropdownMenuStories.FilterPanel} />
+
+Unlike `<DropdownMenuContent>`, opening a `<DropdownMenuPanel>` doesn't move focus anywhere — there's no safe assumption about what (if anything) inside arbitrary children should receive it. Escape still closes it and returns focus to the trigger; there's no Arrow/Home/End handling, since those belong to whatever field has focus, not to the panel itself. `<SearchFilter>` is the real, worked example of this in practice — see its own docs page.
+
 ## Behavior
 
 - **Closes on**: clicking outside, selecting an item (unless `closeOnSelect={false}` is passed to that `<DropdownMenuItem>`), or pressing Escape (which also returns focus to the trigger).
@@ -83,6 +107,6 @@ Size is set once on `<DropdownMenuContent size="sm" | "md" | "lg">` and cascades
 
 ## Accessibility
 
-- Trigger gets `aria-haspopup="menu"` and `aria-expanded` automatically via `<DropdownMenuTrigger>`.
-- Panel is a real `role="menu"` with `role="menuitem"` children in `role="none"` list items, per the WAI-ARIA menu pattern.
-- Opening the menu moves focus to the first enabled item; Escape returns focus to the trigger.
+- Trigger gets `aria-haspopup="menu"` and `aria-expanded` automatically via `<DropdownMenuTrigger>` — including when paired with `<DropdownMenuPanel>`, where `"menu"` isn't really accurate (there's no menu, just a panel of fields). Fixing that means changing what every `<DropdownMenuTrigger>` consumer gets, so it's a known, minor inaccuracy rather than something worked around per-consumer.
+- `<DropdownMenuContent>` is a real `role="menu"` with `role="menuitem"` children in `role="none"` list items, per the WAI-ARIA menu pattern. Opening it moves focus to the first enabled item; Escape returns focus to the trigger.
+- `<DropdownMenuPanel>` has no special role — its own children (real form fields) carry their own semantics. Escape still closes it and returns focus to the trigger; focus is otherwise left wherever it already was.

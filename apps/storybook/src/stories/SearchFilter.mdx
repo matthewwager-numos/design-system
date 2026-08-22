@@ -1,0 +1,126 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as SearchFilterStories from "./SearchFilter.stories";
+
+<Meta of={SearchFilterStories} />
+
+# SearchFilter
+
+A search field with a filter button that opens a panel of arbitrary fields — matches Figma's Search/Filter input exactly. Built from the same pieces as everything else: `<SearchInput>`'s own field anatomy, `<FieldLabel>` for the label, and `<DropdownMenu>` + `<DropdownMenuPanel>` (the "any input components" variant of its content — see the DropdownMenu docs) for the filter panel itself.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Search modeled on Gmail's own search bar: type freely, or open a structured filter builder that composes into the same field, rather than a separate "Advanced search" page.
+- When the set of filterable fields is genuinely arbitrary — a date range here, a status checklist there — not a fixed schema this component could know in advance.
+
+## When NOT to use
+
+- A fixed set of 1-3 filters always visible — plain `<Select>`/`<Checkbox>` controls next to the search field are simpler than hiding them behind a panel.
+- Free-text search with autocomplete suggestions and no structured filters at all — that's `<SearchInput>`, not this component.
+
+## Implementation
+
+```tsx
+import { Checkbox, SearchFilter, Slider, TextInput } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<SearchFilter
+  label="Invoices"
+  filters={
+    <>
+      <Checkbox label="Only overdue" />
+      <Slider label="Minimum amount" defaultValue={40} />
+      <TextInput label="Customer" placeholder="e.g. Acme Co." />
+    </>
+  }
+/>
+```
+
+<Canvas of={SearchFilterStories.Default} />
+
+Omit `filters` entirely for a plain search field — the filter button doesn't render at all:
+
+<Canvas of={SearchFilterStories.PlainSearch} />
+
+## `filters` is genuinely just a slot
+
+SearchFilter doesn't know or care what's inside `filters` — any input components, in whatever layout you want (it's rendered inside `<DropdownMenuPanel>` exactly as given). It doesn't validate them, read their values, or coordinate them with the search field's own `value` for you.
+
+<Canvas of={SearchFilterStories.FiltersOpenByDefault} />
+
+## Building "standard filter notation"
+
+The field showing something like `status:overdue amount:>40` isn't a separate display mode SearchFilter computes — it's just the field's own `value`, the same one you could type into directly. Wire each filter control's `onChange` to recompute that notation string and call `onChange`, the same value whether it came from typing or from the panel:
+
+```tsx
+const [query, setQuery] = useState("");
+const [overdue, setOverdue] = useState(false);
+
+function applyFilters(nextOverdue: boolean) {
+  setQuery(nextOverdue ? "status:overdue" : "");
+}
+
+<SearchFilter
+  value={query}
+  onChange={setQuery}
+  filters={
+    <Checkbox
+      label="Only overdue"
+      checked={overdue}
+      onChange={(e) => { setOverdue(e.target.checked); applyFilters(e.target.checked); }}
+    />
+  }
+/>
+```
+
+<Canvas of={SearchFilterStories.WorkedExample} />
+
+Confirmed from Figma: the field shows this text (truncated with an ellipsis if it's long) exactly like a typed query — there's no separate "filled" rendering mode, just `value` being non-empty.
+
+<Canvas of={SearchFilterStories.Filled} />
+
+## Examples
+
+<Canvas of={SearchFilterStories.Error} />
+<Canvas of={SearchFilterStories.Success} />
+<Canvas of={SearchFilterStories.Disabled} />
+
+## Sizes
+
+<Canvas of={SearchFilterStories.Sizes} />
+
+## The trailing icon is the filter toggle, not a clear button
+
+Confirmed from Figma: the funnel icon swaps to an X only while the panel is open — regardless of whether `value` is empty or filled with a filter summary. It's not `<SearchInput>`'s "clear the typed text" button; clicking it toggles the panel, and clicking it again (or Escape, or an outside click) closes it. There's no separate clear-all — clearing the query is ordinary text editing, the same as any other field.
+
+## Controlling the panel
+
+Useful if something inside `filters` (e.g. an "Apply" button) should also close the panel — control `filtersOpen` the same way you'd control any other open state:
+
+```tsx
+const [filtersOpen, setFiltersOpen] = useState(false);
+
+<SearchFilter
+  filtersOpen={filtersOpen}
+  onFiltersOpenChange={setFiltersOpen}
+  filters={
+    <>
+      ...
+      <Button onClick={() => setFiltersOpen(false)}>Apply</Button>
+    </>
+  }
+/>
+```
+
+## Accessibility
+
+- The filter button gets `aria-haspopup="menu"` from `<DropdownMenuTrigger>` — not quite accurate (the panel isn't a menu), a known limitation shared with every other `<DropdownMenuPanel>` consumer; see the DropdownMenu docs.
+- Opening the panel doesn't move focus anywhere — there's no safe assumption about what inside arbitrary `filters` content should receive it. Escape closes the panel and returns focus to the filter button.
+- Sets `aria-invalid="true"` automatically when `status="error"`.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

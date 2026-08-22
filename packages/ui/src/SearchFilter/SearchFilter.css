@@ -1,0 +1,222 @@
+/*
+ * SearchFilter styles — pure token-driven CSS. The field mirrors
+ * <SearchInput>'s exact anatomy (confirmed size-for-size against Figma),
+ * duplicated under this component's own class names rather than imported —
+ * same relationship <SearchInput> itself has to <TextInput>. The one real
+ * difference: a trailing filter/clear toggle button instead of a fixed
+ * trailing icon, and the panel that opens from it.
+ */
+
+.ds-search-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+/* Same reasoning as .ds-select .ds-dropdown-menu-root — see Select.css.
+   Anchors the filter panel to the field itself, not the label/help text. */
+.ds-search-filter .ds-dropdown-menu-root {
+  display: block;
+  width: 100%;
+  position: relative;
+}
+
+.ds-search-filter:has(.ds-search-filter__control:disabled) .ds-search-filter__label {
+  color: var(--content-disabled);
+}
+
+.ds-search-filter__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  background: var(--background-element);
+  color: var(--content-subtle);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-search-filter__field:hover:not(:focus-within):not(.ds-search-filter__field--error):not(.ds-search-filter__field--success):not(.ds-search-filter__field--disabled) {
+  background: var(--background-hover);
+}
+
+.ds-search-filter__field:focus-within {
+  background: var(--background-default);
+  border-color: var(--border-brand);
+  box-shadow: var(--shadow-focus-brand);
+}
+
+.ds-search-filter__field--disabled {
+  background: var(--background-secondary);
+}
+
+.ds-search-filter__field--error {
+  background: var(--background-default);
+  border-color: var(--border-negative);
+  box-shadow: var(--shadow-focus-negative);
+}
+.ds-search-filter__field--error:focus-within {
+  border-color: var(--border-negative);
+  box-shadow: var(--shadow-focus-negative);
+}
+
+.ds-search-filter__field--success {
+  background: var(--background-default);
+  border-color: var(--border-positive);
+  box-shadow: var(--shadow-focus-positive);
+}
+.ds-search-filter__field--success:focus-within {
+  border-color: var(--border-positive);
+  box-shadow: var(--shadow-focus-positive);
+}
+
+.ds-search-filter__control {
+  flex: 1 0 0;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  color: var(--content-base);
+}
+
+.ds-search-filter__control::placeholder {
+  color: var(--content-placeholder);
+}
+
+.ds-search-filter__control:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-search-filter__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* A real button, not a fixed icon — toggles the filter panel, swapping
+   Filter/X to match (see SearchFilter.tsx). Shares .ds-search-filter__icon's
+   per-size svg sizing below. */
+.ds-search-filter__filter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--content-subtle);
+  cursor: pointer;
+}
+.ds-search-filter__filter-button:hover:not(:disabled) {
+  color: var(--content-base);
+}
+.ds-search-filter__filter-button:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-search-filter__help {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--content-subtle);
+}
+.ds-search-filter__help--error {
+  color: var(--content-negative);
+}
+.ds-search-filter__help--success {
+  color: var(--content-positive);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-search-filter--lg .ds-search-filter__field {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+}
+.ds-search-filter--lg .ds-search-filter__control {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+.ds-search-filter--lg .ds-search-filter__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-search-filter--lg .ds-search-filter__icon svg,
+.ds-search-filter--lg .ds-search-filter__filter-button svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ds-search-filter--md .ds-search-filter__field {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+.ds-search-filter--md .ds-search-filter__control {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-search-filter--md .ds-search-filter__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-search-filter--md .ds-search-filter__icon svg,
+.ds-search-filter--md .ds-search-filter__filter-button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-search-filter--sm .ds-search-filter__field {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.ds-search-filter--sm .ds-search-filter__control {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-search-filter--sm .ds-search-filter__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-search-filter--sm .ds-search-filter__icon svg,
+.ds-search-filter--sm .ds-search-filter__filter-button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Below this width, "md"/"sm" render at "lg" metrics regardless of the
+   `size` prop — same reasoning (and breakpoint) as <SearchInput>'s own
+   mobile override: this control is a real <input>, so this also keeps iOS
+   from auto-zooming on focus (it zooms below 16px), on top of the bigger
+   tap target. */
+@media (max-width: 767px) {
+  .ds-search-filter--md .ds-search-filter__field,
+  .ds-search-filter--sm .ds-search-filter__field {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+  .ds-search-filter--md .ds-search-filter__control,
+  .ds-search-filter--sm .ds-search-filter__control {
+    font: var(--type-paragraph-m-regular);
+    letter-spacing: var(--type-paragraph-m-regular-tracking);
+  }
+  .ds-search-filter--md .ds-search-filter__help,
+  .ds-search-filter--sm .ds-search-filter__help {
+    font: var(--type-paragraph-s-regular);
+    letter-spacing: var(--type-paragraph-s-regular-tracking);
+  }
+  .ds-search-filter--md .ds-search-filter__icon svg,
+  .ds-search-filter--sm .ds-search-filter__icon svg,
+  .ds-search-filter--md .ds-search-filter__filter-button svg,
+  .ds-search-filter--sm .ds-search-filter__filter-button svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}

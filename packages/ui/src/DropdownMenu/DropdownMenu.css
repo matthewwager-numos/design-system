@@ -50,10 +50,50 @@
   transform: scale(0.98) translateY(4px);
 }
 
+/* ── Panel (the "accommodates any input components" variant) ─────────
+ * Matches Figma's `Dropdown` `type="Filter"` variant exactly: same border/
+ * shadow/radius as the menu list above (same "focused compound control"
+ * look), but a plain padded box instead of a padding-1 list of rows — its
+ * own children set whatever spacing they need between fields.
+ */
+
+.ds-dropdown-menu-panel {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  width: 100%;
+  min-width: 7.5rem;
+  box-sizing: border-box;
+  padding: var(--space-4);
+  background: var(--background-default);
+  border: 1px solid var(--border-brand);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-focus-brand);
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: top left;
+  transform: scale(0.98) translateY(-4px);
+  /* Enter/exit ease differently — see Modal.css's own comment on the same pattern. */
+  transition: opacity var(--motion-exit-fast), transform var(--motion-exit-fast);
+}
+
+.ds-dropdown-menu-panel--visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+  transition: opacity var(--motion-enter-fast), transform var(--motion-enter-fast);
+}
+
 .ds-dropdown-menu--visible {
   opacity: 1;
   transform: scale(1) translateY(0);
   pointer-events: auto;
+  transition: opacity var(--motion-enter-fast), transform var(--motion-enter-fast);
 }
 
 .ds-dropdown-menu-item {

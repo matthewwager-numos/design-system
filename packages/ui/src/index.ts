@@ -18,12 +18,13 @@ export type { AppIconProps, AppIconName } from "./AppIcon";
 export { TextInput } from "./TextInput";
 export type { TextInputProps, TextInputSize, TextInputStatus } from "./TextInput";
 
-export { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "./DropdownMenu";
+export { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuPanel } from "./DropdownMenu";
 export type {
   DropdownMenuProps,
   DropdownMenuTriggerProps,
   DropdownMenuContentProps,
   DropdownMenuItemProps,
+  DropdownMenuPanelProps,
   DropdownMenuSize,
   DropdownMenuPlacement,
 } from "./DropdownMenu";
@@ -105,6 +106,9 @@ export type { ColumnProps } from "./Column";
 
 export { SearchInput } from "./SearchInput";
 export type { SearchInputProps, SearchInputSize, SearchInputStatus, SearchInputOption } from "./SearchInput";
+
+export { SearchFilter } from "./SearchFilter";
+export type { SearchFilterProps, SearchFilterSize, SearchFilterStatus } from "./SearchFilter";
 
 export { Pagination } from "./Pagination";
 export type { PaginationProps } from "./Pagination";

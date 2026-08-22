@@ -3,3 +3,6 @@ export type { DropdownMenuProps, DropdownMenuTriggerProps, DropdownMenuContentPr
 
 export { DropdownMenuItem } from "./DropdownMenuItem";
 export type { DropdownMenuItemProps } from "./DropdownMenuItem";
+
+export { DropdownMenuPanel } from "./DropdownMenuPanel";
+export type { DropdownMenuPanelProps } from "./DropdownMenuPanel";

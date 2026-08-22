@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { User, Settings, LogOut, Pencil, Copy, Trash2 } from "lucide-react";
-import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@numosai/ui";
+import { User, Settings, LogOut, Pencil, Copy, Trash2, Filter } from "lucide-react";
+import { Button, Checkbox, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuPanel, Slider, TextInput } from "@numosai/ui";
 
 const meta: Meta<typeof DropdownMenu> = {
   title: "Components/DropdownMenu",
@@ -64,6 +64,26 @@ export const WithActiveAndDisabled: Story = {
           <DropdownMenuItem leadingIcon={<Copy size={16} />}>Duplicate</DropdownMenuItem>
           <DropdownMenuItem leadingIcon={<Trash2 size={16} />} disabled>Delete</DropdownMenuItem>
         </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  ),
+};
+
+export const FilterPanel: Story = {
+  name: "DropdownMenuPanel (any input components)",
+  render: () => (
+    <div style={{ minHeight: 380 }}>
+      <DropdownMenu defaultOpen>
+        <DropdownMenuTrigger>
+          <Button variant="secondary" leadingIcon={<Filter size={16} />}>
+            Filters
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuPanel style={{ width: "20rem" }}>
+          <TextInput label="Name contains" placeholder="e.g. invoice" size="md" />
+          <Checkbox label="Only overdue" size="md" />
+          <Slider label="Minimum amount" defaultValue={40} size="md" />
+        </DropdownMenuPanel>
       </DropdownMenu>
     </div>
   ),
