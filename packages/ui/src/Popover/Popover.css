@@ -1,0 +1,150 @@
+/*
+ * Popover styles — pure token-driven CSS, matching Figma's Popover exactly:
+ * Background/Default panel, Figma's own "L2" effect style (confirmed via
+ * get_variable_defs to be exactly this codebase's --shadow-l2), Figma's
+ * "Radius/S" primitive (8px) is this codebase's --radius-md (not
+ * --radius-sm, which is 4px) — the same naming offset already confirmed
+ * for <Card>.
+ *
+ * Position (top/left) and the placement transform are computed in
+ * Popover.tsx from the trigger's measured getBoundingClientRect() and set
+ * inline — the popover is portaled to <body> and needs viewport-relative
+ * coordinates, not CSS anchored to a (possibly clipping) ancestor. Only the
+ * arrow's own position, always relative to the popover box itself, stays
+ * here — same split <Tooltip> uses.
+ */
+
+.ds-popover-root {
+  position: relative;
+  display: inline-block;
+}
+
+.ds-popover {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 18.75rem;
+  padding: var(--space-4);
+  background: var(--background-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-l2);
+  opacity: 0;
+  /* Enter/exit ease differently — see Modal.css's own comment on the same pattern. */
+  transition: opacity var(--motion-exit-fast), transform var(--motion-exit-fast);
+}
+
+.ds-popover--visible {
+  opacity: 1;
+  transition: opacity var(--motion-enter-fast), transform var(--motion-enter-fast);
+}
+
+.ds-popover__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* No title: the body shares this row with the close button instead of a
+   separate (mostly empty) title row sitting above it — top-aligned rather
+   than centered, since body text can wrap to more than one line. */
+.ds-popover__head--body {
+  align-items: flex-start;
+}
+
+.ds-popover__head--body .ds-popover__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ds-popover__title {
+  flex: 1;
+  min-width: 0;
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-popover__close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-left: auto;
+  border: none;
+  background: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-1);
+  color: var(--content-subtle);
+  cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-out), color var(--duration-base) var(--ease-out);
+}
+
+.ds-popover__close:hover {
+  background: var(--background-hover);
+  color: var(--content-base);
+}
+
+.ds-popover__close:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}
+
+.ds-popover__body {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+
+.ds-popover__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.ds-popover__arrow {
+  position: absolute;
+  background: var(--background-default);
+}
+
+/* ── Arrow ─────────────────────────────────────────────────────────── */
+
+.ds-popover--top .ds-popover__arrow {
+  bottom: calc(-1 * var(--space-2));
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--space-4);
+  height: var(--space-2);
+  clip-path: polygon(50% 100%, 100% 0%, 0% 0%);
+}
+
+.ds-popover--bottom .ds-popover__arrow {
+  top: calc(-1 * var(--space-2));
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--space-4);
+  height: var(--space-2);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.ds-popover--left .ds-popover__arrow {
+  right: calc(-1 * var(--space-2));
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--space-2);
+  height: var(--space-4);
+  clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+}
+
+.ds-popover--right .ds-popover__arrow {
+  left: calc(-1 * var(--space-2));
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--space-2);
+  height: var(--space-4);
+  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+}

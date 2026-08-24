@@ -53,6 +53,9 @@ export type { AvatarGroupProps, AvatarGroupOrientation } from "./AvatarGroup";
 export { Tooltip } from "./Tooltip";
 export type { TooltipProps, TooltipPlacement, TooltipTriggerMode } from "./Tooltip";
 
+export { Popover } from "./Popover";
+export type { PopoverProps, PopoverPlacement, PopoverTriggerMode } from "./Popover";
+
 export { Tabs, TabList, Tab, TabPanel } from "./Tabs";
 export type { TabsProps, TabsOrientation, TabListProps, TabProps, TabPanelProps } from "./Tabs";
 

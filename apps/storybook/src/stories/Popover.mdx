@@ -1,0 +1,116 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as PopoverStories from "./Popover.stories";
+
+<Meta of={PopoverStories} />
+
+# Popover
+
+A persistent, dismissible panel anchored to a trigger — matches Figma's Popover exactly: a title + close (×) button row, a body row, an optional footer action row (Figma's own "ButtonGroup", hidden unless you pass `actions`), and a single arrow pointing back at the trigger.
+
+<Primary />
+
+<Controls />
+
+The example above is wrapped in a small Storybook-only `PopoverPlayground` so Controls can drive it — its trigger is always the same button. Click it to open the popover, same as real usage; some examples below set `defaultOpen` so you can see them without clicking first, but they're still the real, uncontrolled component underneath (clicking the trigger, or moving the pointer off it in `trigger="hover"` examples, still closes them). Both the playground and `defaultOpen`-for-review are Storybook conveniences; the real `<Popover>` API is exactly what's documented below.
+
+## When to use
+
+- Content someone needs to interact with — links, form fields, a confirm/cancel action pair — anchored to whatever triggered it.
+- A dismissible panel that should stay open while the user reads or acts on it, rather than disappearing the moment the pointer moves.
+
+## When NOT to use
+
+- A short, non-interactive hint on hover — use `<Tooltip>`, which is lighter-weight (`pointer-events: none`, no header/footer chrome) and exactly what it's for.
+- A list of actions or options to pick from — use `<DropdownMenu>`. A menu's items are the whole point of the panel; a Popover's `content` is closer to an explanation with something to act on.
+- Blocking interaction with the rest of the page until the user responds — use `<Modal>`. A Popover never traps focus or dims the background.
+
+## Implementation
+
+```tsx
+import { Popover, Button } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Popover title="Title" content="Body text">
+  <Button variant="secondary">Click me</Button>
+</Popover>
+```
+
+`children` is the trigger — any single element, wired up via `cloneElement` (same pattern as `<Tooltip>`/`<DropdownMenuTrigger>`), so it renders exactly as you wrote it plus whatever click/hover handling `trigger` needs.
+
+Click the button below — it's a real, live component, not a screenshot.
+
+<Canvas of={PopoverStories.Default} />
+
+### Title is optional
+
+Omit it and the body flows into the space a title would have occupied instead of leaving an empty row above it — sharing that row with the close button, if `showClose` is still on:
+
+<Canvas of={PopoverStories.NoTitle} />
+
+With `showClose` also off, it's just the body, filling the panel on its own:
+
+<Canvas of={PopoverStories.Minimal} />
+
+## Footer actions
+
+Figma's own "ButtonGroup" is hidden by default — pass `actions` (typically a `<ButtonGroup>` of `<Button>`s) for a footer row, right-aligned to match Figma:
+
+```tsx
+<Popover
+  title="Delete this record?"
+  content="This can't be undone."
+  actions={
+    <ButtonGroup>
+      <Button variant="secondary" size="sm">Cancel</Button>
+      <Button variant="primary" size="sm">Confirm</Button>
+    </ButtonGroup>
+  }
+>
+  <Button variant="destructive">Delete</Button>
+</Popover>
+```
+
+<Canvas of={PopoverStories.WithActions} />
+
+### Hiding the close button
+
+Only do this if `actions` (or something else) already gives the user a clear way to dismiss it — otherwise the only way out is Escape or an outside click, which isn't discoverable:
+
+<Canvas of={PopoverStories.NoCloseButton} />
+
+## Placement
+
+`placement` (`"top" | "bottom" | "left" | "right"`, defaults to `"top"`) is which side of the trigger the popover opens toward — matches Figma's four Point-* arrow variants, and the arrow always points back at the trigger from the opposite side. Position is computed from the trigger's measured `getBoundingClientRect()`, not CSS anchoring, and there's no viewport collision detection: if `placement="top"` would run off the top of the screen, it stays there rather than flipping to `"bottom"`.
+
+<Canvas of={PopoverStories.Placements} />
+
+## Trigger mode
+
+`trigger` (`"click" | "hover"`, defaults to `"click"`) — a Popover is a persistent, explicitly-dismissed panel (it has its own close button), not a hover hint, so it defaults the opposite way from `<Tooltip>`. `"click"` also closes on an outside click, mirroring `<DropdownMenu>`. `"hover"` is available for lighter-weight cases — it never renders the close button regardless of `showClose`, since dismissing on pointer-leave already gives it a way out; a persistent close button on a surface that disappears the moment you move toward it doesn't make sense.
+
+<Canvas of={PopoverStories.HoverTrigger} />
+
+## Icon-only triggers
+
+Pair with `aria-label` on the trigger since it has no visible text of its own:
+
+<Canvas of={PopoverStories.IconTrigger} />
+
+## Behavior
+
+- **Opens on**: click/tap (`trigger="click"`, the default) or hover (`trigger="hover"`).
+- **Closes on**: the close button, an outside click (click mode), mouse leave (hover mode), or Escape (any mode) — Escape and the close button both return focus to the trigger; an outside click doesn't, since the user's clicking on something else they likely meant to interact with.
+- **Transition**: fades in while sliding `var(--space-1)` from the trigger's side into its resting `placement` position, same technique as `<Tooltip>`. Reverses on close, and stays mounted for the exit transition instead of disappearing instantly.
+- **Rendering**: portaled to `document.body` and positioned via the trigger's measured position (re-measured on scroll/resize/every render), rather than CSS `position: absolute` in place — otherwise a scrolling or `overflow: hidden` ancestor would clip it the instant it extended past that ancestor's own box, no matter how high its z-index. Re-applies whatever `data-theme` its trigger was under, since portaling escapes that ancestor.
+- **Controlled open state**: skip `defaultOpen`/click entirely and drive it yourself with `open`/`onOpenChange`, same pattern as `<DropdownMenu>`/`<Tooltip>`.
+- **Not handled yet**: no viewport collision detection (see Placement above), and no focus trap — a Popover never blocks interaction with the rest of the page, unlike `<Modal>`.
+
+## Accessibility
+
+- The panel is a real `role="dialog"`, `aria-labelledby` the title when one's given.
+- The trigger gets `aria-describedby` pointing at the popover while it's open.
+- Opening a Popover doesn't move focus into it — there's no safe assumption about whether the close button, an action button, or something inside `content` should receive it first, same reasoning as `<DropdownMenuPanel>`. Escape and the close button both return focus to the trigger.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.
