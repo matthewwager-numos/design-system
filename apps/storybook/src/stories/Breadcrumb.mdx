@@ -1,0 +1,69 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as BreadcrumbStories from "./Breadcrumb.stories";
+
+<Meta of={BreadcrumbStories} />
+
+# Breadcrumb
+
+A trail of ancestor links back to some root, plus the current page — matches Figma's Breadcrumbs exactly: ancestor crumbs in `content-link-default`, the current crumb in `content-emphasis`, a chevron between each.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Showing where a page sits in a hierarchy the user can navigate back up through — a nested settings page, an object detail view reached through a list, a folder structure.
+
+## When NOT to use
+
+- A single level of "back to X" — a plain link or a `<Button variant="link">` is simpler than a one-crumb trail.
+- `<DetailHeader>`'s own breadcrumb row already covers the common "parent list → this record" case with its own `breadcrumb`/`title` props; reach for `<Breadcrumb>` directly when the trail has more than two levels or needs real per-crumb links.
+
+## Implementation
+
+```tsx
+import { Breadcrumb } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Breadcrumb
+  items={[
+    { label: "Root", href: "/root" },
+    { label: "Trunk", href: "/root/trunk" },
+    { label: "Branch", href: "/root/trunk/branch" },
+    { label: "Leaf" },
+  ]}
+/>
+```
+
+<Canvas of={BreadcrumbStories.Default} />
+
+### The last item is always the current page
+
+Regardless of whether it has an `href`/`onClick`, the last entry in `items` renders as plain text with `aria-current="page"`, never a link — matching Figma's own "Leaf" crumb (a different color, not a link) and the general convention that you don't need to navigate to the page you're already on.
+
+<Canvas of={BreadcrumbStories.TwoLevels} />
+
+## Separator
+
+`separator` (`"chevron" | "slash"`, defaults to `"chevron"`) — Figma's own icon is the chevron; `"slash"` is available for the other common breadcrumb convention.
+
+<Canvas of={BreadcrumbStories.Slash} />
+
+## Links, buttons, or plain text
+
+Each non-last item picks its own rendering from what you give it — same convention as `<NavItem>`: `href` → a real `<a>`, `onClick` alone → a `<button>` (for SPA-style navigation without a real URL), neither → plain (non-interactive) text, still styled like the other crumbs. Useful for an intermediate level that doesn't have a page of its own:
+
+<Canvas of={BreadcrumbStories.NonInteractiveCrumb} />
+
+<Canvas of={BreadcrumbStories.OnClickHandlers} />
+
+## Accessibility
+
+- The whole trail is a `<nav aria-label="Breadcrumb">` wrapping a real `<ol>` — one `<li>` per crumb, per the standard breadcrumb pattern.
+- The separator between crumbs is `aria-hidden` — it's decorative, not part of the content a screen reader needs to announce.
+- The current crumb gets `aria-current="page"`.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

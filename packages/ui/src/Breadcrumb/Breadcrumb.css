@@ -1,0 +1,66 @@
+/*
+ * Breadcrumb — matches Figma's Breadcrumbs exactly: Paragraph XS Regular
+ * throughout, ancestor crumbs in content-link-default, the current crumb in
+ * content-emphasis, space-2xs (2px) gaps around each 16px chevron
+ * separator. Hover/active on real links mirrors <Button variant="link">'s
+ * own color + underline treatment, since neither is specified for
+ * breadcrumb links in Figma's static example but real `<a>`s need one.
+ */
+
+.ds-breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-0);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ds-breadcrumb__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0);
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+
+.ds-breadcrumb__link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--content-link-default);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.ds-breadcrumb__link:hover,
+button.ds-breadcrumb__link:hover:not(:disabled) {
+  color: var(--content-link-hover);
+  text-decoration: underline;
+}
+
+a.ds-breadcrumb__link:active,
+button.ds-breadcrumb__link:active:not(:disabled) {
+  color: var(--content-link-active);
+  text-decoration: underline;
+}
+
+.ds-breadcrumb__link:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.ds-breadcrumb__current {
+  color: var(--content-emphasis);
+}
+
+.ds-breadcrumb__separator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--content-placeholder);
+}

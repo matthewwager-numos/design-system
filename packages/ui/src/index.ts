@@ -68,6 +68,9 @@ export type { HeaderProps, HeaderVariant } from "./Header";
 export { DetailHeader } from "./DetailHeader";
 export type { DetailHeaderProps } from "./DetailHeader";
 
+export { Breadcrumb } from "./Breadcrumb";
+export type { BreadcrumbProps, BreadcrumbItem, BreadcrumbSeparator } from "./Breadcrumb";
+
 export { Checkbox, CheckboxGroup } from "./Checkbox";
 export type { CheckboxProps, CheckboxSize, CheckboxGroupProps, CheckboxGroupSize } from "./Checkbox";
 
