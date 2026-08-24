@@ -37,9 +37,19 @@
 }
 
 .ds-tooltip__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
   font: var(--type-paragraph-xs-medium);
   letter-spacing: var(--type-paragraph-xs-medium-tracking);
   color: var(--content-emphasis-inverse);
+}
+
+.ds-tooltip__dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
 }
 
 .ds-tooltip__body {

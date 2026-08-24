@@ -14,6 +14,12 @@ export interface TooltipProps {
   content: ReactNode;
   /** Optional heading above the body — Figma's "Title" text layer, hidden unless set. */
   title?: ReactNode;
+  /**
+   * A small color swatch shown beside the title (or the body, if there's no
+   * title) — e.g. a chart series' own color, so the tooltip visually ties
+   * back to what's hovered. Omit for no dot.
+   */
+  dotColor?: string;
   /** Which side of the trigger the tooltip opens toward. Defaults to "top". */
   placement?: TooltipPlacement;
   /** "hover" (default, also opens on focus) or "click" to toggle on click/tap instead. */
@@ -23,12 +29,25 @@ export interface TooltipProps {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   className?: string;
+  /**
+   * Anchor to this viewport point instead of measuring `children`'s own
+   * `getBoundingClientRect()` — for triggers with no meaningful box of
+   * their own, e.g. a cursor position a chart tooltip tracks. `children` is
+   * still required (and still receives the hover/focus/click wiring below)
+   * since its nearest `[data-theme]` ancestor is still read from it, but
+   * its layout position and size are ignored in favor of this point.
+   */
+  anchorPoint?: { x: number; y: number };
 }
 
 interface Anchor {
   rect: DOMRect;
   /** The trigger's nearest `[data-theme]` ancestor, if any — reapplied to the portaled tooltip since portaling to <body> would otherwise escape it (e.g. <Navigation>'s forced dark theme). */
   theme: string | null;
+}
+
+function rectsEqual(a: DOMRect, b: DOMRect): boolean {
+  return a.top === b.top && a.left === b.left && a.width === b.width && a.height === b.height;
 }
 
 function getPosition(placement: TooltipPlacement, rect: DOMRect): CSSProperties {
@@ -78,12 +97,14 @@ export function Tooltip({
   children,
   content,
   title,
+  dotColor,
   placement = "top",
   trigger = "hover",
   open: controlledOpen,
   defaultOpen = false,
   onOpenChange,
   className,
+  anchorPoint,
 }: TooltipProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const open = controlledOpen ?? uncontrolledOpen;
@@ -122,24 +143,50 @@ export function Tooltip({
     };
   }, [open]);
 
+  // `anchorPoint` skips measuring `children` entirely — its own box is
+  // irrelevant when the tooltip is meant to track an arbitrary point (e.g.
+  // the cursor) instead of a real trigger element. `[data-theme]` is still
+  // read from `children`'s own DOM node regardless, since that lookup is a
+  // plain ancestor walk unaffected by whichever positioning `children` uses.
+  function measureAnchor(): Anchor | null {
+    const el = rootRef.current;
+    if (!el) return null;
+    const theme = el.closest("[data-theme]")?.getAttribute("data-theme") ?? null;
+    const rect = anchorPoint ? new DOMRect(anchorPoint.x, anchorPoint.y, 0, 0) : el.getBoundingClientRect();
+    return { rect, theme };
+  }
+
+  function applyAnchor(next: Anchor | null) {
+    if (!next) return;
+    setAnchor((prev) => (prev && prev.theme === next.theme && rectsEqual(prev.rect, next.rect) ? prev : next));
+  }
+
+  // Re-measures after every render (no dependency array), not just on mount
+  // — a trigger can move without `open`/`placement` changing, e.g.
+  // `anchorPoint` tracking the cursor as its caller's state updates on
+  // mousemove. Bails out via the functional setState form when the rect is
+  // unchanged, so this doesn't loop: same rect in ⇒ same object out ⇒ React
+  // skips the re-render that would otherwise re-trigger this effect.
+  useLayoutEffect(() => {
+    if (!rendered) return;
+    applyAnchor(measureAnchor());
+  });
+
   useLayoutEffect(() => {
     if (!rendered) return;
     function measure() {
-      const el = rootRef.current;
-      if (!el) return;
-      setAnchor({ rect: el.getBoundingClientRect(), theme: el.closest("[data-theme]")?.getAttribute("data-theme") ?? null });
+      applyAnchor(measureAnchor());
     }
-    measure();
-    // The trigger can move without `open`/`placement` changing — a scroll on
-    // any ancestor (capture: true catches those, since scroll doesn't
-    // bubble) or a viewport resize — so keep re-measuring while mounted.
+    // The trigger can also move for reasons outside our own render cycle —
+    // a scroll on any ancestor (capture: true catches those, since scroll
+    // doesn't bubble) or a viewport resize.
     window.addEventListener("scroll", measure, true);
     window.addEventListener("resize", measure);
     return () => {
       window.removeEventListener("scroll", measure, true);
       window.removeEventListener("resize", measure);
     };
-  }, [rendered, placement]);
+  }, [rendered]);
 
   function handleTransitionEnd(event: React.TransitionEvent<HTMLSpanElement>) {
     if (event.target === tooltipRef.current && !open) setRendered(false);
@@ -210,7 +257,12 @@ export function Tooltip({
             style={{ ...getPosition(placement, anchor.rect), transform: getTransform(placement, visible) }}
             onTransitionEnd={handleTransitionEnd}
           >
-            {title && <span className="ds-tooltip__title">{title}</span>}
+            {(title !== undefined || dotColor) && (
+              <span className="ds-tooltip__title">
+                {dotColor && <span className="ds-tooltip__dot" style={{ background: dotColor }} aria-hidden="true" />}
+                {title}
+              </span>
+            )}
             <span className="ds-tooltip__body">{content}</span>
             <span className="ds-tooltip__arrow" />
           </span>,
