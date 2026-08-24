@@ -1,0 +1,80 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as CarouselStories from "./Carousel.stories";
+
+<Meta of={CarouselStories} />
+
+# Carousel
+
+A single-slide-at-a-time viewer with previous/next arrows and dot indicators — matches Figma's Carousel exactly: `<IconButton variant="secondary" size="md">` arrows and dots where the active one is a wider pill among plain circles. Figma's own mockup is a single static slot; sliding between real `slides` via a translated track is a genuine implementation, not a reproduction of that placeholder.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A set of promotional images, product photos, or cards where only one needs attention at a time and the rest are worth browsing, not reading in sequence.
+
+## When NOT to use
+
+- Content the user needs to compare side by side, or scan all of at once — a carousel hides everything but the current slide, which is exactly wrong for that.
+- A sequence with a clear start/end the user should read in order — pagination or plain scrolling keeps everything reachable without depending on remembering to click through.
+
+## Implementation
+
+```tsx
+import { Carousel } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Carousel
+  slides={[
+    <img src="/photo-1.jpg" alt="…" />,
+    <img src="/photo-2.jpg" alt="…" />,
+    <img src="/photo-3.jpg" alt="…" />,
+  ]}
+/>
+```
+
+<Canvas of={CarouselStories.Default} />
+
+## Arrows are real `<IconButton>`s
+
+The previous/next arrows are `<IconButton variant="secondary" size="md">` — not bespoke markup. At the first/last slide, the relevant arrow disables using that variant's own disabled treatment (confirmed from this exact Carousel instance in Figma: a flat `background-disabled` fill, no border) rather than wrapping around.
+
+## `loop`
+
+Pass `loop` to wrap from the last slide back to the first (and vice versa) instead of disabling the arrows at the ends — Figma's own example shows the non-looping default (first slide, "previous" arrow disabled).
+
+<Canvas of={CarouselStories.Loop} />
+
+## Dots
+
+One dot per slide, shown below the viewer — click one to jump straight to that slide. Hidden automatically when there's only one slide (no navigation possible), or pass `showDots={false}` to hide them regardless of slide count.
+
+<Canvas of={CarouselStories.NoDots} />
+<Canvas of={CarouselStories.TwoSlides} />
+<Canvas of={CarouselStories.SingleSlide} />
+
+## Controlled index
+
+Skip `defaultIndex` and drive the active slide yourself with `index`/`onIndexChange` — useful for syncing the carousel with something else on the page (thumbnails, a step indicator):
+
+<Canvas of={CarouselStories.Controlled} />
+
+## Behavior
+
+- **Navigation**: the arrows, clicking a dot, or the Left/Right arrow keys while focus is anywhere inside the carousel.
+- **Transition**: the track slides via `transform: translateX(...)` on `--motion-toggle` — a persistent-state change between two slides, not a mount/unmount, so it doesn't use an enter/exit token.
+- **Sizing**: slides aren't given a height by this component — size your own slide content (an `<img>`, a fixed-height placeholder), and the viewer sizes to whatever the tallest one ends up being.
+- **Not handled yet**: no autoplay, and no swipe/drag gesture support — navigation is arrows, dots, and keyboard only.
+
+## Accessibility
+
+- The root is `role="region"` `aria-roledescription="carousel"` with an `aria-label` you provide (describe what the slides *are* — "Product photos" — not the word "carousel," which `aria-roledescription` already announces).
+- Each slide is `role="group"` `aria-roledescription="slide"` with an `aria-label` of "Slide X of N", and `aria-hidden` while it isn't the active one.
+- Each dot is a real `<button>` with an `aria-label` ("Go to slide X") and `aria-current` on the active one.
+- Left/Right arrow keys navigate from anywhere inside the carousel, not just when an arrow button itself has focus.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

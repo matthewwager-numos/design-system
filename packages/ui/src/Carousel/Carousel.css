@@ -1,0 +1,75 @@
+/*
+ * Carousel — matches Figma's Carousel exactly: space-l (16px) gaps between
+ * the arrows/slot and between the viewer/dots, the slot's own radius-md
+ * (Figma's "Radius/S" primitive is 8px — this codebase's --radius-md, not
+ * --radius-sm, the same offset already confirmed for <Card>/<Popover>),
+ * and dots where the active one is a wider pill in content-brand-primary
+ * among plain background-element circles.
+ *
+ * The arrows are real <IconButton variant="secondary" size="md">s, not
+ * bespoke markup — confirmed identical treatment, including Figma's own
+ * disabled nav arrow (a flat background-disabled fill, no border), which
+ * is what that variant's disabled state now matches (see IconButton.css).
+ */
+
+.ds-carousel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.ds-carousel__viewer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.ds-carousel__slot {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.ds-carousel__track {
+  display: flex;
+  width: 100%;
+  transition: transform var(--motion-toggle);
+}
+
+.ds-carousel__slide {
+  flex: none;
+  width: 100%;
+}
+
+.ds-carousel__dots {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ds-carousel__dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: none;
+  padding: 0;
+  border-radius: var(--radius-full);
+  background: var(--background-element);
+  cursor: pointer;
+  transition: width var(--motion-toggle), background-color var(--duration-base) var(--ease-out);
+}
+
+.ds-carousel__dot--active {
+  width: 1rem;
+  background: var(--content-brand-primary);
+}
+
+.ds-carousel__dot:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}

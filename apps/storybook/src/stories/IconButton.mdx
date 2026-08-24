@@ -1,0 +1,85 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as IconButtonStories from "./IconButton.stories";
+
+<Meta of={IconButtonStories} />
+
+# IconButton
+
+A circular, icon-only button — matches Figma's Icon Button exactly across its 4 types × 3 sizes.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A single, unlabeled action next to other content — a close (×), a row's delete/edit action, a toolbar button — where an icon alone is a clear, established convention and a text label would be redundant.
+
+## When NOT to use
+
+- Any action whose meaning isn't obvious from the icon alone — use `<Button>` with a visible label, or at minimum pair the icon with one.
+- Inline with body text or as a labeled action in a form — `<Button leadingIcon={...}>` is a labeled button that also happens to have an icon; this is icon-*only*.
+
+## Implementation
+
+```tsx
+import { IconButton } from "@numosai/ui";
+import { Plus } from "lucide-react";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<IconButton icon={<Plus size={24} />} aria-label="Add" />
+```
+
+`icon` is sized by the caller, not this component — matching `<Button>`'s own `leadingIcon` convention. Figma's confirmed icon size per `size`: **16px for "sm", 24px for "md" and "lg"**. That's not a typo — Size M's icon was recently increased from 16px to 24px in Figma, so M and L now share the same icon size and differ only in the surrounding circle's diameter (36px vs. 48px).
+
+`aria-label` is required — an icon-only button has no visible label of its own for assistive tech to read.
+
+<Canvas of={IconButtonStories.Primary} />
+
+## Variants
+
+Figma calls the outlined type "Tertiary"; it's renamed to `"secondary"` here — the identical treatment `<Button variant="secondary">` already has a name for, and Figma's own label would just be a second name for the same visual concept. `"ghost"` (no border, no fill until hover) has no equivalent on `<Button>`.
+
+<Canvas of={IconButtonStories.Secondary} />
+<Canvas of={IconButtonStories.Ghost} />
+<Canvas of={IconButtonStories.Accent} />
+
+## Sizes
+
+`size` (`"sm" | "md" | "lg"`, defaults to `"md"`) sets the circle's diameter — 24px, 36px, 48px. Pass a matching icon size yourself (see above).
+
+<Canvas of={IconButtonStories.Sizes} />
+
+## All variants × sizes
+
+<Canvas of={IconButtonStories.AllVariants} />
+
+## Disabled
+
+<Canvas of={IconButtonStories.Disabled} />
+<Canvas of={IconButtonStories.DisabledAllVariants} />
+
+## A gap Figma doesn't define within this component
+
+**`"accent"` only has a Default state in Figma** — no Hover/Active/Disabled symbols exist yet. Hover/active reuse the exact `--button-accent-hover`/`--button-accent-active` tokens `<Button variant="accent">` already uses (confirmed: Figma's `Button/Accent/Default` color is exactly what `--button-accent-default` already resolves to), and Disabled matches `"primary"`'s (both solid-fill types dim to `--background-disabled` uniformly).
+
+`"secondary"` (Figma's "Tertiary") Disabled has no symbol in this component's own frame either, but `<Carousel>`'s disabled nav arrow uses this exact variant and confirms what it looks like: a flat `--background-disabled` fill with no border — matching `"primary"`'s own disabled treatment, not an outlined ring.
+
+## Colors
+
+| Variant | Default | Hover | Active | Disabled |
+|---|---|---|---|---|
+| `primary` | `--button-primary-default` bg, white icon | `--button-primary-hover` bg | `--button-primary-active` bg + `--shadow-focus-brand` | `--background-disabled` bg, `--content-disabled` icon |
+| `secondary` | `--border-brand` outline, `--content-brand-primary` icon | + `--background-brand-subdued` fill | thicker `--content-link-default` outline + fill + `--shadow-focus-brand` | `--background-disabled` bg, no border, `--content-disabled` icon |
+| `ghost` | `--content-brand-primary` icon, no fill | `--background-element` fill | `--background-hover` fill | `--content-disabled` icon, no fill |
+| `accent` | `--button-accent-default` bg, `--button-accent-content` icon | `--button-accent-hover` bg | `--button-accent-active` bg + `--shadow-focus-brand` | `--background-disabled` bg, `--content-disabled` icon |
+
+## Accessibility
+
+- `aria-label` is a required prop (not optional) — TypeScript enforces it can't be skipped.
+- Real `<button type="button">`, so it's keyboard-focusable and activates on Enter/Space for free.
+- `disabled` uses the native attribute, removing it from the tab order like any other disabled button.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

@@ -3,6 +3,12 @@
 export { Button } from "./Button";
 export type { ButtonProps } from "./Button";
 
+export { IconButton } from "./IconButton";
+export type { IconButtonProps, IconButtonVariant, IconButtonSize } from "./IconButton";
+
+export { Carousel } from "./Carousel";
+export type { CarouselProps } from "./Carousel";
+
 export { Badge } from "./Badge";
 export type { BadgeProps, BadgeStatus, BadgeSize } from "./Badge";
 

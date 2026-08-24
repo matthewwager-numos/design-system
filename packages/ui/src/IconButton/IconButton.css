@@ -1,0 +1,151 @@
+/*
+ * IconButton — matches Figma's Icon Button exactly: confirmed geometry via
+ * get_metadata (not the flattened Tailwind guess, which mislabeled Size M's
+ * padding) — sm: 24px circle / 16px icon, md: 36px circle / 24px icon,
+ * lg: 48px circle / 24px icon. Centered via flexbox rather than fixed
+ * padding, since Size M's real gap (6px) isn't any real spacing token —
+ * the icon was recently sized up to 24px without the surrounding circle or
+ * a token-aligned padding changing to match, so centering is the only
+ * value that's actually stable to build on.
+ *
+ * One gap Figma doesn't define within this component itself, filled from a
+ * confirmed sibling instead of guessed: "accent" only has a Default symbol
+ * here — hover/active/disabled reuse the exact --button-accent-* tokens
+ * <Button variant="accent"> already uses, confirmed to resolve to the same
+ * color Figma's Accent/Default does.
+ *
+ * "secondary" (Figma's "Tertiary") Disabled has no symbol in this frame
+ * either, but Figma's own Carousel instance shows a disabled nav arrow
+ * using this exact variant — a flat --background-disabled fill with no
+ * border, matching "primary"'s own disabled treatment, not an outlined
+ * --border-disabled ring as originally guessed here before that turned up.
+ */
+
+.ds-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-out), border-color var(--duration-base) var(--ease-out), box-shadow var(--motion-pulse-fast);
+}
+
+.ds-icon-button:disabled {
+  cursor: not-allowed;
+}
+
+.ds-icon-button:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}
+
+.ds-icon-button__icon {
+  display: inline-flex;
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-icon-button--sm {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ds-icon-button--md {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.ds-icon-button--lg {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* ── Primary ───────────────────────────────────────────────────────── */
+
+.ds-icon-button--primary {
+  border: none;
+  background: var(--button-primary-default);
+  color: var(--content-emphasis-inverse);
+}
+
+.ds-icon-button--primary:hover:not(:disabled) {
+  background: var(--button-primary-hover);
+}
+
+.ds-icon-button--primary:active:not(:disabled) {
+  background: var(--button-primary-active);
+  box-shadow: var(--shadow-focus-brand);
+}
+
+.ds-icon-button--primary:disabled {
+  background: var(--background-disabled);
+  color: var(--content-disabled);
+}
+
+/* ── Secondary (Figma's "Tertiary") ────────────────────────────────── */
+
+.ds-icon-button--secondary {
+  border: 1px solid var(--border-brand);
+  background: none;
+  color: var(--content-brand-primary);
+}
+
+.ds-icon-button--secondary:hover:not(:disabled) {
+  background: var(--background-brand-subdued);
+}
+
+.ds-icon-button--secondary:active:not(:disabled) {
+  border-width: 1.5px;
+  border-color: var(--content-link-default);
+  background: var(--background-brand-subdued);
+  box-shadow: var(--shadow-focus-brand);
+}
+
+.ds-icon-button--secondary:disabled {
+  border-color: transparent;
+  background: var(--background-disabled);
+  color: var(--content-disabled);
+}
+
+/* ── Ghost ─────────────────────────────────────────────────────────── */
+
+.ds-icon-button--ghost {
+  border: none;
+  background: none;
+  color: var(--content-brand-primary);
+}
+
+.ds-icon-button--ghost:hover:not(:disabled) {
+  background: var(--background-element);
+}
+
+.ds-icon-button--ghost:active:not(:disabled) {
+  background: var(--background-hover);
+}
+
+.ds-icon-button--ghost:disabled {
+  color: var(--content-disabled);
+}
+
+/* ── Accent ────────────────────────────────────────────────────────── */
+
+.ds-icon-button--accent {
+  border: none;
+  background: var(--button-accent-default);
+  color: var(--button-accent-content);
+}
+
+.ds-icon-button--accent:hover:not(:disabled) {
+  background: var(--button-accent-hover);
+}
+
+.ds-icon-button--accent:active:not(:disabled) {
+  background: var(--button-accent-active);
+  box-shadow: var(--shadow-focus-brand);
+}
+
+.ds-icon-button--accent:disabled {
+  background: var(--background-disabled);
+  color: var(--content-disabled);
+}
