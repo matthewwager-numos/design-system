@@ -1,0 +1,70 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as BarChartStories from "./Chart-Bar.stories";
+
+<Meta of={BarChartStories} />
+
+# BarChart
+
+A vertical or horizontal bar chart — matches Figma's Chart component's colors, typography, and grid/baseline treatment exactly. `orientation="horizontal"` is the same chart transposed, not a separate implementation.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Comparing a handful of discrete categories against each other (revenue by region, count by status).
+- `orientation="horizontal"` when category labels are long — a vertical chart's rotated or truncated labels are harder to read than a horizontal one's full-width row.
+
+## When NOT to use
+
+- A continuous trend over time — use `<LineChart>`.
+- Part-to-whole composition of a single total — use `<DonutChart>`.
+
+## Implementation
+
+```tsx
+import { BarChart } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<BarChart
+  data={[
+    { label: "First", value: 58 },
+    { label: "Second", value: 73 },
+    { label: "Third", value: 94 },
+    { label: "Fourth", value: 73 },
+    { label: "Fifth", value: 96 },
+  ]}
+/>
+```
+
+<Canvas of={BarChartStories.Default} />
+
+## Orientation
+
+<Canvas of={BarChartStories.Horizontal} />
+
+## Independent visibility controls
+
+Confirmed from the request behind this component: legend, grid lines (with their axis tick values), and category labels are three separate booleans, not one bundled "show chrome" switch — Figma's own static example always shows all three together, but nothing about the chart depends on that.
+
+<Canvas of={BarChartStories.GridLinesHidden} />
+<Canvas of={BarChartStories.LegendHidden} />
+<Canvas of={BarChartStories.Minimal} />
+
+## Colors
+
+Bars default to the five-color `--chart-1`…`--chart-5` palette (Figma's own "Charts/First"–"Charts/Fifth"), assigned by index — pass `color` on a datum to override it.
+
+## Ticks are computed, not literal
+
+Figma's own grid rows show static `"00"` placeholder text at each end. Here, every tick is a real value derived from `data`'s max — `gridLineCount` (default 5) controls how many divisions, not what they say.
+
+## Accessibility
+
+- The bars and grid are `aria-hidden` — a bar chart's visual encoding doesn't have a meaningful DOM/AX fallback of its own; pair it with a visually-hidden data table or summary if the underlying data needs to reach assistive tech.
+- Legend and axis/category text render as real, readable text (not baked into an image), so zoom and text-scaling work normally.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

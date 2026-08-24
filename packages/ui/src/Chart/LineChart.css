@@ -1,0 +1,89 @@
+/*
+ * LineChart — same grid/baseline treatment as BarChart's vertical
+ * orientation (confirmed identical in Figma): border-subtle gridlines,
+ * a more prominent border-emphasis baseline holding category labels,
+ * Paragraph XS Regular / content-placeholder throughout.
+ */
+
+.ds-line-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ds-line-chart__grid {
+  display: flex;
+  flex-direction: column;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+
+.ds-line-chart__rows {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ds-line-chart__row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-subtle);
+  padding: 0 var(--space-4);
+}
+
+.ds-line-chart__baseline {
+  flex: none;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-emphasis);
+  padding: 0 var(--space-4);
+}
+
+.ds-line-chart__tick,
+.ds-line-chart__category {
+  color: var(--content-placeholder);
+  white-space: nowrap;
+}
+
+.ds-line-chart__baseline .ds-line-chart__category {
+  flex: 1;
+  text-align: center;
+}
+
+.ds-line-chart__plot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ds-line-chart__plot .ds-line-chart__line {
+  transition: stroke var(--duration-base) var(--ease-out);
+}
+
+.ds-line-chart__points {
+  position: absolute;
+  inset: 0;
+}
+
+.ds-line-chart__point {
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-out);
+}
+
+.ds-line-chart__point:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}

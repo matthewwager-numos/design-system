@@ -1,0 +1,73 @@
+/*
+ * BubbleChart — same "Chart grid" building block as BarChart/LineChart
+ * (border-subtle gridlines, border-emphasis baseline, Paragraph XS
+ * Regular / content-placeholder throughout), except both axes are numeric
+ * here: the baseline shows the x-axis's own 0/max, not category labels.
+ */
+
+.ds-bubble-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ds-bubble-chart__grid {
+  display: flex;
+  flex-direction: column;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+
+.ds-bubble-chart__rows {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ds-bubble-chart__row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-subtle);
+  padding: 0 var(--space-4);
+}
+
+.ds-bubble-chart__baseline {
+  flex: none;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-emphasis);
+  padding: 0 var(--space-4);
+}
+
+.ds-bubble-chart__tick {
+  color: var(--content-placeholder);
+  white-space: nowrap;
+}
+
+.ds-bubble-chart__bubbles {
+  position: absolute;
+  inset: 0;
+}
+
+.ds-bubble-chart__bubble {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-full);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    width var(--motion-toggle),
+    height var(--motion-toggle);
+}
+
+.ds-bubble-chart__bubble:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}

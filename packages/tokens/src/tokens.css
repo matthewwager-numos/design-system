@@ -367,6 +367,18 @@
   --shadow-focus-brand: 0 0 0 2px var(--background-brand-subdued);
   --shadow-focus-negative: 0 0 0 2px var(--background-negative);
   --shadow-focus-positive: 0 0 0 2px var(--background-positive);
+
+  /* ── Charts ──────────────────────────────────────────────────────────
+     A categorical palette for distinguishing data series (bar/line/donut/
+     sankey all pull from this same five-color sequence in Figma) — series
+     identity, not UI chrome, so components pick by index rather than any
+     one series owning a fixed meaning. Declared once: Figma's own chart
+     instances don't show a dark-mode pairing for these. */
+  --chart-1: var(--brand-dark-blue);
+  --chart-2: var(--brand-700);
+  --chart-3: var(--green-700);
+  --chart-4: var(--yellow-700);
+  --chart-5: var(--magenta-700);
 }
 
 @media (prefers-color-scheme: dark) {

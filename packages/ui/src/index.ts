@@ -131,6 +131,25 @@ export type { CardProps, CardExpand, CardHeaderProps, CardHeaderAction, CardGrou
 export { SettingsCard } from "./SettingsCard";
 export type { SettingsCardProps } from "./SettingsCard";
 
+export { ChartLegend, BarChart, LineChart, DonutChart, SankeyChart, BubbleChart, chartColor, chartColorMuted } from "./Chart";
+export type {
+  ChartLegendProps,
+  ChartLegendItem,
+  ChartLegendOrientation,
+  BarChartProps,
+  BarChartOrientation,
+  ChartDatum,
+  LineChartProps,
+  LineChartSeries,
+  DonutChartProps,
+  DonutChartDatum,
+  SankeyChartProps,
+  SankeyNode,
+  SankeyLink,
+  BubbleChartProps,
+  BubbleChartDatum,
+} from "./Chart";
+
 // Not a component — a small utility `<Wizard>` uses internally to pin its
 // own footer, and that consuming apps can reuse for the same "fixed chrome
 // needs a real measured height, not a guess" problem (e.g. a fixed mobile

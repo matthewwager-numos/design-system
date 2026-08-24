@@ -1,0 +1,165 @@
+/*
+ * BarChart — matches Figma's Vertical Bar / Horizontal bar chart types
+ * exactly for color, typography, and the gridline/baseline distinction:
+ * every non-baseline gridline uses border-subtle (Figma "Border/Subdued"),
+ * the baseline (where category labels sit) uses the more prominent
+ * border-emphasis — a deliberate distinction, not a Figma inconsistency.
+ * Axis tick / category / legend text is all Paragraph XS Regular in
+ * content-placeholder, confirmed via get_variable_defs.
+ *
+ * Horizontal orientation is the same chart transposed: rows become
+ * columns, the bottom baseline becomes a left-side category column, bars
+ * grow rightward instead of upward.
+ */
+
+.ds-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ds-bar-chart__grid--vertical {
+  display: flex;
+  flex-direction: column;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+
+.ds-bar-chart__rows {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ds-bar-chart__row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-subtle);
+  padding: 0 var(--space-4);
+}
+
+.ds-bar-chart__baseline {
+  flex: none;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-emphasis);
+  padding: 0 var(--space-4);
+}
+
+.ds-bar-chart__tick,
+.ds-bar-chart__category {
+  color: var(--content-placeholder);
+  white-space: nowrap;
+}
+
+.ds-bar-chart__baseline .ds-bar-chart__category {
+  flex: 1;
+  text-align: center;
+}
+
+.ds-bar-chart__bar {
+  cursor: pointer;
+}
+
+.ds-bar-chart__bar:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}
+
+.ds-bar-chart__grid--vertical .ds-bar-chart__bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+}
+
+.ds-bar-chart__grid--vertical .ds-bar-chart__bar-slot {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.ds-bar-chart__grid--vertical .ds-bar-chart__bar {
+  width: min(100%, 2rem);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: height var(--motion-toggle), background-color var(--duration-base) var(--ease-out);
+}
+
+/* ── Horizontal ─────────────────────────────────────────────────────── */
+
+.ds-bar-chart__grid--horizontal {
+  display: flex;
+  flex-direction: row;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+
+.ds-bar-chart__category-column {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-1);
+  border-right: 1px solid var(--border-emphasis);
+  padding: var(--space-4) var(--space-1);
+}
+
+.ds-bar-chart__category-column .ds-bar-chart__category {
+  text-align: right;
+}
+
+.ds-bar-chart__columns {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-width: 0;
+}
+
+.ds-bar-chart__column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-right: 1px solid var(--border-subtle);
+  padding: var(--space-1) 0;
+}
+
+.ds-bar-chart__grid--horizontal .ds-bar-chart__bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-4) 0;
+}
+
+.ds-bar-chart__grid--horizontal .ds-bar-chart__bar-slot {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.ds-bar-chart__grid--horizontal .ds-bar-chart__bar {
+  height: min(100%, 0.5rem);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  transition: width var(--motion-toggle), background-color var(--duration-base) var(--ease-out);
+}

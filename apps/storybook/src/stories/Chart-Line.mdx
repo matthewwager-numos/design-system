@@ -1,0 +1,66 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as LineChartStories from "./Chart-Line.stories";
+
+<Meta of={LineChartStories} />
+
+# LineChart
+
+A multi-series line chart — the same grid/baseline/legend treatment as `<BarChart orientation="vertical">`, confirmed identical in Figma. Figma's own "Fever Line" instance is a single flattened illustration, not real coordinate data, so this is a genuine renderer built from `series`, not a reproduction of that image.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A trend over an ordered sequence — time, steps, cohorts — especially comparing several series against the same categories.
+
+## When NOT to use
+
+- A handful of unordered categories with no inherent sequence — use `<BarChart>`.
+- Part-to-whole composition of a single total — use `<DonutChart>`.
+
+## Implementation
+
+```tsx
+import { LineChart } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<LineChart
+  categories={["Jan", "Feb", "Mar", "Apr", "May", "Jun"]}
+  series={[
+    { label: "Revenue", values: [40, 55, 48, 62, 70, 66] },
+    { label: "Expenses", values: [30, 32, 38, 35, 42, 40] },
+  ]}
+/>
+```
+
+<Canvas of={LineChartStories.Default} />
+
+`series` is any length — one line, or several sharing the same `categories`:
+
+<Canvas of={LineChartStories.SingleSeries} />
+
+## Independent visibility controls
+
+Legend, grid lines (with their axis tick values), and category labels are three separate booleans — same convention as `<BarChart>`.
+
+<Canvas of={LineChartStories.GridLinesHidden} />
+<Canvas of={LineChartStories.LegendHidden} />
+
+## Colors
+
+Each series defaults to the five-color `--chart-1`…`--chart-5` palette assigned by index — pass `color` on a series to override it.
+
+## Ticks are computed, not literal
+
+Every axis tick is a real value derived from the max across all series' `values` — `gridLineCount` (default 5) controls how many divisions.
+
+## Accessibility
+
+- The plotted lines are `aria-hidden` — pair with a visually-hidden data table or summary if the underlying data needs to reach assistive tech.
+- Legend and axis/category text render as real, readable text.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

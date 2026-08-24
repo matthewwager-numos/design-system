@@ -1,0 +1,69 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as DonutChartStories from "./Chart-Donut.stories";
+
+<Meta of={DonutChartStories} />
+
+# DonutChart
+
+A donut chart — matches Figma's colors, center-text typography (Heading 2XL value / Heading XS label), and side-positioned vertical legend exactly. Figma's own ring is 5 flattened SVG vector fragments, not real arc data, so the arcs here are computed from `data`'s real value proportions via `stroke-dasharray`.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Part-to-whole composition of a single total, with 2–5 segments — a share of revenue by product line, a status breakdown.
+
+## When NOT to use
+
+- More than a handful of segments — thin slices become unreadable; use `<BarChart>` instead once there are more than ~5–6 categories.
+- Comparing magnitudes, not proportions of one whole — use `<BarChart>`.
+
+## Implementation
+
+```tsx
+import { DonutChart } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<DonutChart
+  data={[
+    { label: "First", value: 38 },
+    { label: "Second", value: 27 },
+    { label: "Third", value: 18 },
+    { label: "Fourth", value: 11 },
+    { label: "Fifth", value: 6 },
+  ]}
+  centerLabel="Total"
+/>
+```
+
+<Canvas of={DonutChartStories.Default} />
+
+## A genuinely different legend layout
+
+Unlike bar/line/sankey's horizontal-wrap legend below the chart, the donut's legend is a narrow vertical stack beside the ring — confirmed from Figma as a deliberate, different layout for this chart type, not an oversight to unify.
+
+## Center text
+
+`centerValue` defaults to the sum of `data`'s values; `centerLabel` is optional — omit it for just the number. Toggle both off at once with `showCenterLabel`.
+
+<Canvas of={DonutChartStories.CenterLabelHidden} />
+<Canvas of={DonutChartStories.CustomCenterValue} />
+
+## Legend visibility
+
+<Canvas of={DonutChartStories.LegendHidden} />
+
+## Colors
+
+Segments default to the five-color `--chart-1`…`--chart-5` palette assigned by index — pass `color` on a datum to override it.
+
+## Accessibility
+
+- The ring is decorative markup with no accessible fallback of its own; pair with a visually-hidden data table or summary if the underlying data needs to reach assistive tech.
+- Center value/label and legend text render as real, readable text.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

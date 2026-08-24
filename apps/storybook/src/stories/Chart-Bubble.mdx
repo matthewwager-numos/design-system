@@ -1,0 +1,70 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as ChartBubbleStories from "./Chart-Bubble.stories";
+
+<Meta of={ChartBubbleStories} />
+
+# BubbleChart
+
+A bubble chart — the same "Chart grid" building block as `<BarChart>`/`<LineChart>` (border-subtle gridlines, a border-emphasis baseline, Paragraph XS Regular / content-placeholder throughout), except both axes are numeric here: the baseline shows the x-axis's own 0/max instead of category labels. Figma's own bubbles are 5 flattened SVG images at fixed positions, not real x/y/size data, so the layout here is computed from `data`'s real values.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Comparing three numeric dimensions at once — two axes plus a size encoding — like reach vs. engagement vs. spend across campaigns.
+
+## When NOT to use
+
+- Only two dimensions — use `<LineChart>` or `<BarChart>` instead; a bubble chart's size encoding adds nothing without a real third variable.
+- Precise value comparison — bubble area is naturally harder to compare exactly than bar length; use `<BarChart>` when the numbers themselves matter more than the overall shape of the data.
+
+## Implementation
+
+```tsx
+import { BubbleChart } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<BubbleChart
+  data={[
+    { label: "First", x: 78, y: 82, size: 58 },
+    { label: "Second", x: 43, y: 88, size: 34 },
+    { label: "Third", x: 47, y: 28, size: 44 },
+    { label: "Fourth", x: 50, y: 92, size: 22 },
+    { label: "Fifth", x: 62, y: 32, size: 24 },
+  ]}
+/>
+```
+
+<Canvas of={ChartBubbleStories.Default} />
+
+## Bubbles default to 50% opacity
+
+Unlike Bar/Line/Donut (fully opaque by default, dimmed on hover), bubbles start at their `chartColorMuted` (50%) fill — the same convention `<SankeyChart>` uses for its ribbons — so overlapping bubbles stay legible. Hovering (or focusing) one brings it to full color and shows its x/y/size in a tooltip; a full-color border keeps every bubble's outline visible even at rest.
+
+## Independent visibility controls
+
+Legend and grid lines (with their axis tick values) are two separate booleans — same convention as the other chart types.
+
+<Canvas of={ChartBubbleStories.GridLinesHidden} />
+<Canvas of={ChartBubbleStories.LegendHidden} />
+
+## Bubble size range
+
+`minDiameter`/`maxDiameter` (default 16/64px) set the px range `size` is scaled into — the smallest value in `data` renders at `minDiameter`, the largest at `maxDiameter`.
+
+<Canvas of={ChartBubbleStories.SizeRange} />
+
+## Colors
+
+Bubbles default to the five-color `--chart-1`…`--chart-5` palette assigned by index — pass `color` on a datum to override it.
+
+## Accessibility
+
+- Each bubble is `tabIndex`-focusable with an `aria-label` describing its x/y/size — pair with a visually-hidden data table if the underlying data needs a non-visual equivalent beyond that summary.
+- Legend and axis text render as real, readable text.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

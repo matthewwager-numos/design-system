@@ -79,6 +79,13 @@ export const tokens = {
       default50: "var(--overlay-default-50)",
       inverse50: "var(--overlay-inverse-50)",
     },
+    chart: [
+      "var(--chart-1)",
+      "var(--chart-2)",
+      "var(--chart-3)",
+      "var(--chart-4)",
+      "var(--chart-5)",
+    ],
   },
   space: {
     0: "var(--space-0)",

@@ -1,0 +1,54 @@
+/*
+ * DonutChart — matches Figma's Donut exactly: ring + legend side by side
+ * (not the horizontal-wrap legend the other chart types use — a narrow
+ * vertical stack, confirmed a genuinely different, deliberate layout),
+ * center value at Heading 2XL / content-emphasis, center label at
+ * Heading XS / content-subtle.
+ */
+
+.ds-donut-chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.ds-donut-chart__ring {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+}
+
+.ds-donut-chart__segment {
+  cursor: pointer;
+  transition: fill var(--duration-base) var(--ease-out);
+}
+
+.ds-donut-chart__segment:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}
+
+.ds-donut-chart__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.ds-donut-chart__center-value {
+  font: var(--type-heading-2xl);
+  letter-spacing: var(--type-heading-2xl-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-donut-chart__center-label {
+  font: var(--type-heading-xs);
+  letter-spacing: var(--type-heading-xs-tracking);
+  color: var(--content-subtle);
+}

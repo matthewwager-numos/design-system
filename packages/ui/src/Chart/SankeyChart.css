@@ -1,0 +1,40 @@
+/*
+ * SankeyChart — the stage-label row and legend match Figma's typography/
+ * placement conventions (Paragraph XS Regular, content-placeholder,
+ * horizontal-wrap legend below); the ribbons/nodes are a genuine layout,
+ * not a reproduction of Figma's flattened illustration.
+ */
+
+.ds-sankey-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-0);
+}
+
+.ds-sankey-chart__stage-labels {
+  display: flex;
+  justify-content: space-between;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-placeholder);
+}
+
+.ds-sankey-chart__plot {
+  width: 100%;
+  overflow: visible;
+}
+
+.ds-sankey-chart__ribbon {
+  cursor: pointer;
+  transition: fill var(--duration-base) var(--ease-out);
+}
+
+.ds-sankey-chart__ribbon:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}
+
+.ds-sankey-chart .ds-chart-legend {
+  padding-top: var(--space-2);
+}

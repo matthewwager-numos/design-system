@@ -1,0 +1,75 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as SankeyChartStories from "./Chart-Sankey.stories";
+
+<Meta of={SankeyChartStories} />
+
+# SankeyChart
+
+A flow diagram — matches Figma's color palette and stage-label row, but Figma's own ribbons are 71 flattened SVG vector fragments, not real flow data. This lays out `nodes`/`links` from first principles: nodes stacked within their `stage` column sized by throughput, links drawn as smooth ribbons sized by `value` and stacked in input order along each endpoint.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Visualizing how a quantity splits and flows across a sequence of stages — funnel drop-off, budget allocation across categories, traffic sources into outcomes.
+
+## When NOT to use
+
+- A single stage of part-to-whole composition — use `<DonutChart>`.
+- Comparing magnitudes with no flow between them — use `<BarChart>`.
+
+## Implementation
+
+Every node declares which column (`stage`) it belongs to — an arbitrary link graph has no single correct column ordering to derive automatically, so it isn't inferred:
+
+```tsx
+import { SankeyChart } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<SankeyChart
+  nodes={[
+    { id: "visits", stage: 0 },
+    { id: "signups", stage: 1 },
+    { id: "bounced", stage: 1 },
+    { id: "customers", stage: 2 },
+    { id: "churned", stage: 2 },
+  ]}
+  links={[
+    { source: "visits", target: "signups", value: 60 },
+    { source: "visits", target: "bounced", value: 40 },
+    { source: "signups", target: "customers", value: 45 },
+    { source: "signups", target: "churned", value: 15 },
+  ]}
+  stageLabels={["Visits", "Converted", "Outcome"]}
+/>
+```
+
+<Canvas of={SankeyChartStories.Default} />
+
+## Stage labels aren't derived from node data
+
+`stageLabels` is a separate array (one entry per distinct `stage` value, in ascending order) from any per-node data — Figma's own instance showed non-sequential placeholder numbers ("0, 1, 2, 4") that turned out to be a Figma artifact, not real data, which is why this is a prop you set intentionally rather than something read off the nodes. Omit it for each stage's own number:
+
+<Canvas of={SankeyChartStories.DefaultStageNumbers} />
+<Canvas of={SankeyChartStories.StageLabelsHidden} />
+
+## Legend is manual
+
+Unlike bar/line/donut, a link doesn't belong to one obvious "series" the way a bar or line datum does — so `legend` is an explicit array you compose to match however you're coloring `links` (by source node, by outcome, whatever makes sense for the data), rather than something derived automatically.
+
+<Canvas of={SankeyChartStories.LegendHidden} />
+
+## Colors
+
+Links default to the five-color `--chart-1`…`--chart-5` palette assigned by index — pass `color` on a link to override it.
+
+## Accessibility
+
+- The ribbons and nodes are decorative markup with no accessible fallback of their own; pair with a visually-hidden data table or summary if the underlying flow data needs to reach assistive tech.
+- Stage-label and legend text render as real, readable text.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.
