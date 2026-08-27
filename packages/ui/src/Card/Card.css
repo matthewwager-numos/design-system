@@ -60,6 +60,14 @@
   height: 100%;
 }
 
+.ds-card[draggable="true"] {
+  cursor: grab;
+}
+
+.ds-card[draggable="true"]:active {
+  cursor: grabbing;
+}
+
 .ds-card:hover:not([data-selected="true"]) {
   border-color: var(--border-emphasis);
 }

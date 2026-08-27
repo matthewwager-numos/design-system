@@ -221,3 +221,44 @@ export const MultiSelect: Story = {
   name: "CardGroup — multi select",
   render: () => <MultiSelectGroupDemo />,
 };
+
+function DraggableDemo() {
+  const [order, setOrder] = useState(PEOPLE.map((p) => p.id));
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+
+  function handleDrop(targetId: string) {
+    if (!draggingId || draggingId === targetId) return;
+    setOrder((prev) => {
+      const next = prev.filter((id) => id !== draggingId);
+      next.splice(next.indexOf(targetId), 0, draggingId);
+      return next;
+    });
+  }
+
+  return (
+    <div>
+      <p style={CAPTION_STYLE}>Drag a card by its body to reorder the list — native HTML5 drag-and-drop, same as reordering rows in a real app.</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)", width: "22rem" }}>
+        {order.map((id) => {
+          const person = PEOPLE.find((p) => p.id === id)!;
+          return (
+            // The drop target (onDragOver/onDrop) is a plain wrapper, not the
+            // Card itself — Card only knows it's a drag source; something
+            // else always owns where drops land, the same way a native
+            // draggable element would work.
+            <div key={id} onDragOver={(event) => event.preventDefault()} onDrop={() => handleDrop(id)}>
+              <Card expand="x" draggable onDragStart={() => setDraggingId(id)} onDragEnd={() => setDraggingId(null)}>
+                <CardHeader lead={<Avatar size="xs" name={person.name} />} title={person.name} subtitle={person.role} />
+              </Card>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export const Draggable: Story = {
+  name: "Drag and drop (reorder)",
+  render: () => <DraggableDemo />,
+};

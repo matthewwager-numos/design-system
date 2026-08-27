@@ -1,4 +1,4 @@
-import type { KeyboardEvent, ReactNode } from "react";
+import type { DragEvent, KeyboardEvent, ReactNode } from "react";
 import { clsx } from "clsx";
 import { useCardGroupContext } from "./CardGroupContext";
 import "./Card.css";
@@ -41,6 +41,18 @@ export interface CardProps {
   minHeight?: string;
   maxHeight?: string;
   onClick?: () => void;
+  /**
+   * Sets the native `draggable` attribute — real HTML5 drag-and-drop, not a
+   * custom gesture system, so it composes with `onDragStart`/`onDragEnd`
+   * (this card as the drag source) the same way any plain draggable
+   * element would. The drop side (a container's own `onDragOver`/`onDrop`)
+   * lives wherever that container is, same as it would for a native
+   * element — a `<Card>` only needs to know it's draggable, not who's
+   * accepting it.
+   */
+  draggable?: boolean;
+  onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
+  onDragEnd?: (event: DragEvent<HTMLDivElement>) => void;
   className?: string;
 }
 
@@ -70,6 +82,9 @@ export function Card({
   minHeight,
   maxHeight,
   onClick,
+  draggable,
+  onDragStart,
+  onDragEnd,
   className,
 }: CardProps) {
   const group = useCardGroupContext();
@@ -99,6 +114,9 @@ export function Card({
       aria-pressed={selected}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
+      draggable={draggable}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
       style={{
         minWidth: expandX ? minWidth : undefined,
         maxWidth: expandX ? maxWidth : undefined,

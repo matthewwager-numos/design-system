@@ -108,6 +108,18 @@ const [expanded, setExpanded] = useState(false);
 
 <Canvas of={CardStories.ExpandableByIconButton} />
 
+## Drag and drop
+
+`draggable` sets the native HTML5 `draggable` attribute; pair it with `onDragStart`/`onDragEnd` to make a card a drag source — real browser drag-and-drop, not a custom gesture library. `<Card>` only knows it's draggable, not who accepts it: the drop side (`onDragOver`/`onDrop`) belongs to whatever container is receiving the card, the same as it would for any plain draggable element.
+
+```tsx
+<Card draggable onDragStart={() => setDraggingId(person.id)} onDragEnd={() => setDraggingId(null)}>
+  ...
+</Card>
+```
+
+<Canvas of={CardStories.Draggable} />
+
 ## CardHeader
 
 Figma's real Card content instance reuses the same `Card Header` layout twice — once as an actual header (lead image + title/subtitle + actions), once as a plain footer button row — so it's its own component, not something `<Card>` renders for you. `lead`, `subtitle`, and `actions` are all optional; omit any of them for a plainer header.
@@ -116,7 +128,7 @@ Figma's real Card content instance reuses the same `Card Header` layout twice �
 
 ## Props
 
-**Card**: `children` (required), `value` (only meaningful inside a `<CardGroup type="single">`), `selected` (ignored inside a `<CardGroup type="single">` when `value` is set), `expand` (`"x"` | `"y"` | `"both"`), `minWidth`/`maxWidth` (only apply when `expand` includes `"x"`), `minHeight`/`maxHeight` (only apply when `expand` includes `"y"`), `onClick`, `className`.
+**Card**: `children` (required), `value` (only meaningful inside a `<CardGroup type="single">`), `selected` (ignored inside a `<CardGroup type="single">` when `value` is set), `expand` (`"x"` | `"y"` | `"both"`), `minWidth`/`maxWidth` (only apply when `expand` includes `"x"`), `minHeight`/`maxHeight` (only apply when `expand` includes `"y"`), `onClick`, `draggable`, `onDragStart`, `onDragEnd`, `className`.
 
 **CardHeader**: `title` (required), `lead`, `subtitle`, `actions` (up to 3 — same `{ icon, label, onClick, disabled }` shape as `<Cell type="icon">`'s row actions), `className`.
 
