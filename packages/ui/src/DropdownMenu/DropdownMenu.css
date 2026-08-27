@@ -16,9 +16,16 @@
 }
 
 .ds-dropdown-menu {
-  position: absolute;
-  left: 0;
-  z-index: 50;
+  /* `top`/`left`/`bottom` come from the portaled inline style (see
+     `getFixedPosition` in DropdownMenu.tsx) — computed from the trigger's
+     real measured position, not a static CSS value relative to a
+     since-left-behind parent. `position: fixed` (not `absolute`) since
+     that's what makes viewport-relative `getBoundingClientRect()`
+     coordinates line up correctly once portaled to `<body>`. */
+  position: fixed;
+  /* Above <Modal>'s own z-index: 100 — a Select/DropdownMenu used inside a
+     modal still needs to render above it, not get stacked underneath. */
+  z-index: 150;
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -37,15 +44,16 @@
 }
 
 /* ── Placement ─────────────────────────────────────────────────────── */
+/* Position itself is inline (see above) — these two only carry the
+   enter/exit scale/offset animation, which differs by which edge the panel
+   grows from. */
 
 .ds-dropdown-menu--bottom {
-  top: calc(100% + var(--space-1));
   transform-origin: top left;
   transform: scale(0.98) translateY(-4px);
 }
 
 .ds-dropdown-menu--top {
-  bottom: calc(100% + var(--space-1));
   transform-origin: bottom left;
   transform: scale(0.98) translateY(4px);
 }
@@ -58,15 +66,14 @@
  */
 
 .ds-dropdown-menu-panel {
-  position: absolute;
-  top: calc(100% + var(--space-1));
-  left: 0;
-  z-index: 50;
+  /* `top`/`left`/`bottom`/`width` come from the portaled inline style — see
+     `.ds-dropdown-menu`'s own comment above; same reasoning. */
+  position: fixed;
+  z-index: 150;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-4);
-  width: 100%;
   min-width: 7.5rem;
   box-sizing: border-box;
   padding: var(--space-4);

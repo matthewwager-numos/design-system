@@ -1,7 +1,9 @@
 import { cloneElement, useCallback, useEffect, useId, useRef, useState } from "react";
-import type { HTMLAttributes, ReactElement, ReactNode } from "react";
+import type { CSSProperties, HTMLAttributes, ReactElement, ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { clsx } from "clsx";
 import { DropdownMenuContext, useDropdownMenuContext } from "./DropdownMenuContext";
+import { useAnchorRect } from "./useAnchorRect";
 import "./DropdownMenu.css";
 
 export type DropdownMenuSize = "sm" | "md" | "lg";
@@ -79,6 +81,20 @@ export function DropdownMenuTrigger({ children }: DropdownMenuTriggerProps) {
 
 export type DropdownMenuPlacement = "bottom" | "top";
 
+/**
+ * Fixed-position coordinates for a portaled panel, left-aligned to the
+ * trigger's own left edge — "bottom" opens below it (`top` from the
+ * trigger's bottom edge), "top" opens above it (`bottom` from the
+ * trigger's top edge, measured from the viewport's own bottom so the panel
+ * doesn't need its own height known up front).
+ */
+export function getFixedPosition(placement: DropdownMenuPlacement, rect: DOMRect): CSSProperties {
+  const base = { left: `${rect.left}px` };
+  return placement === "bottom"
+    ? { ...base, top: `calc(${rect.bottom}px + var(--space-1))` }
+    : { ...base, bottom: `calc(${window.innerHeight - rect.top}px + var(--space-1))` };
+}
+
 export interface DropdownMenuContentProps extends HTMLAttributes<HTMLUListElement> {
   size?: DropdownMenuSize;
   /** Which side of the trigger the panel opens toward. Defaults to "bottom". No viewport collision detection — see "Not handled yet" below. */
@@ -93,12 +109,20 @@ export interface DropdownMenuContentProps extends HTMLAttributes<HTMLUListElemen
  * in the DOM to animate. `rendered` controls mounting; `visible` controls the
  * open/closed CSS state, flipped a frame after mount so the enter transition
  * actually animates from the closed state instead of appearing pre-opened.
+ *
+ * Renders via a portal to `document.body`, positioned from the trigger's
+ * measured `getBoundingClientRect()` (see `useAnchorRect`) rather than CSS
+ * `position: absolute` in place — otherwise any clipping/scrolling ancestor
+ * (a `<Modal>`'s own `overflow: hidden` panel, a scrollable table) would
+ * crop the panel the instant it extends past that ancestor's box, same
+ * reasoning as `<Tooltip>`'s own portal.
  */
 export function DropdownMenuContent({ size = "lg", placement = "bottom", className, children, onKeyDown, ...rest }: DropdownMenuContentProps) {
   const { open, setOpen, triggerRef, contentId } = useDropdownMenuContext("DropdownMenuContent");
   const listRef = useRef<HTMLUListElement>(null);
   const [rendered, setRendered] = useState(open);
   const [visible, setVisible] = useState(open);
+  const anchor = useAnchorRect(triggerRef, rendered);
 
   useEffect(() => {
     if (!open) {
@@ -122,7 +146,7 @@ export function DropdownMenuContent({ size = "lg", placement = "bottom", classNa
     items?.[0]?.focus();
   }, [open]);
 
-  if (!rendered) return null;
+  if (!rendered || !anchor) return null;
 
   function handleTransitionEnd(event: React.TransitionEvent<HTMLUListElement>) {
     if (event.target === listRef.current && !open) {
@@ -164,17 +188,20 @@ export function DropdownMenuContent({ size = "lg", placement = "bottom", classNa
     }
   }
 
-  return (
+  return createPortal(
     <ul
       ref={listRef}
       id={contentId}
       role="menu"
+      data-theme={anchor.theme ?? undefined}
       className={clsx("ds-dropdown-menu", `ds-dropdown-menu--${size}`, `ds-dropdown-menu--${placement}`, visible && "ds-dropdown-menu--visible", className)}
+      style={getFixedPosition(placement, anchor.rect)}
       onKeyDown={handleKeyDown}
       onTransitionEnd={handleTransitionEnd}
       {...rest}
     >
       {children}
-    </ul>
+    </ul>,
+    document.body,
   );
 }

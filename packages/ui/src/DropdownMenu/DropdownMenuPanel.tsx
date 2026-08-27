@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { HTMLAttributes, KeyboardEvent, TransitionEvent } from "react";
+import { createPortal } from "react-dom";
 import { clsx } from "clsx";
+import { getFixedPosition } from "./DropdownMenu";
 import { useDropdownMenuContext } from "./DropdownMenuContext";
+import { useAnchorRect } from "./useAnchorRect";
 
 export interface DropdownMenuPanelProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -19,12 +22,19 @@ export interface DropdownMenuPanelProps extends HTMLAttributes<HTMLDivElement> {
  * `<DropdownMenuContent>`, which focuses its first item, there's no safe
  * assumption about what (if anything) inside arbitrary children should get
  * focus instead.
+ *
+ * Renders via a portal to `document.body`, positioned (and width-matched)
+ * from the trigger's measured `getBoundingClientRect()` — same reasoning as
+ * `<DropdownMenuContent>`'s own portal: CSS `position: absolute` in place
+ * would otherwise get cropped by any clipping/scrolling ancestor (e.g. a
+ * `<Modal>`'s own `overflow: hidden` panel).
  */
 export function DropdownMenuPanel({ className, children, onKeyDown, ...rest }: DropdownMenuPanelProps) {
-  const { open, setOpen } = useDropdownMenuContext("DropdownMenuPanel");
+  const { open, setOpen, triggerRef } = useDropdownMenuContext("DropdownMenuPanel");
   const panelRef = useRef<HTMLDivElement>(null);
   const [rendered, setRendered] = useState(open);
   const [visible, setVisible] = useState(open);
+  const anchor = useAnchorRect(triggerRef, rendered);
 
   useEffect(() => {
     if (!open) {
@@ -42,7 +52,7 @@ export function DropdownMenuPanel({ className, children, onKeyDown, ...rest }: D
     };
   }, [open]);
 
-  if (!rendered) return null;
+  if (!rendered || !anchor) return null;
 
   function handleTransitionEnd(event: TransitionEvent<HTMLDivElement>) {
     if (event.target === panelRef.current && !open) {
@@ -59,15 +69,18 @@ export function DropdownMenuPanel({ className, children, onKeyDown, ...rest }: D
     }
   }
 
-  return (
+  return createPortal(
     <div
       ref={panelRef}
+      data-theme={anchor.theme ?? undefined}
       className={clsx("ds-dropdown-menu-panel", visible && "ds-dropdown-menu-panel--visible", className)}
+      style={{ ...getFixedPosition("bottom", anchor.rect), width: `${anchor.rect.width}px` }}
       onKeyDown={handleKeyDown}
       onTransitionEnd={handleTransitionEnd}
       {...rest}
     >
       {children}
-    </div>
+    </div>,
+    document.body,
   );
 }
