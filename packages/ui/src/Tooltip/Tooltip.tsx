@@ -10,7 +10,7 @@ export type TooltipTriggerMode = "hover" | "click";
 export interface TooltipProps {
   /** A single element the tooltip attaches to — wired up via cloneElement, nothing extra is mounted around it. */
   children: ReactElement<any>;
-  /** Body text — Figma's "Body" text layer. */
+  /** Body text — Figma's "Body" text layer. Hidden if falsy (e.g. `""`) — for a tooltip whose `title` already reads as a complete sentence with nothing to add below it. */
   content: ReactNode;
   /** Optional heading above the body — Figma's "Title" text layer, hidden unless set. */
   title?: ReactNode;
@@ -263,7 +263,7 @@ export function Tooltip({
                 {title}
               </span>
             )}
-            <span className="ds-tooltip__body">{content}</span>
+            {content ? <span className="ds-tooltip__body">{content}</span> : null}
             <span className="ds-tooltip__arrow" />
           </span>,
           document.body,

@@ -82,3 +82,56 @@ export const DefaultStageNumbers: Story = {
     </div>
   ),
 };
+
+export const OneColor: Story = {
+  name: "One color",
+  args: { color: "var(--chart-1)", legend: undefined, showLegend: false },
+  render: (args) => (
+    <div style={{ width: "28rem" }}>
+      <SankeyChart {...args} />
+    </div>
+  ),
+};
+
+const FUNNEL_NODES = [
+  { id: "backlog", stage: 0 },
+  { id: "assigned", stage: 1 },
+  { id: "droppedAfterBacklog", stage: 1, hidden: true },
+  { id: "inProgress", stage: 2 },
+  { id: "droppedAfterAssigned", stage: 2, hidden: true },
+  { id: "inReview", stage: 3 },
+  { id: "droppedAfterInProgress", stage: 3, hidden: true },
+  { id: "reconciled", stage: 4 },
+  { id: "droppedAfterInReview", stage: 4, hidden: true },
+];
+
+const FUNNEL_LINKS = [
+  { source: "backlog", target: "assigned", value: 20, label: "Backlog → Assigned" },
+  { source: "backlog", target: "droppedAfterBacklog", value: 5, label: "Dropped after Backlog" },
+  { source: "assigned", target: "inProgress", value: 15, label: "Assigned → In Progress" },
+  { source: "assigned", target: "droppedAfterAssigned", value: 5, label: "Dropped after Assigned" },
+  { source: "inProgress", target: "inReview", value: 10, label: "In Progress → In Review" },
+  { source: "inProgress", target: "droppedAfterInProgress", value: 5, label: "Dropped after In Progress" },
+  { source: "inReview", target: "reconciled", value: 5, label: "In Review → Reconciled" },
+  { source: "inReview", target: "droppedAfterInReview", value: 5, label: "Dropped after In Review" },
+];
+
+export const BranchingFunnel: Story = {
+  name: "Branching drop-off funnel (hidden nodes)",
+  args: {
+    nodes: FUNNEL_NODES,
+    links: FUNNEL_LINKS,
+    legend: undefined,
+    showLegend: false,
+    showStageLabels: true,
+    stageLabels: ["Backlog", "Assigned", "In Progress", "In Review", "Reconciled"],
+    color: "var(--chart-2)",
+    nodeWidth: 8,
+    stageAlign: "centers",
+  },
+  render: (args) => (
+    <div style={{ width: "40rem" }}>
+      <SankeyChart {...args} />
+    </div>
+  ),
+};

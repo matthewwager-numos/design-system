@@ -10,6 +10,14 @@ export interface SankeyNode {
   id: string;
   /** Which column this node sits in — not auto-derived, since an arbitrary link graph has no single correct ordering. */
   stage: number;
+  /**
+   * Lays the node out (and gives its links a real endpoint) without
+   * drawing its own marker — for a link that terminates by leaving the
+   * flow entirely (attrition, drop-off) rather than continuing on to
+   * another real, visible stage. Pair with a `stage` matching wherever the
+   * drop-off should visually branch away, not a stage of its own.
+   */
+  hidden?: boolean;
 }
 
 export interface SankeyLink {
@@ -18,6 +26,13 @@ export interface SankeyLink {
   value: number;
   /** Shown in the hover tooltip — defaults to `"{source} → {target}"`. */
   label?: string;
+  /**
+   * Omits the tooltip's second line (`value`, shown below `label`) — for
+   * when `label` already reads as a complete sentence with the number
+   * folded in (e.g. `"20 moved to assigned"`), rather than a plain
+   * description that still needs the raw value stated alongside it.
+   */
+  omitTooltipValue?: boolean;
   /** Defaults to the palette color at this link's index. */
   color?: string;
 }
@@ -35,6 +50,43 @@ export interface SankeyChartProps {
    * whatever grouping makes sense for `links` (e.g. by source node).
    */
   legend?: ChartLegendItem[];
+  /**
+   * Renders every ribbon and node in this single color instead of each
+   * link picking its own from the categorical palette by index (a
+   * per-link `color` still overrides this). Nodes render at full opacity;
+   * ribbons keep the usual `chartColorMuted` (50%) default and brighten to
+   * full opacity on hover/focus — the same interaction as the default
+   * multi-color mode, just one color instead of many.
+   */
+  color?: string;
+  /**
+   * Node marker thickness in real px, regardless of the chart's own
+   * rendered width — drawn as a stroked line with `vector-effect:
+   * non-scaling-stroke` rather than a fill shape, the same technique
+   * `<LineChart>` already uses to keep its own line width constant.
+   * Defaults to a thin 3px marker.
+   */
+  nodeWidth?: number;
+  /**
+   * `"edges"` (default) spreads stages from the chart's own left edge to
+   * its right edge — matches Figma's own layout. `"centers"` splits the
+   * width into equal bands and centers each stage within its own band.
+   * `"start"` instead aligns each stage to its band's own *left* edge —
+   * for lining a Sankey up against a same-width column layout whose own
+   * headings are left-aligned rather than centered (a kanban board's own
+   * column titles, for instance), where each stage needs to sit under the
+   * start of its column, not the middle.
+   */
+  stageAlign?: "edges" | "centers" | "start";
+  /**
+   * How many equal bands `"centers"`/`"start"` divide the width into.
+   * Defaults to the number of distinct `stage` values actually present in
+   * `nodes` — only needed explicitly when that count doesn't match the
+   * number of *visual* columns, e.g. `"start"` plus one extra hidden
+   * trailing stage purely to let the last real stage's ribbon fill out its
+   * own column's full width instead of stopping dead at the bar.
+   */
+  columnCount?: number;
   height?: number;
   className?: string;
 }
@@ -50,7 +102,10 @@ const NODE_GAP = 8;
  * along each endpoint. Ribbons default to their `chartColorMuted` (50%)
  * variant — hovering (or focusing) one brings it to full color and shows
  * its value in a tooltip, leaving the rest at their default translucency
- * rather than needing a separate "dimmed" state.
+ * rather than needing a separate "dimmed" state. Pass `color` for a
+ * one-color chart instead of the default categorical palette — nodes at
+ * full opacity, ribbons at the same muted/full split as always, just one
+ * color throughout instead of one per link.
  */
 export function SankeyChart({
   nodes,
@@ -59,13 +114,20 @@ export function SankeyChart({
   showStageLabels = true,
   showLegend = true,
   legend,
+  color,
+  nodeWidth = 3,
+  stageAlign = "edges",
+  columnCount,
   height = 220,
   className,
 }: SankeyChartProps) {
   const { hoveredKey, tooltip, tooltipVisible, showTooltipAtPoint, showTooltipAtElement, hideTooltip } = useChartHover();
   const stageNumbers = Array.from(new Set(nodes.map((n) => n.stage))).sort((a, b) => a - b);
+  const bandCount = columnCount ?? stageNumbers.length;
   const stageX = (stage: number) => {
     const index = stageNumbers.indexOf(stage);
+    if (stageAlign === "centers") return ((index + 0.5) / bandCount) * 100;
+    if (stageAlign === "start") return (index / bandCount) * 100;
     return stageNumbers.length > 1 ? (index / (stageNumbers.length - 1)) * 100 : 50;
   };
 
@@ -147,14 +209,14 @@ export function SankeyChart({
       <svg className="ds-sankey-chart__plot" viewBox={`0 0 100 ${height}`} preserveAspectRatio="none" style={{ height }}>
         {links.map((link, i) => {
           const key = `${link.source}->${link.target}:${i}`;
-          const color = link.color ?? chartColor(i);
+          const linkColor = link.color ?? color ?? chartColor(i);
           const label = link.label ?? `${link.source} → ${link.target}`;
-          const tooltipPoint = { label, value: String(link.value), color };
+          const tooltipPoint = { label, value: link.omitTooltipValue ? "" : String(link.value), color: linkColor };
           return (
             <path
               key={key}
               d={ribbonPath(link)}
-              fill={hoveredKey === key ? color : chartColorMuted(color)}
+              fill={hoveredKey === key ? linkColor : chartColorMuted(linkColor)}
               className="ds-sankey-chart__ribbon"
               tabIndex={0}
               role="img"
@@ -168,28 +230,26 @@ export function SankeyChart({
           );
         })}
         {nodes.map((node) => {
+          if (node.hidden) return null;
           const layout = layoutById.get(node.id);
           if (!layout) return null;
-          const stageIndex = stageNumbers.indexOf(node.stage);
-          // Center the marker on its stage's x — except at the first/last
-          // stage, where centering would push half the rect outside the
-          // viewBox (invisible); there, keep the marker's outer edge
-          // flush with the chart's own edge instead.
-          const nodeWidth = 2;
-          const rectX =
-            stageIndex === 0
-              ? 0
-              : stageIndex === stageNumbers.length - 1
-                ? 100 - nodeWidth
-                : layout.x - nodeWidth / 2;
+          // A stroked line at a constant real px width (vector-effect
+          // cancels out the viewBox's own scaling) rather than a fill
+          // shape sized in viewBox units — the only way to get an exact
+          // px thickness regardless of the chart's rendered width. Since
+          // `.ds-sankey-chart__plot` is `overflow: visible`, a stage at
+          // the very edge (x=0 or x=100) isn't clipped even though half
+          // its stroke width technically falls outside the nominal box.
           return (
-            <rect
+            <line
               key={node.id}
-              x={rectX}
-              y={layout.yTop}
-              width={nodeWidth}
-              height={Math.max(layout.yBottom - layout.yTop, 0)}
-              fill="var(--border-emphasis)"
+              x1={layout.x}
+              x2={layout.x}
+              y1={layout.yTop}
+              y2={Math.max(layout.yBottom, layout.yTop)}
+              stroke={color ?? "var(--border-emphasis)"}
+              strokeWidth={nodeWidth}
+              vectorEffect="non-scaling-stroke"
             />
           );
         })}

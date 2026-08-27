@@ -63,7 +63,51 @@ Unlike bar/line/donut, a link doesn't belong to one obvious "series" the way a b
 
 ## Colors
 
-Links default to the five-color `--chart-1`…`--chart-5` palette assigned by index — pass `color` on a link to override it.
+Links default to the five-color `--chart-1`…`--chart-5` palette assigned by index — pass `color` on a link to override that one link.
+
+### One color
+
+Pass `color` on the chart itself (not a link) for a monochrome chart instead of the categorical palette — nodes render at full opacity, ribbons keep the same muted-by-default/full-on-hover split as always, just with one color throughout instead of one per link. A per-link `color` still overrides this for that one link.
+
+```tsx
+<SankeyChart nodes={nodes} links={links} color="var(--chart-1)" />
+```
+
+<Canvas of={SankeyChartStories.OneColor} />
+
+## Branching drop-off (hidden nodes)
+
+A node can be `hidden` — it still gets laid out and gives a link a real endpoint, but draws no marker of its own. Pairing a hidden node with a stage that already has a real, visible node splits that stage's incoming flow into two: the part that continues on to the next visible stage, and the part that branches off and ends there instead (attrition, drop-off) — without adding an extra visible stage for it.
+
+```tsx
+<SankeyChart
+  nodes={[
+    { id: "backlog", stage: 0 },
+    { id: "assigned", stage: 1 },
+    { id: "droppedAfterBacklog", stage: 1, hidden: true },
+    // …
+  ]}
+  links={[
+    { source: "backlog", target: "assigned", value: 20 },
+    { source: "backlog", target: "droppedAfterBacklog", value: 5 },
+    // …
+  ]}
+  nodeWidth={8}
+  stageAlign="centers"
+/>
+```
+
+<Canvas of={SankeyChartStories.BranchingFunnel} />
+
+## Node width and alignment
+
+`nodeWidth` (default 3) sets each stage marker's thickness in real px, regardless of the chart's own rendered width — drawn as a stroked line (`vector-effect: non-scaling-stroke`, the same technique `<LineChart>` uses for its own line), not a fill shape sized in viewBox units, since only that technique holds an exact px value steady across any container width.
+
+`stageAlign` (`"edges"` default, or `"centers"`) controls where each stage sits horizontally. `"edges"` spreads stages from the chart's own left edge to its right edge, matching Figma. `"centers"` instead splits the width into equal bands (one per stage) and centers each stage within its own band — for lining a Sankey up against a same-width column layout rendered alongside it, like a kanban board, where each stage needs to sit under the middle of its column rather than at a shared edge.
+
+## Tooltip wording
+
+By default a link's tooltip is two lines — `label` (defaults to `"{source} → {target}"`) above the raw `value`. Set `omitTooltipValue` on a link when `label` already reads as a complete sentence with the number folded in (e.g. `"20 moved to assigned"` instead of `"Backlog → Assigned"` + `"20"`) — this hides the redundant second line rather than repeating the number.
 
 ## Accessibility
 
