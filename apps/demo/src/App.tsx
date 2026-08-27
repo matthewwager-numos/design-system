@@ -3,6 +3,7 @@ import { MobileNav, Navigation, useMeasuredHeightVar } from "@numosai/ui";
 import { NavContent, accountMenu } from "./NavContent";
 import { HomePage } from "./pages/HomePage";
 import { EmployeesApp } from "./apps/employees/EmployeesApp";
+import { ReconciliationApp } from "./apps/reconciliation/ReconciliationApp";
 import { ToastProvider } from "./toast/ToastProvider";
 import type { PageId } from "./pages";
 
@@ -34,6 +35,7 @@ export default function App() {
         <main className="app-shell__main">
           {page === "home" && <HomePage />}
           {page === "employees" && <EmployeesApp />}
+          {page === "reconciliation" && <ReconciliationApp />}
         </main>
       </div>
     </ToastProvider>

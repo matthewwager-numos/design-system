@@ -1,4 +1,4 @@
-import { Home, LogOut, Settings, Users } from "lucide-react";
+import { CheckSquare, Home, LogOut, Settings, Users } from "lucide-react";
 import { DropdownMenuItem, NavItem, NavSection, NavUser } from "@numosai/ui";
 import type { PageId } from "./pages";
 
@@ -23,6 +23,9 @@ export function NavContent({ active, onNavigate, onSignOut }: NavContentProps) {
         </NavItem>
         <NavItem icon={<Users size={24} />} selected={active === "employees"} onClick={() => onNavigate("employees")}>
           People
+        </NavItem>
+        <NavItem icon={<CheckSquare size={24} />} selected={active === "reconciliation"} onClick={() => onNavigate("reconciliation")}>
+          Close Checklist
         </NavItem>
       </NavSection>
       <NavSection>
