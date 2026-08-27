@@ -16,4 +16,7 @@ export type { SankeyChartProps, SankeyNode, SankeyLink } from "./SankeyChart";
 export { BubbleChart } from "./BubbleChart";
 export type { BubbleChartProps, BubbleChartDatum } from "./BubbleChart";
 
+export { GaugeChart } from "./GaugeChart";
+export type { GaugeChartProps, GaugeChartMode, GaugeChartScaleDirection, GaugeChartStatus, GaugeChartSize } from "./GaugeChart";
+
 export { chartColor, chartColorMuted } from "./chartColors";

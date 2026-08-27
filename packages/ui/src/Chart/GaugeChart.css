@@ -1,0 +1,128 @@
+/*
+ * GaugeChart — matches Figma's ChartGage exactly: a background-element
+ * track, a status-colored fill arc, a content-emphasis needle/pivot, and a
+ * center readout using the exact same typography tokens <ProgressBar>
+ * already uses for its own label/value (Heading 2XL for the number, Heading
+ * XS for the caption — Figma's own "Content/Subdued" is this codebase's
+ * --content-subtle, confirmed by value, the same naming variant already
+ * seen on <Card>'s "Border/Subdued").
+ */
+
+.ds-gauge-chart {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.ds-gauge-chart--xs {
+  width: 4rem;
+}
+
+.ds-gauge-chart--sm {
+  width: 6rem;
+}
+
+.ds-gauge-chart--md {
+  width: 9rem;
+}
+
+.ds-gauge-chart--xl {
+  width: 12rem;
+}
+
+.ds-gauge-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Layered on top of everything (the arc, the readout text) in its own SVG,
+   painted last in DOM order — the needle sweeps up into the readout's own
+   area at high values and needs to stay visible over it. */
+.ds-gauge-chart__svg--needle {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ds-gauge-chart__track {
+  fill: var(--background-element);
+}
+
+.ds-gauge-chart__fill--positive {
+  fill: var(--background-positive-base);
+}
+.ds-gauge-chart__fill--notice {
+  fill: var(--background-notice-base);
+}
+.ds-gauge-chart__fill--negative {
+  fill: var(--background-negative-base);
+}
+.ds-gauge-chart__fill--info {
+  fill: var(--background-brand-base);
+}
+
+.ds-gauge-chart__needle {
+  stroke: var(--content-emphasis);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.ds-gauge-chart__pivot {
+  fill: var(--content-emphasis);
+}
+
+.ds-gauge-chart__readout {
+  /* `top` is set inline from real arc geometry — see GaugeChart.tsx. */
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.ds-gauge-chart__value {
+  font: var(--type-heading-2xl);
+  letter-spacing: var(--type-heading-2xl-tracking);
+  color: var(--content-emphasis);
+}
+
+/* One step down the same type ramp per size step below "xl" — a fixed
+   Heading 2XL (Figma's own only spec, at "xl") is too large for the
+   proportionally smaller hollow interior at every other size. */
+.ds-gauge-chart--md .ds-gauge-chart__value {
+  font: var(--type-heading-xl);
+  letter-spacing: var(--type-heading-xl-tracking);
+}
+
+.ds-gauge-chart--sm .ds-gauge-chart__value {
+  font: var(--type-heading-l);
+  letter-spacing: var(--type-heading-l-tracking);
+}
+
+.ds-gauge-chart--xs .ds-gauge-chart__value {
+  font: var(--type-heading-m);
+  letter-spacing: var(--type-heading-m-tracking);
+}
+
+.ds-gauge-chart__label {
+  font: var(--type-heading-xs);
+  letter-spacing: var(--type-heading-xs-tracking);
+  color: var(--content-subtle);
+}
+
+/* ── Accessibility ─────────────────────────────────────────────────── */
+
+.ds-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

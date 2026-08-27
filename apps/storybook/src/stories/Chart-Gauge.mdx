@@ -1,0 +1,99 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as ChartGaugeStories from "./Chart-Gauge.stories";
+
+<Meta of={ChartGaugeStories} />
+
+# GaugeChart
+
+A half-donut reading with a needle — matches Figma's ChartGage exactly. `mode` picks between two kinds of coloring, identical logic to `<ProgressBar>`:
+
+- **Scaled** (`"negative-to-positive"` or `"positive-to-negative"`) — the fill color is driven by `value` itself, the same red/yellow/green bands `<ProgressBar>` uses.
+- **Fixed** (`"info"` / `"positive"` / `"notice"` / `"negative"`) — one color, ignoring `value` entirely.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- **Scaled, `"negative-to-positive"`** (the default): higher is better — a health score, capacity remaining, a quality rating.
+- **Scaled, `"positive-to-negative"`**: higher is worse — error rate, risk score, load nearing a limit. Same bands, inverted, so a high reading still reads as alarming.
+- **Fixed, `"info"`**: a plain "here's the current reading, no judgment" gauge — a signal strength, a thermostat — where the number isn't good or bad, just what it is.
+- **Fixed, `"positive"` / `"notice"` / `"negative"`**: force a color a scaled mode would otherwise choose automatically.
+- Reach for this over `<ProgressBar>` when the reading benefits from an at-a-glance needle position (a dashboard, a single headline metric) rather than a linear fill — for anything read left-to-right in a list or table, `<ProgressBar>` is the simpler, more compact choice.
+
+## When NOT to use
+
+- An indeterminate/unknown-duration loading state — this component always needs a `value`; use a spinner instead.
+- A list of several readings — a column of `<ProgressBar>`s is far more compact than a row of gauges.
+
+## Implementation
+
+```tsx
+import { GaugeChart } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<GaugeChart value={75} label="CPU usage" />
+```
+
+### Scaled: negative → positive (default)
+
+Higher is better. Red below 34%, yellow below 67%, green at 67%+.
+
+<Canvas of={ChartGaugeStories.NegativeToPositive} />
+
+### Scaled: positive → negative
+
+Higher is worse. Same bands, inverted.
+
+```tsx
+<GaugeChart mode="positive-to-negative" value={80} label="Error rate" />
+```
+
+<Canvas of={ChartGaugeStories.PositiveToNegative} />
+
+### Fixed color (non-graded)
+
+```tsx
+<GaugeChart mode="info" value={40} label="Signal" />
+```
+
+<Canvas of={ChartGaugeStories.FixedColor} />
+<Canvas of={ChartGaugeStories.AllFixedColors} />
+
+## Sizes
+
+`size` (`"xs" | "sm" | "md" | "xl"`, defaults to `"xl"`) matches Figma's three sizes plus an extra `"xs"` step below Figma's own smallest. Figma's own "sm" is a bare colored arc with no needle or readout — illustrated too small in the design file to fit one legibly, not a separate non-functional mode. `showValue` (identical concept to `<ProgressBar>`'s own prop) defaults to `false` at `"sm"`/`"xs"` to match that look; every size is the same real, value-driven gauge underneath, so pass `showValue` explicitly to override either way.
+
+The value's own font size steps down the same type ramp one size per size step below `"xl"` — Figma only specifies "Heading 2XL" at its one fully-detailed size, which is too large once the gauge (and its hollow interior) gets proportionally smaller: `"xl"` stays Heading 2XL, `"md"` drops to Heading XL, `"sm"` to Heading L, `"xs"` to Heading M. The caption stays Heading XS throughout, matching Figma's own fixed choice for it.
+
+<Canvas of={ChartGaugeStories.Sizes} />
+
+### Without value or label
+
+<Canvas of={ChartGaugeStories.WithoutValue} />
+<Canvas of={ChartGaugeStories.WithoutLabel} />
+
+## A renamed status
+
+Figma's fourth status is called "Neutral" here — confirmed via `get_variable_defs` to fill with the exact same `--background-brand-base` token `<ProgressBar>` already calls `"info"`. Renamed to `"info"` for the same reason `<IconButton>` renamed Figma's "Tertiary" to `"secondary"`: it's the identical color and concept `<ProgressBar>` already has a name for, and Figma's own label here would just be a second name for the same thing.
+
+## Colors
+
+| Status | Fill |
+|---|---|
+| `positive` | `--background-positive-base` |
+| `notice` | `--background-notice-base` |
+| `negative` | `--background-negative-base` |
+| `info` | `--background-brand-base` |
+
+Track, needle, and readout are fixed regardless of status: `--background-element` track, `--content-emphasis` needle/pivot/value, `--content-subtle` caption (Figma's own "Content/Subdued" — the same naming variant already seen on `<Card>`'s "Border/Subdued").
+
+## Accessibility
+
+- Renders `role="meter"` with `aria-valuenow`/`aria-valuemin`/`aria-valuemax` set automatically from `value` — the ARIA analog of `<ProgressBar>`'s `role="progressbar"`, since a gauge is a static reading rather than an in-progress task.
+- When `label` is set, it's wired as the gauge's accessible name via `aria-labelledby` (a generated id) — no extra markup needed, same as `<ProgressBar>`.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

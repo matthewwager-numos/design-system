@@ -143,7 +143,7 @@ export type { CardProps, CardExpand, CardHeaderProps, CardHeaderAction, CardGrou
 export { SettingsCard } from "./SettingsCard";
 export type { SettingsCardProps } from "./SettingsCard";
 
-export { ChartLegend, BarChart, LineChart, DonutChart, SankeyChart, BubbleChart, chartColor, chartColorMuted } from "./Chart";
+export { ChartLegend, BarChart, LineChart, DonutChart, SankeyChart, BubbleChart, GaugeChart, chartColor, chartColorMuted } from "./Chart";
 export type {
   ChartLegendProps,
   ChartLegendItem,
@@ -160,6 +160,11 @@ export type {
   SankeyLink,
   BubbleChartProps,
   BubbleChartDatum,
+  GaugeChartProps,
+  GaugeChartMode,
+  GaugeChartScaleDirection,
+  GaugeChartStatus,
+  GaugeChartSize,
 } from "./Chart";
 
 // Not a component — a small utility `<Wizard>` uses internally to pin its
