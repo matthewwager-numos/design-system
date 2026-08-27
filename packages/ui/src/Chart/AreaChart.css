@@ -1,0 +1,94 @@
+/*
+ * AreaChart — matches Figma's ChartLineHover exactly: Paragraph XS Medium
+ * for the value (content-emphasis), Paragraph XS Regular for the dates
+ * (content-placeholder — confirmed the same deliberate choice as the other
+ * chart types, not content-subtle), border-subtle top/bottom rules and
+ * crosshair, background-brand-base line over a background-brand-subdued
+ * fill.
+ */
+
+.ds-area-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0);
+  width: 100%;
+}
+
+.ds-area-chart__header {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  min-height: 1rem;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-1);
+}
+
+.ds-area-chart__footer {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-1);
+}
+
+.ds-area-chart__value,
+.ds-area-chart__date {
+  white-space: nowrap;
+}
+
+.ds-area-chart__value {
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-area-chart__date {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-placeholder);
+}
+
+.ds-area-chart__value--floating,
+.ds-area-chart__date--floating {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.ds-area-chart__plot {
+  position: relative;
+  width: 100%;
+  cursor: crosshair;
+}
+
+.ds-area-chart__plot:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}
+
+.ds-area-chart__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ds-area-chart__crosshair {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-subtle);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.ds-area-chart__dot {
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 2px solid var(--background-default);
+  border-radius: var(--radius-full);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}

@@ -1,0 +1,84 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as ChartAreaStories from "./Chart-Area.stories";
+
+<Meta of={ChartAreaStories} />
+
+# AreaChart
+
+A single trend line with an area fill and a continuous hover readout — matches Figma's ChartLineHover exactly (renamed: "area chart" is what this pattern is universally called — a revenue graph, a stock chart — and Figma's own name describes the interaction, not the chart type).
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A single metric changing over time where the shape of the trend matters as much as any individual value — revenue, active users, a stock price.
+- You want a big, prominent "current value" readout up top that updates as the user explores history by hovering, the way Apple Stocks or a brokerage app does.
+
+## When NOT to use
+
+- More than one series — use `<LineChart>`, which supports multiple series with a legend, though its own hover only responds to discrete per-point dot targets rather than tracking the pointer continuously.
+- Categorical (non-time-series) data — `<BarChart>` or `<LineChart>` fit a fixed set of named categories better than a continuous date axis.
+
+## Implementation
+
+```tsx
+import { AreaChart } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<AreaChart
+  data={[
+    { date: new Date("2026-01-01"), value: 62000 },
+    { date: new Date("2026-01-02"), value: 78000 },
+    // …
+  ]}
+/>
+```
+
+Move the pointer across the chart below — it's real and live, not a screenshot.
+
+<Canvas of={ChartAreaStories.Default} />
+
+## Continuous hover, not discrete dots
+
+This is the key difference from `<LineChart>`'s own hover, which only responds to its own small per-point dot targets. Here, the *entire plot area* tracks the pointer continuously and snaps to whichever data point is nearest — no small hit target required, the same interaction real stock-chart apps use. At rest, the header shows the last point's value and the footer shows the full date range (the "dateline"); while hovering, both switch to the hovered point's own value and date, floating near the crosshair.
+
+## Formatting
+
+`formatValue`, `formatDate` (the single centered date shown while hovering), and `formatRangeDate` (the start/end dates shown at rest) all default to plain, unstyled output — Figma's own "$123,456" is one example value, not a hardcoded currency format:
+
+```tsx
+<AreaChart data={data} formatValue={(value) => `$${value.toLocaleString()}`} />
+```
+
+<Canvas of={ChartAreaStories.CustomFormatting} />
+
+## Colors
+
+`color` (the line) and `fillColor` (the area beneath it) are two independent props — confirmed as genuinely distinct tokens in Figma, not one derived from the other — defaulting to `--background-brand-base` and `--background-brand-subdued`.
+
+<Canvas of={ChartAreaStories.CustomColor} />
+
+## Sizing
+
+`height` sets the plot's px height; width always fills the parent.
+
+<Canvas of={ChartAreaStories.TallerPlot} />
+<Canvas of={ChartAreaStories.FewPoints} />
+
+## Behavior
+
+- **Hover**: moving the pointer anywhere over the plot continuously updates the crosshair, dot, value, and date to the nearest data point. Leaving the plot reverts to the at-rest state (last value, full date range).
+- **Keyboard**: the plot is focusable; Left/Right move one point at a time, Home/End jump to the first/last point, and losing focus reverts to the at-rest state — the same underlying hover state, just driven by focus instead of the pointer.
+- **Not handled yet**: no pinch-to-zoom or range selection — this is a read-only trend view, not a full charting/analysis widget.
+
+## Accessibility
+
+- The root is `role="group"` with an `aria-label` you provide — describe what the data *is* ("Revenue over the last 31 days"), not the word "chart."
+- The value and date readouts are `aria-live="polite"`, so keyboard/screen-reader users exploring via Left/Right hear each point's value and date as they move.
+- The plot itself is keyboard-focusable (see Behavior above) rather than requiring a pointer.
+
+## Props
+
+See the **Controls** table above for the full list, types, and defaults — generated automatically from the TypeScript types.

@@ -7,6 +7,9 @@ export type { BarChartProps, BarChartOrientation, ChartDatum } from "./BarChart"
 export { LineChart } from "./LineChart";
 export type { LineChartProps, LineChartSeries } from "./LineChart";
 
+export { AreaChart } from "./AreaChart";
+export type { AreaChartProps, AreaChartPoint } from "./AreaChart";
+
 export { DonutChart } from "./DonutChart";
 export type { DonutChartProps, DonutChartDatum } from "./DonutChart";
 
