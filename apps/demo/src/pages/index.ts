@@ -1,1 +1,1 @@
-export type PageId = "home" | "employees" | "reconciliation";
+export type PageId = "home" | "employees" | "reconciliation" | "settings";

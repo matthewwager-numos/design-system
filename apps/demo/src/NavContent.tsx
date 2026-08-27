@@ -34,7 +34,9 @@ export function NavContent({ active, onNavigate, onSignOut }: NavContentProps) {
           <DropdownMenuItem>Preferences</DropdownMenuItem>
           <DropdownMenuItem onClick={onSignOut}>Sign out</DropdownMenuItem>
         </NavUser>
-        <NavItem icon={<Settings size={24} />}>Settings</NavItem>
+        <NavItem icon={<Settings size={24} />} selected={active === "settings"} onClick={() => onNavigate("settings")}>
+          Settings
+        </NavItem>
         <NavItem icon={<LogOut size={24} />} onClick={onSignOut}>
           Sign Out
         </NavItem>

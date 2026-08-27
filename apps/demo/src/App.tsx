@@ -2,8 +2,10 @@ import { useState } from "react";
 import { MobileNav, Navigation, useMeasuredHeightVar } from "@numosai/ui";
 import { NavContent, accountMenu } from "./NavContent";
 import { HomePage } from "./pages/HomePage";
+import { SettingsPage } from "./pages/SettingsPage";
 import { EmployeesApp } from "./apps/employees/EmployeesApp";
 import { ReconciliationApp } from "./apps/reconciliation/ReconciliationApp";
+import { ThemeProvider } from "./theme/ThemeProvider";
 import { ToastProvider } from "./toast/ToastProvider";
 import type { PageId } from "./pages";
 
@@ -18,26 +20,29 @@ export default function App() {
   }
 
   return (
-    <ToastProvider>
-      <div className="app-shell">
-        <div className="app-shell__desktop-nav">
-          <Navigation>
-            <NavContent active={page} onNavigate={setPage} onSignOut={handleSignOut} />
-          </Navigation>
-        </div>
+    <ThemeProvider>
+      <ToastProvider>
+        <div className="app-shell">
+          <div className="app-shell__desktop-nav">
+            <Navigation>
+              <NavContent active={page} onNavigate={setPage} onSignOut={handleSignOut} />
+            </Navigation>
+          </div>
 
-        <div className="app-shell__mobile-nav" ref={mobileNavRef}>
-          <MobileNav name="Matthew Wager" accountMenu={accountMenu(handleSignOut)}>
-            <NavContent active={page} onNavigate={setPage} onSignOut={handleSignOut} />
-          </MobileNav>
-        </div>
+          <div className="app-shell__mobile-nav" ref={mobileNavRef}>
+            <MobileNav name="Matthew Wager" accountMenu={accountMenu(handleSignOut)}>
+              <NavContent active={page} onNavigate={setPage} onSignOut={handleSignOut} />
+            </MobileNav>
+          </div>
 
-        <main className="app-shell__main">
-          {page === "home" && <HomePage />}
-          {page === "employees" && <EmployeesApp />}
-          {page === "reconciliation" && <ReconciliationApp />}
-        </main>
-      </div>
-    </ToastProvider>
+          <main className="app-shell__main">
+            {page === "home" && <HomePage />}
+            {page === "employees" && <EmployeesApp />}
+            {page === "reconciliation" && <ReconciliationApp />}
+            {page === "settings" && <SettingsPage />}
+          </main>
+        </div>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
