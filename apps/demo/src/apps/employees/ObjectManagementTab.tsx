@@ -36,7 +36,7 @@ export function ObjectManagementTab({ onAddEmployee }: ObjectManagementTabProps)
   }
 
   return (
-    <div className="page">
+    <div className="page page--full-width">
       <div className="page__header">
         <p className="page__description">
           {employees.length} {employees.length === 1 ? "person" : "people"}

@@ -5,6 +5,7 @@ import { HomePage } from "./pages/HomePage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { EmployeesApp } from "./apps/employees/EmployeesApp";
 import { ReconciliationApp } from "./apps/reconciliation/ReconciliationApp";
+import { AccrualsApp } from "./apps/accruals/AccrualsApp";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { ToastProvider } from "./toast/ToastProvider";
 import type { PageId } from "./pages";
@@ -39,6 +40,7 @@ export default function App() {
             {page === "home" && <HomePage />}
             {page === "employees" && <EmployeesApp />}
             {page === "reconciliation" && <ReconciliationApp />}
+            {page === "accruals" && <AccrualsApp />}
             {page === "settings" && <SettingsPage />}
           </main>
         </div>

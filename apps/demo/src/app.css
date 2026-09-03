@@ -200,6 +200,13 @@ a {
   max-width: 64rem;
 }
 
+/* A page built around a wide table (Accruals, People) shouldn't be capped
+   to the same comfortable reading width as a text/form page — it should
+   use the full width of the content area instead. */
+.page--full-width {
+  max-width: none;
+}
+
 .page__header {
   display: flex;
   align-items: center;
@@ -702,4 +709,171 @@ a {
   border: none;
   padding: 0;
   cursor: pointer;
+}
+
+/* ── Accruals — toolbar & table ────────────────────────────────────── */
+.accruals-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+/* <Select>'s own root is width: 100% (it's meant to fill a field's
+   container) — these two placements need a fixed width instead, or it
+   swallows all the flex row's space. */
+.accruals-month-select {
+  width: 10rem;
+  flex-shrink: 0;
+}
+
+.accruals-page-size-select {
+  width: 12rem;
+  flex-shrink: 0;
+}
+
+/* Search + settings sit together as one right-aligned group, not
+   stretched across the remaining row — .accruals-toolbar's own
+   justify-content: space-between already pushes this whole group away
+   from the month select; nothing here should grow to fill leftover space. */
+.accruals-toolbar__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+/* <SearchFilter>'s own root is width: 100% too, same reasoning as the
+   Selects above. */
+.accruals-search-filter {
+  width: 10rem;
+}
+
+.accruals-settings-description {
+  margin: 0;
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+  color: var(--content-subtle);
+}
+
+/* "Freeze first column" — pins the Region column (header + every row's
+   own cell together, since sticky applies to the whole flex column, not
+   each cell separately) to the scroll container's left edge, with an L2
+   shadow marking it as raised above whatever scrolls underneath. Every
+   cell already has its own opaque background (.ds-cell), so the frozen
+   column correctly occludes that scrolled content without needing its own
+   background override here. */
+.accruals-column--frozen {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  box-shadow: var(--shadow-l2);
+}
+
+/* .ds-column's own default (min-width: 0) lets a column shrink all the way
+   down to its cells' own ellipsis-truncated width whenever there isn't
+   enough room. Only applied while "freeze first column" is on (see
+   TableTab's own conditional className) — freezing only means something
+   once the table can actually overflow and scroll horizontally, so that's
+   also when metric columns stop shrinking past a sensible width instead of
+   truncating. With freezing off, columns go back to squeezing into
+   whatever width is available, same as before this floor existed. */
+.accruals-column--metric {
+  min-width: 10rem;
+}
+
+.accruals-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.accruals-table {
+  display: flex;
+  min-width: 40rem;
+}
+
+/* The row-head content — a plain div for country/total rows, or (see
+   --interactive below) the actual clickable expand/collapse control for a
+   region row. Same layout either way, so the two look identical. */
+.accruals-region-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+.accruals-region-cell--interactive {
+  cursor: pointer;
+}
+
+/* The whole row (every column's cell at this row's key, not just the row
+   head) highlights together on hover — see TableTab's own `hoveredRow`
+   state and `rowHoverProps`. Two classes, not one, so this reliably wins
+   over .ds-cell's own `background` regardless of CSS import order between
+   this stylesheet and the design system's own. */
+.ds-cell.accruals-row--hovered {
+  background: var(--background-secondary);
+}
+
+.accruals-chevron {
+  flex-shrink: 0;
+  color: var(--content-subtle);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.accruals-chevron--collapsed {
+  transform: rotate(-90deg);
+}
+
+.accruals-region-spacer {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+}
+
+.accruals-region-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+
+.accruals-region-label--indent {
+  padding-left: var(--space-5);
+}
+
+.accruals-region-label--emphasis {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-emphasis);
+}
+
+.accruals-figure {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.accruals-figure--emphasis {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-emphasis);
+}
+
+.accruals-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
 }
