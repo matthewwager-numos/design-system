@@ -76,7 +76,7 @@ export function Select({
         </FieldLabel>
       ) : null}
 
-      <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenu open={open} onOpenChange={setOpen} size={size}>
         <DropdownMenuTrigger>
           <button
             type="button"
@@ -94,7 +94,7 @@ export function Select({
             </span>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent size={size}>
+        <DropdownMenuContent matchTriggerWidth>
           {options.map((option) => (
             <DropdownMenuItem
               key={option.value}

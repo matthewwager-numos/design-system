@@ -1,12 +1,14 @@
 import { cloneElement, useCallback, useEffect, useId, useRef, useState } from "react";
-import type { CSSProperties, HTMLAttributes, ReactElement, ReactNode } from "react";
+import type { HTMLAttributes, ReactElement, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { clsx } from "clsx";
 import { DropdownMenuContext, useDropdownMenuContext } from "./DropdownMenuContext";
+import type { DropdownMenuSize } from "./DropdownMenuContext";
 import { useAnchorRect } from "./useAnchorRect";
+import { useDropdownMenuPlacement } from "./useDropdownMenuPlacement";
 import "./DropdownMenu.css";
 
-export type DropdownMenuSize = "sm" | "md" | "lg";
+export type { DropdownMenuSize };
 
 export interface DropdownMenuProps {
   children: ReactNode;
@@ -14,6 +16,13 @@ export interface DropdownMenuProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Shared by every `<DropdownMenuContent>`/`<DropdownMenuPanel>` inside
+   * this root via context — set it once here, not on the content itself,
+   * so a trigger's own size and its panel's size are structurally
+   * impossible to mismatch. Defaults to `"lg"`.
+   */
+  size?: DropdownMenuSize;
 }
 
 /**
@@ -23,7 +32,7 @@ export interface DropdownMenuProps {
  * interactive behavior Figma doesn't specify — this is the same foundation
  * <Select> builds on.
  */
-export function DropdownMenu({ children, open: controlledOpen, defaultOpen = false, onOpenChange }: DropdownMenuProps) {
+export function DropdownMenu({ children, open: controlledOpen, defaultOpen = false, onOpenChange, size = "lg" }: DropdownMenuProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = useCallback(
@@ -41,16 +50,25 @@ export function DropdownMenu({ children, open: controlledOpen, defaultOpen = fal
   useEffect(() => {
     if (!open) return;
     function handlePointerDown(event: PointerEvent) {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
+      const target = event.target as Node;
+      if (rootRef.current?.contains(target)) return;
+      // <DropdownMenuContent>/<DropdownMenuPanel> render via createPortal to
+      // document.body — a real React child, but never a DOM *descendant* of
+      // rootRef, so a plain .contains() check above always treats a click
+      // anywhere inside the (portaled) menu itself as "outside," closing it
+      // before whatever was clicked (a real menu item) gets a chance to run
+      // its own onClick. Both tag their portaled root with this shared
+      // contentId specifically so this check can still find them.
+      const portalRoot = document.getElementById(contentId);
+      if (portalRoot?.contains(target)) return;
+      setOpen(false);
     }
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
-  }, [open, setOpen]);
+  }, [open, setOpen, contentId]);
 
   return (
-    <DropdownMenuContext.Provider value={{ open, setOpen, triggerRef, contentId }}>
+    <DropdownMenuContext.Provider value={{ open, setOpen, triggerRef, contentId, size }}>
       <div className="ds-dropdown-menu-root" ref={rootRef}>
         {children}
       </div>
@@ -81,24 +99,13 @@ export function DropdownMenuTrigger({ children }: DropdownMenuTriggerProps) {
 
 export type DropdownMenuPlacement = "bottom" | "top";
 
-/**
- * Fixed-position coordinates for a portaled panel, left-aligned to the
- * trigger's own left edge — "bottom" opens below it (`top` from the
- * trigger's bottom edge), "top" opens above it (`bottom` from the
- * trigger's top edge, measured from the viewport's own bottom so the panel
- * doesn't need its own height known up front).
- */
-export function getFixedPosition(placement: DropdownMenuPlacement, rect: DOMRect): CSSProperties {
-  const base = { left: `${rect.left}px` };
-  return placement === "bottom"
-    ? { ...base, top: `calc(${rect.bottom}px + var(--space-1))` }
-    : { ...base, bottom: `calc(${window.innerHeight - rect.top}px + var(--space-1))` };
-}
-
 export interface DropdownMenuContentProps extends HTMLAttributes<HTMLUListElement> {
+  /** Defaults to the size set on the enclosing `<DropdownMenu>` — only needed here to override that for this one panel. */
   size?: DropdownMenuSize;
-  /** Which side of the trigger the panel opens toward. Defaults to "bottom". No viewport collision detection — see "Not handled yet" below. */
+  /** Preferred side — flips to the other one automatically if it would run the panel off-screen. Defaults to "bottom". */
   placement?: DropdownMenuPlacement;
+  /** Matches the panel's width to the trigger's own measured width, e.g. for `<Select>`'s options list. Defaults to false (shrink-to-fit content, e.g. a plain action menu). */
+  matchTriggerWidth?: boolean;
 }
 
 /**
@@ -111,18 +118,30 @@ export interface DropdownMenuContentProps extends HTMLAttributes<HTMLUListElemen
  * actually animates from the closed state instead of appearing pre-opened.
  *
  * Renders via a portal to `document.body`, positioned from the trigger's
- * measured `getBoundingClientRect()` (see `useAnchorRect`) rather than CSS
- * `position: absolute` in place — otherwise any clipping/scrolling ancestor
- * (a `<Modal>`'s own `overflow: hidden` panel, a scrollable table) would
- * crop the panel the instant it extends past that ancestor's box, same
- * reasoning as `<Tooltip>`'s own portal.
+ * measured `getBoundingClientRect()` and corrected for viewport collisions
+ * (see `useDropdownMenuPlacement`) rather than CSS `position: absolute` in
+ * place — otherwise any clipping/scrolling ancestor (a `<Modal>`'s own
+ * `overflow: hidden` panel, a scrollable table) would crop the panel the
+ * instant it extends past that ancestor's box, same reasoning as
+ * `<Tooltip>`'s own portal.
  */
-export function DropdownMenuContent({ size = "lg", placement = "bottom", className, children, onKeyDown, ...rest }: DropdownMenuContentProps) {
-  const { open, setOpen, triggerRef, contentId } = useDropdownMenuContext("DropdownMenuContent");
+export function DropdownMenuContent({
+  size: sizeProp,
+  placement = "bottom",
+  matchTriggerWidth = false,
+  className,
+  style,
+  children,
+  onKeyDown,
+  ...rest
+}: DropdownMenuContentProps) {
+  const { open, setOpen, triggerRef, contentId, size: contextSize } = useDropdownMenuContext("DropdownMenuContent");
+  const size = sizeProp ?? contextSize;
   const listRef = useRef<HTMLUListElement>(null);
   const [rendered, setRendered] = useState(open);
   const [visible, setVisible] = useState(open);
   const anchor = useAnchorRect(triggerRef, rendered);
+  const resolved = useDropdownMenuPlacement(listRef, anchor, placement, matchTriggerWidth);
 
   useEffect(() => {
     if (!open) {
@@ -146,7 +165,7 @@ export function DropdownMenuContent({ size = "lg", placement = "bottom", classNa
     items?.[0]?.focus();
   }, [open]);
 
-  if (!rendered || !anchor) return null;
+  if (!rendered || !anchor || !resolved) return null;
 
   function handleTransitionEnd(event: React.TransitionEvent<HTMLUListElement>) {
     if (event.target === listRef.current && !open) {
@@ -194,8 +213,8 @@ export function DropdownMenuContent({ size = "lg", placement = "bottom", classNa
       id={contentId}
       role="menu"
       data-theme={anchor.theme ?? undefined}
-      className={clsx("ds-dropdown-menu", `ds-dropdown-menu--${size}`, `ds-dropdown-menu--${placement}`, visible && "ds-dropdown-menu--visible", className)}
-      style={getFixedPosition(placement, anchor.rect)}
+      className={clsx("ds-dropdown-menu", `ds-dropdown-menu--${size}`, `ds-dropdown-menu--${resolved.placement}`, visible && "ds-dropdown-menu--visible", className)}
+      style={{ ...style, ...resolved.style }}
       onKeyDown={handleKeyDown}
       onTransitionEnd={handleTransitionEnd}
       {...rest}

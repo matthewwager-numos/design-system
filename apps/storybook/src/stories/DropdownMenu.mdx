@@ -62,17 +62,32 @@ const [open, setOpen] = useState(false);
 
 ## Sizes
 
-Size is set once on `<DropdownMenuContent size="sm" | "md" | "lg">` and cascades to every item — you don't set it per item. Pair it with the same size on the trigger.
+Size is set once on the root — `<DropdownMenu size="sm" | "md" | "lg">` — and shared via context by every `<DropdownMenuContent>`/`<DropdownMenuPanel>` inside it, cascading down to each item. A trigger built at "md" and a `<DropdownMenuContent>` opened at "lg" can't drift out of sync this way, since there's only one place to set it:
+
+```tsx
+<DropdownMenu size="md">
+  <DropdownMenuTrigger>...</DropdownMenuTrigger>
+  <DropdownMenuContent>...</DropdownMenuContent>
+</DropdownMenu>
+```
+
+`<DropdownMenuContent>`/`<DropdownMenuPanel>` still each accept their own `size` prop directly, overriding the root's, for the rare case that genuinely needs to — but the root is where `<Select>`/`<MultiSelect>`/`<SearchFilter>` set it, once, from their own `size` prop.
 
 <Canvas of={DropdownMenuStories.Sizes} />
 
+## Width
+
+`<DropdownMenuContent matchTriggerWidth>` (default `false`) matches the panel's width to the trigger's own measured width — what `<Select>`/`<MultiSelect>` use for their options list, so it lines up with the field that opened it rather than shrinking to its content. `<DropdownMenuPanel>` defaults this to `true` instead, since a panel is almost always anchored to a full-width field (`<SearchFilter>`'s own filters panel, for instance).
+
 ## Placement
 
-`<DropdownMenuContent placement="bottom" | "top">` (defaults to `"bottom"`) is which side of the trigger the panel opens toward — always left-aligned either way. Added for triggers pinned near the bottom of the viewport (e.g. `<Navigation>`'s `<NavUser>` account menu), where opening downward would push the panel off-screen.
+`placement="bottom" | "top"` (defaults to `"bottom"`) is a *preferred* side, not a fixed one — the panel automatically flips to the other side, and/or right-aligns instead of left-aligning, whenever the preferred combination would run it off the edge of the viewport once its real rendered size is known. A trigger pinned near a corner (a table row's kebab menu, `<Navigation>`'s `<NavUser>` account menu near the bottom of the sidebar) ends up wherever actually keeps the whole panel on-screen — `placement` just picks which side to try first.
 
 ```tsx
 <DropdownMenuContent placement="top">...</DropdownMenuContent>
 ```
+
+<Canvas of={DropdownMenuStories.NearViewportCorner} />
 
 ## DropdownMenuPanel: any input components
 
@@ -103,7 +118,7 @@ Unlike `<DropdownMenuContent>`, opening a `<DropdownMenuPanel>` doesn't move foc
 - **Closes on**: clicking outside, selecting an item (unless `closeOnSelect={false}` is passed to that `<DropdownMenuItem>`), or pressing Escape (which also returns focus to the trigger).
 - **Transition**: the panel fades and scales in/out (`--duration-fast`) on open/close. It stays mounted for the duration of the close animation rather than disappearing instantly — implemented with plain CSS + a mount/visible state split, no animation library.
 - **Keyboard**: Arrow Down/Up move between items (wrapping), Home/End jump to the first/last, Enter/Space activate the focused item — all native `<button>` behavior, nothing custom.
-- **Not handled yet**: viewport collision detection. `placement` is a fixed choice you make, not an automatic one — the panel doesn't flip from bottom to top (or vice versa) on its own when there's no room, so picking the right `placement` for a trigger near a viewport edge is still on you.
+- **Viewport collision**: handled automatically (see Placement above) — the correction happens inside the panel's own hidden "just mounted" frame, so only the final, already-correct position is ever visible, no flash of the wrong placement first.
 
 ## Accessibility
 

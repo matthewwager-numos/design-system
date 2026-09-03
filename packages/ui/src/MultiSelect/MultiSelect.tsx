@@ -109,7 +109,7 @@ export function MultiSelect({
         </FieldLabel>
       ) : null}
 
-      <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenu open={open} onOpenChange={setOpen} size={size}>
         <DropdownMenuTrigger>
           {/* A role="button" div, not a real <button> — same reasoning as
               <Card>: this needs to contain other real interactive controls
@@ -168,7 +168,7 @@ export function MultiSelect({
             )}
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent size={size}>
+        <DropdownMenuContent matchTriggerWidth>
           {options.map((option) => {
             const isSelected = value.includes(option.value);
             return (

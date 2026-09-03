@@ -79,7 +79,7 @@ export const FilterPanel: Story = {
             Filters
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuPanel style={{ width: "20rem" }}>
+        <DropdownMenuPanel matchTriggerWidth={false} style={{ width: "20rem" }}>
           <TextInput label="Name contains" placeholder="e.g. invoice" size="md" />
           <Checkbox label="Only overdue" size="md" />
           <Slider label="Minimum amount" defaultValue={40} size="md" />
@@ -89,15 +89,39 @@ export const FilterPanel: Story = {
   ),
 };
 
+export const NearViewportCorner: Story = {
+  name: "Viewport collision (auto-flip)",
+  render: () => (
+    <div style={{ minHeight: 220 }}>
+      <p style={{ margin: "0 0 1rem", font: "var(--type-paragraph-s-regular)", color: "var(--content-subtle)" }}>
+        This trigger sits fixed at the bottom-right corner of the preview — its menu automatically opens above and
+        right-aligns instead of running off the edge below/to the right.
+      </p>
+      <div style={{ position: "fixed", bottom: 16, right: 16 }}>
+        <DropdownMenu defaultOpen>
+          <DropdownMenuTrigger>
+            <Button variant="secondary">Corner menu</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem leadingIcon={<User size={16} />}>Profile</DropdownMenuItem>
+            <DropdownMenuItem leadingIcon={<Settings size={16} />}>Settings</DropdownMenuItem>
+            <DropdownMenuItem leadingIcon={<LogOut size={16} />}>Log out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  ),
+};
+
 export const Sizes: Story = {
   render: () => (
     <div style={{ display: "flex", gap: "var(--space-6)", ...PREVIEW_STYLE }}>
       {(["sm", "md", "lg"] as const).map((size) => (
-        <DropdownMenu key={size} defaultOpen>
+        <DropdownMenu key={size} defaultOpen size={size}>
           <DropdownMenuTrigger>
             <Button variant="secondary" size={size}>{size}</Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent size={size}>
+          <DropdownMenuContent>
             <DropdownMenuItem>First option</DropdownMenuItem>
             <DropdownMenuItem>Second option</DropdownMenuItem>
             <DropdownMenuItem>Third option</DropdownMenuItem>

@@ -80,13 +80,15 @@ Pass `name` to render a hidden input alongside the trigger, so the selected valu
 
 Fills its container's width by default, same as `<TextInput>`/`<Textarea>` — not sized to the selected option's own text. That took an explicit fix: `<Select>` is built on `<DropdownMenu>`, whose root wrapper is `display: inline-block` (correct for a plain dropdown trigger button, which shouldn't stretch on its own) — scoped to `.ds-select`, it's overridden to fill the field's width instead.
 
+The options list matches that same width — `<DropdownMenuContent matchTriggerWidth>` — rather than shrinking to its longest option's own text, so the open menu lines up with the field edge-to-edge exactly like a native `<select>` would.
+
 ## Options
 
 Each option is `{ value, label, disabled?, leadingIcon? }`. `disabled` options are unclickable and skipped by keyboard navigation — both handled by `<DropdownMenuItem>`, not reimplemented here.
 
 ## Behavior
 
-Everything interactive — open/close, outside-click, Escape, Arrow/Home/End navigation, the open/close transition — comes directly from `<DropdownMenu>`. Select only adds: a field-styled trigger showing the selected label (or placeholder), a chevron that flips when open, and turning a click into a selected value. See the DropdownMenu docs for the full behavior contract, including its one known gap (no viewport collision detection).
+Everything interactive — open/close, outside-click, Escape, Arrow/Home/End navigation, the open/close transition, automatic viewport-collision flipping — comes directly from `<DropdownMenu>`. Select only adds: a field-styled trigger showing the selected label (or placeholder), a chevron that flips when open, and turning a click into a selected value. See the DropdownMenu docs for the full behavior contract.
 
 ## Accessibility
 

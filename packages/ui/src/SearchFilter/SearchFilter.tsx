@@ -90,7 +90,7 @@ export function SearchFilter({
         </FieldLabel>
       ) : null}
 
-      <DropdownMenu open={filters ? open : false} onOpenChange={filters ? setOpen : undefined}>
+      <DropdownMenu open={filters ? open : false} onOpenChange={filters ? setOpen : undefined} size={size}>
         <div
           className={clsx(
             "ds-search-filter__field",

@@ -1,8 +1,10 @@
 /*
  * DropdownMenu styles — pure token-driven CSS. No hard-coded colors or sizes.
  * Item size (padding/type/radius/icon size) cascades from the panel's own
- * size class, so consumers set `size` once on <DropdownMenuContent> rather
- * than on every item.
+ * size class — set once on the root <DropdownMenu size="..."> and shared
+ * via context by every <DropdownMenuContent>/<DropdownMenuPanel> inside
+ * it (see DropdownMenuContext.ts), not on every item or re-passed on the
+ * content itself.
  */
 
 .ds-dropdown-menu-root {
@@ -16,12 +18,13 @@
 }
 
 .ds-dropdown-menu {
-  /* `top`/`left`/`bottom` come from the portaled inline style (see
-     `getFixedPosition` in DropdownMenu.tsx) — computed from the trigger's
-     real measured position, not a static CSS value relative to a
-     since-left-behind parent. `position: fixed` (not `absolute`) since
-     that's what makes viewport-relative `getBoundingClientRect()`
-     coordinates line up correctly once portaled to `<body>`. */
+  /* `top`/`left`/`bottom`/`transform-origin` come from the portaled inline
+     style (see `useDropdownMenuPlacement`) — computed from the trigger's
+     real measured position and corrected for viewport collisions, not a
+     static CSS value relative to a since-left-behind parent. `position:
+     fixed` (not `absolute`) since that's what makes viewport-relative
+     `getBoundingClientRect()` coordinates line up correctly once portaled
+     to `<body>`. */
   position: fixed;
   /* Above <Modal>'s own z-index: 100 — a Select/DropdownMenu used inside a
      modal still needs to render above it, not get stacked underneath. */
@@ -44,17 +47,16 @@
 }
 
 /* ── Placement ─────────────────────────────────────────────────────── */
-/* Position itself is inline (see above) — these two only carry the
-   enter/exit scale/offset animation, which differs by which edge the panel
-   grows from. */
+/* Position and transform-origin are both inline (see above — origin has
+   to follow the resolved left/right align too, which CSS alone can't
+   express here) — these two only carry the enter/exit scale/offset
+   animation, which differs by which edge the panel grows from. */
 
 .ds-dropdown-menu--bottom {
-  transform-origin: top left;
   transform: scale(0.98) translateY(-4px);
 }
 
 .ds-dropdown-menu--top {
-  transform-origin: bottom left;
   transform: scale(0.98) translateY(4px);
 }
 
@@ -66,27 +68,32 @@
  */
 
 .ds-dropdown-menu-panel {
-  /* `top`/`left`/`bottom`/`width` come from the portaled inline style — see
-     `.ds-dropdown-menu`'s own comment above; same reasoning. */
+  /* `top`/`left`/`bottom`/`width`/`transform-origin` come from the portaled
+     inline style — see `.ds-dropdown-menu`'s own comment above; same
+     reasoning. Padding/gap/radius are size-tiered below, same pattern as
+     `.ds-dropdown-menu`'s own item sizing. */
   position: fixed;
   z-index: 150;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-4);
   min-width: 7.5rem;
   box-sizing: border-box;
-  padding: var(--space-4);
   background: var(--background-default);
   border: 1px solid var(--border-brand);
-  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-focus-brand);
   opacity: 0;
   pointer-events: none;
-  transform-origin: top left;
-  transform: scale(0.98) translateY(-4px);
   /* Enter/exit ease differently — see Modal.css's own comment on the same pattern. */
   transition: opacity var(--motion-exit-fast), transform var(--motion-exit-fast);
+}
+
+.ds-dropdown-menu-panel--bottom {
+  transform: scale(0.98) translateY(-4px);
+}
+
+.ds-dropdown-menu-panel--top {
+  transform: scale(0.98) translateY(4px);
 }
 
 .ds-dropdown-menu-panel--visible {
@@ -186,4 +193,26 @@
 .ds-dropdown-menu--sm .ds-dropdown-menu-item__icon svg {
   width: 1rem;
   height: 1rem;
+}
+
+/* Panel sizes — same three tiers, but there's no per-item row to cascade
+   onto, so it's just the panel's own padding/gap/radius scaling down
+   (its children set whatever spacing they need internally). */
+
+.ds-dropdown-menu-panel--lg {
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+}
+
+.ds-dropdown-menu-panel--md {
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.ds-dropdown-menu-panel--sm {
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
 }
