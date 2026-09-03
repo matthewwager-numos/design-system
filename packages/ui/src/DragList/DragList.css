@@ -1,0 +1,123 @@
+/*
+ * DragList styles — pure token-driven CSS. Confirmed against Figma's own
+ * ListItem states via get_design_context/get_variable_defs: the L1/L2/L3
+ * shadow effects it uses are exactly this codebase's own --shadow-l1/l2/l3
+ * tokens, and its "Radius/XS" (4px) is this codebase's own --radius-sm.
+ */
+
+.ds-drag-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-0);
+  width: 100%;
+}
+
+.ds-drag-list__item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--background-default);
+  box-shadow: var(--shadow-l1);
+  cursor: grab;
+}
+
+/* Hover — reveals the delete button (see .ds-drag-list__remove) and lifts
+   the shadow one step. Native drag-and-drop suppresses ordinary :hover
+   while a drag is in progress (the browser dispatches dragover/dragenter
+   instead), so this never fights with .ds-drag-list__item--target below. */
+.ds-drag-list__item:hover,
+.ds-drag-list__item:focus-within {
+  box-shadow: var(--shadow-l2);
+}
+.ds-drag-list__item:hover .ds-drag-list__label,
+.ds-drag-list__item:hover .ds-drag-list__grip,
+.ds-drag-list__item:focus-within .ds-drag-list__label,
+.ds-drag-list__item:focus-within .ds-drag-list__grip {
+  color: var(--content-emphasis);
+}
+.ds-drag-list__item:hover .ds-drag-list__remove,
+.ds-drag-list__item:focus-within .ds-drag-list__remove {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ds-drag-list__item:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+}
+
+/* Active — the row actually being dragged right now. Stays in its
+   original position (rather than disappearing) with the biggest shadow of
+   the three, so it visibly "lifts" above the rest of the list. */
+.ds-drag-list__item--active {
+  cursor: grabbing;
+  box-shadow: var(--shadow-l3);
+}
+.ds-drag-list__item--active .ds-drag-list__label,
+.ds-drag-list__item--active .ds-drag-list__grip {
+  color: var(--content-emphasis);
+}
+
+/* Target — replaces whichever row a drag is currently over, marking where
+   the dragged row will land if dropped here. Same box model as a real
+   row (padding/border-radius) so the list doesn't reflow height while a
+   drag is in progress. */
+.ds-drag-list__item--target {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-1);
+  border: 1px dashed var(--content-placeholder);
+  border-radius: var(--radius-sm);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-placeholder);
+}
+
+.ds-drag-list__grip {
+  flex-shrink: 0;
+  color: var(--content-subtle);
+}
+
+.ds-drag-list__label {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+
+/* Hidden until the row is hovered/focused (see .ds-drag-list__item:hover
+   above) rather than conditionally rendered, so a keyboard user tabbing
+   into the row can still reach it via :focus-within. */
+.ds-drag-list__remove {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--content-info);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+.ds-drag-list__remove:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}

@@ -143,7 +143,7 @@ export type { CardProps, CardExpand, CardHeaderProps, CardHeaderAction, CardGrou
 export { SettingsCard } from "./SettingsCard";
 export type { SettingsCardProps } from "./SettingsCard";
 
-export { ChartLegend, BarChart, LineChart, AreaChart, DonutChart, SankeyChart, BubbleChart, GaugeChart, chartColor, chartColorMuted } from "./Chart";
+export { ChartLegend, BarChart, LineChart, AreaChart, DonutChart, SankeyChart, BubbleChart, GaugeChart, GanttChart, chartColor, chartColorMuted } from "./Chart";
 export type {
   ChartLegendProps,
   ChartLegendItem,
@@ -167,7 +167,14 @@ export type {
   GaugeChartScaleDirection,
   GaugeChartStatus,
   GaugeChartSize,
+  GanttChartProps,
+  GanttGroup,
+  GanttTask,
+  GanttMilestone,
 } from "./Chart";
+
+export { DragList } from "./DragList";
+export type { DragListProps, DragListItem, DragListAddOption } from "./DragList";
 
 // Not a component — a small utility `<Wizard>` uses internally to pin its
 // own footer, and that consuming apps can reuse for the same "fixed chrome

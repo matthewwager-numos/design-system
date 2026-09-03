@@ -22,4 +22,7 @@ export type { BubbleChartProps, BubbleChartDatum } from "./BubbleChart";
 export { GaugeChart } from "./GaugeChart";
 export type { GaugeChartProps, GaugeChartMode, GaugeChartScaleDirection, GaugeChartStatus, GaugeChartSize } from "./GaugeChart";
 
+export { GanttChart } from "./GanttChart";
+export type { GanttChartProps, GanttGroup, GanttTask, GanttMilestone } from "./GanttChart";
+
 export { chartColor, chartColorMuted } from "./chartColors";

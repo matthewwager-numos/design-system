@@ -1,0 +1,99 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as DragListStories from "./DragList.stories";
+
+<Meta of={DragListStories} />
+
+# DragList
+
+A reorderable list — drag any row by its grip handle to move it, hover a row to reveal its own delete button, and (if you pass `addOptions`) add more rows from a dropdown at the bottom. Matches Figma's ListItem exactly across its 4 states: **Default**, **Hover** (reveals the delete button), **Active** (the row actually being dragged — bigger shadow, no delete button), and **Target** (the dashed "Drop here" placeholder shown in place of whichever row a drag is currently over).
+
+<Canvas of={DragListStories.Default} />
+
+## When to use
+
+- An ordered set of things the user should be able to rearrange by hand — checklist steps, form field order, a ranked list.
+- A list where items can also be added (from a fixed set of options) and removed, alongside reordering.
+
+## When NOT to use
+
+- A large or virtualized list — this renders every row directly into the DOM, with no virtualization.
+- Free-form item creation (typing a new item's own text) — `addOptions` is a closed set of choices offered in a dropdown, not a text field. Compose your own "new item" input alongside `DragList` if you need that.
+
+## Implementation
+
+```tsx
+import { useState } from "react";
+import { DragList } from "@numosai/ui";
+import type { DragListItem } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+function Example() {
+  const [items, setItems] = useState<DragListItem[]>([
+    { id: "sync", label: "Sync data" },
+    { id: "validate", label: "Validate completion" },
+    { id: "prepare", label: "Prepare schedules" },
+  ]);
+
+  return (
+    <DragList
+      items={items}
+      onReorder={setItems}
+      onRemove={(id) => setItems((prev) => prev.filter((item) => item.id !== id))}
+    />
+  );
+}
+```
+
+`DragList` is fully controlled — it never owns the list itself. `onReorder` is called with the complete list in its new order once a drag-and-drop reorder finishes; you're responsible for storing that and passing it back in as `items`.
+
+## Adding items from a dropdown
+
+Pass `addOptions` (and `onAddOption`) to show a small "+" button after the last row — clicking it opens a dropdown of the options you give it. Omit `addOptions` (or pass an empty array) to hide the button entirely, e.g. once every option has already been added:
+
+<Canvas of={DragListStories.WithAddButton} />
+
+```tsx
+<DragList
+  items={items}
+  onReorder={setItems}
+  addOptions={[
+    { value: "audit", label: "Audit trail" },
+    { value: "signoff", label: "Manager sign-off" },
+  ]}
+  onAddOption={(value) => {
+    // look up the option and append it to `items` yourself
+  }}
+/>
+```
+
+`items` and `addOptions` are two separate, consumer-owned lists — `DragList` itself never moves an entry between them. The example above wires its own `onRemove` to push a deleted row's `{ id, label }` back into `addOptions` (as `{ value: id, label }`), so deleting something makes it available to add back later instead of discarding it outright — a pattern worth following if `addOptions` represents "the full set of things that could be in this list," rather than something else entirely.
+
+## Without a delete button
+
+Omit `onRemove` and rows never show the delete affordance, even on hover — reordering only:
+
+<Canvas of={DragListStories.NotRemovable} />
+
+## Behavior
+
+- **Reordering**: built on the native HTML5 drag-and-drop API — the same technique the demo app's own kanban board already uses, not a drag library dependency. Drag a row by anywhere on it (not just the grip icon, which is a visual affordance rather than the only handle) and drop it on another row to move it there.
+- **The dragged row** stays visible in its original position with an elevated shadow (Figma's "Active" state) rather than disappearing — the row you're currently dragging *over* shows the dashed "Drop here" placeholder (Figma's "Target" state) in its place instead of its own content, marking exactly where the dragged row will land.
+- **Removing a row**: hovering (or keyboard-focusing) a row reveals its delete (×) button; clicking it calls `onRemove(id)`. Hidden for the row currently being dragged, since a row mid-drag can't also be individually deleted.
+- **Not handled**: no keyboard equivalent for reordering — native drag-and-drop has none, so moving a row is mouse/touch-only. The delete button and the add dropdown are both fully keyboard operable regardless.
+
+## Accessibility
+
+- The delete button is reachable via keyboard (`:focus-within` keeps it visible while tabbing through a row, not just on mouse hover) and always carries `aria-label="Remove item"`.
+- The add button is a real `<IconButton aria-label="Add item">` opening a real `<DropdownMenu>` — same keyboard behavior (arrow keys, Escape, outside click) as everywhere else that component is used.
+- Reordering itself has no assistive-technology announcement or keyboard path — a known limitation of native drag-and-drop, not something this component works around.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `DragListItem[]` (`{ id: string; label: ReactNode }[]`) | — | The list, in order. |
+| `onReorder` | `(items: DragListItem[]) => void` | — | Called with the full list in its new order after a drag-and-drop reorder. |
+| `onRemove` | `(id: string) => void` | — | Omit to hide every row's hover delete button. |
+| `addOptions` | `DragListAddOption[]` (`{ value: string; label: ReactNode }[]`) | `[]` | Options shown in the "Add item" button's dropdown. Omit/empty hides that button. |
+| `onAddOption` | `(value: string) => void` | — | Called with the picked option's `value` when chosen from the add dropdown. |
+| `className` | `string` | — | Applied to the list's own root element. |

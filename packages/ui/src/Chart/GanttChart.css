@@ -1,0 +1,183 @@
+/*
+ * GanttChart styles — pure token-driven CSS. Built from real HTML/CSS grid
+ * rows (a label column + a timeline column), not SVG — every row needs its
+ * own clickable label and hover target. Grid-line spacing (--ds-gantt-
+ * columns) and the label column's width (--ds-gantt-label-width) are set
+ * inline per chart/row, since both are entirely data-driven (the date
+ * range, and a consumer-chosen label width).
+ */
+
+.ds-gantt-chart {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.ds-gantt-chart__header {
+  display: flex;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ds-gantt-chart__header-spacer {
+  display: flex;
+  align-items: center;
+  flex: 0 0 var(--ds-gantt-label-width);
+  padding-right: var(--space-2);
+}
+
+.ds-gantt-chart__row {
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem;
+}
+
+.ds-gantt-chart__row--group {
+  min-height: 2.75rem;
+}
+
+.ds-gantt-chart__label-button {
+  display: flex;
+  flex: 0 0 var(--ds-gantt-label-width);
+  align-items: center;
+  gap: var(--space-1);
+  padding-right: var(--space-2);
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.ds-gantt-chart__chevron {
+  flex-shrink: 0;
+  color: var(--content-subtle);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.ds-gantt-chart__chevron--collapsed {
+  transform: rotate(-90deg);
+}
+
+.ds-gantt-chart__label {
+  flex: 0 0 var(--ds-gantt-label-width);
+  padding: 0 var(--space-2) 0 calc(var(--space-4) + 1rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.ds-gantt-chart__label--group {
+  flex: 1 1 auto;
+  padding: 0;
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+  color: var(--content-emphasis);
+}
+
+/* ── Timeline ──────────────────────────────────────────────────────── */
+
+.ds-gantt-chart__timeline {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  align-self: stretch;
+  /* Vertical grid lines, one per day column — a repeating gradient instead
+     of one DOM element per line, sized off --ds-gantt-columns so it works
+     for any date range without generating a matching number of divs. */
+  background-image: linear-gradient(to right, var(--border-subtle) 1px, transparent 1px);
+  background-size: calc(100% / var(--ds-gantt-columns)) 100%;
+}
+
+.ds-gantt-chart__header .ds-gantt-chart__timeline {
+  min-height: 2rem;
+}
+
+.ds-gantt-chart__header-column {
+  flex: 1 1 0%;
+  display: flex;
+  align-items: center;
+  padding-left: var(--space-2);
+  min-width: 0;
+}
+
+.ds-gantt-chart__header-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-placeholder);
+}
+
+.ds-gantt-chart__header-cell--milestone {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-gantt-chart__milestone-trigger {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Same top/height/transform as .ds-gantt-chart__bar-position, so the
+   background track and every bar are exactly the same height (1rem) and
+   share one vertical center — only the horizontal inset (var(--space-2))
+   differs from the bar's own left/width, which is computed against this
+   same inset span (see GanttChart.tsx). */
+.ds-gantt-chart__track {
+  position: absolute;
+  top: 50%;
+  left: var(--space-2);
+  right: var(--space-2);
+  height: 1rem;
+  transform: translateY(-50%);
+  border-radius: var(--radius-full);
+  background: var(--background-element);
+}
+
+/* The percentage left/width position lives here (a definite-sized box,
+   since top/height/left/width are all resolved against .ds-gantt-chart__
+   timeline) — kept separate from .ds-gantt-chart__bar itself so a
+   <Popover> can wrap just the bar without needing to also be the
+   percentage-positioned element. */
+.ds-gantt-chart__bar-position {
+  position: absolute;
+  top: 50%;
+  height: 1rem;
+  transform: translateY(-50%);
+  min-width: var(--space-2);
+}
+
+/* <Popover>'s own root wrapper is display:inline-block, sized to fit its
+   child — which would collapse to zero here, since .ds-gantt-chart__bar
+   contributes no size of its own (it just fills this wrapper). Forcing it
+   to a plain, fully-stretched block sidesteps that entirely. */
+.ds-gantt-chart__bar-position .ds-popover-root {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ds-gantt-chart__bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.ds-gantt-chart__bar:hover,
+.ds-gantt-chart__bar:focus-visible {
+  opacity: 0.85;
+}
+
+.ds-gantt-chart__bar:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}
