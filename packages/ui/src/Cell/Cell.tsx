@@ -66,7 +66,15 @@ export interface CellProps {
   "aria-label"?: string;
   /** `button` / `checkbox` / `checkboxColumnHead` only. */
   disabled?: boolean;
-  /** `button` only, or `avatar` — makes the row head itself clickable (e.g. opening a detail view), rendered as a real `<button>` rather than a `<div>`. Omit for a plain, non-interactive avatar cell. */
+  /**
+   * `button` / `avatar` — makes the row head itself clickable (e.g. opening
+   * a detail view), rendered as a real `<button>` rather than a `<div>`.
+   * Omit for a plain, non-interactive avatar cell.
+   *
+   * `columnHead` / `sorted` — makes the header itself clickable (sort by
+   * this column), same `<button>` treatment. Omit for a plain,
+   * non-interactive header.
+   */
   onClick?: () => void;
   /** `icon` only — up to 3 row-action buttons, right-aligned. */
   actions?: CellAction[];
@@ -74,6 +82,15 @@ export interface CellProps {
   count?: ReactNode;
   /** `sorted` only. Defaults to `"asc"`. */
   direction?: "asc" | "desc";
+  /**
+   * Orthogonal to `type` — available on every cell regardless of what it
+   * renders. A row spans multiple `<Column>`s, so its cells are never real
+   * DOM siblings; a consumer highlighting a whole row on hover tracks a
+   * shared "hovered row" key in its own state from these and applies a
+   * matching `className` to each of that row's cells in turn.
+   */
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   className?: string;
 }
 
@@ -117,6 +134,8 @@ export function Cell({
   actions = [],
   count,
   direction = "asc",
+  onMouseEnter,
+  onMouseLeave,
   className,
   "aria-label": ariaLabel,
 }: CellProps) {
@@ -130,6 +149,8 @@ export function Cell({
         (type === "numeric" || type === "checkbox" || type === "icon") && "ds-cell--end",
         className,
       )}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {type === "text" && <span className="ds-cell__text">{children}</span>}
 
@@ -204,14 +225,29 @@ export function Cell({
         </div>
       )}
 
-      {type === "columnHead" && <span className="ds-cell__head-label">{children}</span>}
+      {type === "columnHead" &&
+        (onClick ? (
+          <button type="button" className="ds-cell__header-button" onClick={onClick}>
+            <span className="ds-cell__head-label">{children}</span>
+          </button>
+        ) : (
+          <span className="ds-cell__head-label">{children}</span>
+        ))}
 
-      {type === "sorted" && (
-        <div className="ds-cell__sort">
-          {direction === "asc" ? <ArrowUp size={16} aria-hidden /> : <ArrowDown size={16} aria-hidden />}
-          <span className="ds-cell__sort-label">{children}</span>
-        </div>
-      )}
+      {type === "sorted" &&
+        (onClick ? (
+          <button type="button" className="ds-cell__header-button" onClick={onClick}>
+            <div className="ds-cell__sort">
+              {direction === "asc" ? <ArrowUp size={16} aria-hidden /> : <ArrowDown size={16} aria-hidden />}
+              <span className="ds-cell__sort-label">{children}</span>
+            </div>
+          </button>
+        ) : (
+          <div className="ds-cell__sort">
+            {direction === "asc" ? <ArrowUp size={16} aria-hidden /> : <ArrowDown size={16} aria-hidden />}
+            <span className="ds-cell__sort-label">{children}</span>
+          </div>
+        ))}
     </div>
   );
 }

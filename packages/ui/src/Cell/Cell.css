@@ -23,7 +23,7 @@
 
 .ds-cell--header {
   height: 3rem;
-  background: var(--background-secondary);
+  background: var(--background-element);
   border-bottom-color: var(--border-base);
   /* Figma's own raw drop-shadow value — not bound to a named token there either. */
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
@@ -257,6 +257,15 @@
   color: var(--content-base);
 }
 
+/* .ds-cell--end shifts a flex *child* rightward via justify-content — but
+   .ds-cell__head-label's own flex: 1 0 0 already grows to fill all
+   available width, leaving nothing for justify-content to shift into. The
+   text itself has to be told to right-align instead, same as
+   .ds-cell--end .ds-cell__text already does for plain numeric cells. */
+.ds-cell--end .ds-cell__head-label {
+  text-align: right;
+}
+
 .ds-cell__sort {
   flex: 1 0 0;
   min-width: 0;
@@ -264,6 +273,10 @@
   align-items: center;
   gap: var(--space-2);
   color: var(--content-emphasis);
+}
+
+.ds-cell--end .ds-cell__sort {
+  justify-content: flex-end;
 }
 
 .ds-cell__sort-label {
@@ -275,4 +288,39 @@
   font: var(--type-paragraph-xs-medium);
   letter-spacing: var(--type-paragraph-xs-medium-tracking);
   color: var(--content-emphasis);
+}
+
+/* Same reasoning as .ds-cell__head-label above — the label's own flex
+   growth would otherwise cancel out .ds-cell__sort's justify-content:
+   flex-end, so the icon+label pair shrinks to its own content width here
+   instead of filling the row, letting the whole group (icon still
+   immediately beside its label) sit flush against the right edge. */
+.ds-cell--end .ds-cell__sort-label {
+  flex: 0 1 auto;
+}
+
+/* Clicking to sort — .ds-cell__head-label/.ds-cell__sort's own inner
+   content is unchanged; this just makes the *whole* header cell (not only
+   the text) the click target and hover surface, matching how <Select>'s
+   own field backgrounds respond to hover. Expands past the cell's own
+   padding box (negative margin, matching padding restored) so the hover
+   fill reaches the cell's real edges instead of stopping at the text. */
+.ds-cell__header-button {
+  display: flex;
+  align-items: center;
+  width: calc(100% + 2 * var(--space-4));
+  height: calc(100% + 2 * var(--space-4));
+  margin: calc(-1 * var(--space-4));
+  padding: var(--space-4);
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+.ds-cell__header-button:hover {
+  background: var(--background-hover);
+}
+.ds-cell__header-button:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: -2px;
 }
