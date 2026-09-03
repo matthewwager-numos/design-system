@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
 import "./IconButton.css";
@@ -27,13 +28,21 @@ export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonEle
  * "secondary" here: it's the identical outlined treatment
  * `<Button variant="secondary">` already has a name for, and Figma's own
  * label would just be a second name for the same visual concept.
+ *
+ * Forwards its ref to the real `<button>` — same reasoning as `<Button>`'s
+ * own `forwardRef`: anything that clones this to attach a ref (e.g.
+ * `<DropdownMenuTrigger>`/`<Popover>`/`<Tooltip>` measuring it as their
+ * anchor) needs that ref to actually reach a DOM node, not silently drop.
  */
-export function IconButton({ icon, variant = "primary", size = "md", className, ...rest }: IconButtonProps) {
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
+  { icon, variant = "primary", size = "md", className, ...rest },
+  ref,
+) {
   return (
-    <button type="button" className={clsx("ds-icon-button", `ds-icon-button--${variant}`, `ds-icon-button--${size}`, className)} {...rest}>
+    <button ref={ref} type="button" className={clsx("ds-icon-button", `ds-icon-button--${variant}`, `ds-icon-button--${size}`, className)} {...rest}>
       <span className="ds-icon-button__icon" aria-hidden="true">
         {icon}
       </span>
     </button>
   );
-}
+});
