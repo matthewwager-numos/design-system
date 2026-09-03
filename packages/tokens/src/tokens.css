@@ -372,8 +372,8 @@
      A categorical palette for distinguishing data series (bar/line/donut/
      sankey all pull from this same five-color sequence in Figma) — series
      identity, not UI chrome, so components pick by index rather than any
-     one series owning a fixed meaning. Declared once: Figma's own chart
-     instances don't show a dark-mode pairing for these. */
+     one series owning a fixed meaning. Dark-mode pairing below, in both
+     the @media and [data-theme="dark"] blocks. */
   --chart-1: var(--brand-dark-blue);
   --chart-2: var(--brand-700);
   --chart-3: var(--green-700);
@@ -451,6 +451,12 @@
     --shadow-focus-brand: 0 0 0 2px var(--background-brand-subdued);
     --shadow-focus-negative: 0 0 0 2px var(--background-negative);
     --shadow-focus-positive: 0 0 0 2px var(--background-positive);
+
+    --chart-1: var(--brand-200);
+    --chart-2: var(--brand-500);
+    --chart-3: var(--green-500);
+    --chart-4: var(--yellow-500);
+    --chart-5: var(--magenta-500);
   }
 }
 
@@ -598,4 +604,10 @@
   --shadow-focus-brand: 0 0 0 2px var(--background-brand-subdued);
   --shadow-focus-negative: 0 0 0 2px var(--background-negative);
   --shadow-focus-positive: 0 0 0 2px var(--background-positive);
+
+  --chart-1: var(--brand-200);
+  --chart-2: var(--brand-500);
+  --chart-3: var(--green-500);
+  --chart-4: var(--yellow-500);
+  --chart-5: var(--magenta-500);
 }
