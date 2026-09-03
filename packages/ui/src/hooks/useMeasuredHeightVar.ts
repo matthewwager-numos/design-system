@@ -24,7 +24,7 @@ import { useCallback, useLayoutEffect, useState } from "react";
  * on every real attach/detach, so a remount is re-measured instead of stuck
  * at a stale (or zeroed) value.
  */
-export function useMeasuredHeightVar<T extends HTMLElement>(cssVarName: string, target: HTMLElement | (() => HTMLElement) = document.documentElement) {
+export function useMeasuredHeightVar<T extends HTMLElement>(cssVarName: string, target: HTMLElement | (() => HTMLElement) = () => document.documentElement) {
   const [element, setElement] = useState<T | null>(null);
   const ref = useCallback((node: T | null) => {
     setElement(node);
