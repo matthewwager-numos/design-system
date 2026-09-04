@@ -1,11 +1,10 @@
-// History (a chronological feed/audit log of accrual changes) is explicitly
-// deferred — not designed yet, matching the same placeholder used by the
-// other apps' own History tabs. This is a plain placeholder, not an
-// attempt to guess at that design.
+import { HistoryTimeline } from "../../components/HistoryTimeline";
+import { ACCRUALS_HISTORY } from "../../data/accrualsHistory";
+
 export function HistoryTab() {
   return (
-    <div className="page">
-      <p style={{ margin: 0, color: "var(--content-subtle)" }}>History isn't designed yet — this tab is a placeholder.</p>
+    <div className="page page--full-width page--fill-height">
+      <HistoryTimeline entries={ACCRUALS_HISTORY} />
     </div>
   );
 }

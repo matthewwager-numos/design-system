@@ -878,3 +878,91 @@ a {
   gap: var(--space-4);
 }
 
+/* ── HistoryTimeline (shared by every app's own History tab) ─────────── */
+
+.history-timeline {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.history-timeline__feed {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-width: 20rem;
+  max-width: 40rem;
+}
+
+.history-timeline__group-header {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) 0;
+}
+
+.history-timeline__group-label {
+  font: var(--type-paragraph-l-regular);
+  letter-spacing: var(--type-paragraph-l-regular-tracking);
+  color: var(--content-emphasis);
+}
+
+.history-timeline__empty {
+  margin: 0;
+  padding: var(--space-4) 0;
+  color: var(--content-subtle);
+}
+
+.history-timeline__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 15.75rem;
+  flex-shrink: 0;
+  padding: var(--space-4) 0;
+}
+
+/* Below this width, .history-timeline is just one column stacked on top of
+   the other, sharing .app-body's own single scroll — same as any other
+   page. At the desktop breakpoint, the feed and the sidebar become two
+   independently scrolling regions filling the page's own height, and the
+   sidebar's month nav stays put (`position: sticky`) at the top of its own
+   scroll area rather than scrolling away with the search field above it. */
+@media (min-width: 48rem) {
+  .page--fill-height {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .history-timeline {
+    height: 100%;
+    align-items: stretch;
+    flex-wrap: nowrap;
+  }
+
+  .history-timeline__feed,
+  .history-timeline__sidebar {
+    height: 100%;
+    overflow-y: auto;
+    /* Still scrollable (via wheel/trackpad/drag/keyboard) — just without
+       the scrollbar's own track/thumb chrome cluttering two side-by-side
+       columns. */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge */
+  }
+
+  .history-timeline__feed::-webkit-scrollbar,
+  .history-timeline__sidebar::-webkit-scrollbar {
+    display: none; /* Chromium/WebKit */
+  }
+
+  .history-timeline__nav {
+    position: sticky;
+    top: 0;
+    background: var(--background-secondary);
+  }
+}
+
