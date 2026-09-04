@@ -14,11 +14,22 @@
   width: 100%;
 }
 
+/* min-height has to cover padding-top + border-top too, not just the text's
+   own line-height (1rem) — box-sizing: border-box (Tailwind's own preflight
+   reset) means min-height is measured on the *border* box, so a value of
+   just `1rem` still let these collapse by exactly padding+border (5px) the
+   instant hover swaps the real inline value/date text for the *floating*
+   variant below (`position: absolute`, contributing nothing to flow) —
+   confirmed by measuring the real rendered heights before/after hover, not
+   assumed. That's the "charts jump on hover" bug's other half (ChartTooltip
+   was the first): every hover made the whole chart resize because its
+   header (a little) and footer (a lot — it had no min-height at all) both
+   shrank. */
 .ds-area-chart__header {
   position: relative;
   display: flex;
   justify-content: flex-end;
-  min-height: 1rem;
+  min-height: calc(1rem + var(--space-1) + 1px);
   border-top: 1px solid var(--border-subtle);
   padding-top: var(--space-1);
 }
@@ -27,6 +38,7 @@
   position: relative;
   display: flex;
   justify-content: space-between;
+  min-height: calc(1rem + var(--space-1) + 1px);
   border-top: 1px solid var(--border-subtle);
   padding-top: var(--space-1);
 }

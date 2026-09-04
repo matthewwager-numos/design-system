@@ -1,24 +1,6 @@
+import { BarChart, DisplayMetric, DonutChart } from "@numosai/ui";
 import { useEmployees } from "../../data/useEmployees";
-import { departmentLabel } from "../../data/employees";
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div
-      style={{
-        flex: "1 1 10rem",
-        padding: "var(--space-4)",
-        border: "1px solid var(--border-subtle)",
-        borderRadius: "var(--radius-md)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--space-1)",
-      }}
-    >
-      <span style={{ font: "var(--type-paragraph-s-regular)", color: "var(--content-subtle)" }}>{label}</span>
-      <span style={{ font: "var(--type-heading-xl)", letterSpacing: "var(--type-heading-xl-tracking)", color: "var(--content-emphasis)" }}>{value}</span>
-    </div>
-  );
-}
+import { departmentLabel, EMPLOYMENT_TYPE_OPTIONS } from "../../data/employees";
 
 export function OverviewTab() {
   const { employees } = useEmployees();
@@ -30,41 +12,43 @@ export function OverviewTab() {
   }
 
   const fullTimeCount = employees.filter((employee) => employee.employmentType === "fulltime").length;
+  const adminCount = employees.filter((employee) => employee.role === "admin").length;
+
+  const byDepartmentChart = Array.from(byDepartment.entries()).map(([department, count]) => ({
+    label: department === "—" ? department : departmentLabel(department),
+    value: count,
+  }));
+
+  const byEmploymentType = EMPLOYMENT_TYPE_OPTIONS.map((option) => ({
+    label: option.label,
+    value: employees.filter((employee) => employee.employmentType === option.value).length,
+  }));
 
   return (
-    <div className="page">
-      <div style={{ display: "flex", gap: "var(--space-4)", flexWrap: "wrap" }}>
-        <StatCard label="Total employees" value={String(employees.length)} />
-        <StatCard label="Full-time" value={String(fullTimeCount)} />
-        <StatCard label="Departments" value={String(byDepartment.size)} />
+    <div className="page page--full-width">
+      <div className="overview-metrics">
+        <DisplayMetric value={String(employees.length)} label="Total employees" color="brand" />
+        <DisplayMetric value={String(fullTimeCount)} label="Full-time" color="green" />
+        <DisplayMetric value={String(byDepartment.size)} label="Departments" color="magenta" />
+        <DisplayMetric value={String(adminCount)} label="Admins" color="yellow" />
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
-        <h2 style={{ margin: 0, font: "var(--type-heading-l)", letterSpacing: "var(--type-heading-l-tracking)", color: "var(--content-emphasis)" }}>
-          By department
-        </h2>
-        {byDepartment.size === 0 ? (
-          <p style={{ margin: 0, color: "var(--content-subtle)" }}>No employees yet.</p>
-        ) : (
-          <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
-            {Array.from(byDepartment.entries()).map(([department, count]) => (
-              <li
-                key={department}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "var(--space-2) 0",
-                  borderBottom: "1px solid var(--border-subtle)",
-                  font: "var(--type-paragraph-s-regular)",
-                  color: "var(--content-base)",
-                }}
-              >
-                <span>{department === "—" ? department : departmentLabel(department)}</span>
-                <span style={{ color: "var(--content-subtle)" }}>{count}</span>
-              </li>
-            ))}
-          </ul>
-        )}
+      <div className="overview-section">
+        <h2 className="overview-section-title">Breakdown</h2>
+        <div className="overview-chart-row">
+          <div className="overview-chart-card overview-chart-card--centered">
+            <h3 className="overview-chart-card__title">By department</h3>
+            {byDepartmentChart.length === 0 ? (
+              <p className="overview-chart-card__description">No employees yet.</p>
+            ) : (
+              <DonutChart data={byDepartmentChart} centerLabel="Employees" size={160} thickness={20} />
+            )}
+          </div>
+          <div className="overview-chart-card">
+            <h3 className="overview-chart-card__title">By employment type</h3>
+            <BarChart data={byEmploymentType} height={220} />
+          </div>
+        </div>
       </div>
     </div>
   );

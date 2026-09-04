@@ -16,12 +16,26 @@ export interface ChartTooltipProps {
  * ribbons — nested inside `<Tooltip>`'s own wrapping `<span>` doesn't even
  * render, confirmed empirically). `children` is still required by
  * `<Tooltip>`'s API but otherwise inert here.
+ *
+ * Wrapped in a `position: absolute` div so this stays out of the flex flow
+ * of whichever chart renders it (BarChart/DonutChart/etc. all lay out their
+ * own chart/legend with `gap`) — confirmed the hard way that without this,
+ * `<Tooltip>`'s own root span, despite being visually empty, still counts
+ * as a real flex child the instant `data` goes non-null on first hover,
+ * adding one extra `gap` unit to the chart's total height and visibly
+ * growing the whole card (and, via `align-items: stretch` on a shared row,
+ * even its unhovered siblings) — the "charts jump on hover" bug. The actual
+ * tooltip content itself is unaffected either way, since `<Tooltip>`
+ * portals it to `document.body` with its own fixed positioning, entirely
+ * independent of where this wrapper sits.
  */
 export function ChartTooltip({ data, visible }: ChartTooltipProps) {
   if (!data) return null;
   return (
-    <Tooltip open={visible} anchorPoint={{ x: data.x, y: data.y }} title={data.label} content={data.value} dotColor={data.color} placement="top">
-      <span aria-hidden="true" />
-    </Tooltip>
+    <div style={{ position: "absolute" }}>
+      <Tooltip open={visible} anchorPoint={{ x: data.x, y: data.y }} title={data.label} content={data.value} dotColor={data.color} placement="top">
+        <span aria-hidden="true" />
+      </Tooltip>
+    </div>
   );
 }

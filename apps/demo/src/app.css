@@ -966,3 +966,68 @@ a {
   }
 }
 
+/* ── Overview template (shared by every app's own Overview tab) ───────── */
+
+.overview-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.overview-metrics > * {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.overview-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.overview-section-title {
+  margin: 0;
+  font: var(--type-heading-l);
+  letter-spacing: var(--type-heading-l-tracking);
+  color: var(--content-emphasis);
+}
+
+.overview-chart-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.overview-chart-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1 1 20rem;
+  min-width: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--background-default);
+  box-shadow: var(--shadow-l1);
+}
+
+.overview-chart-card__title {
+  margin: 0;
+  font: var(--type-heading-m);
+  letter-spacing: var(--type-heading-m-tracking);
+  color: var(--content-emphasis);
+}
+
+.overview-chart-card__description {
+  margin: calc(-1 * var(--space-2)) 0 0;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}
+
+/* A gauge's own content is a small centered circle — cards holding one
+   center their content instead of stretching it to the card's full,
+   otherwise-empty width. */
+.overview-chart-card--centered {
+  align-items: center;
+  text-align: center;
+}
