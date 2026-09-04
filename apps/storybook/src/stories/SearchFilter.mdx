@@ -82,6 +82,33 @@ Confirmed from Figma: the field shows this text (truncated with an ellipsis if i
 
 <Canvas of={SearchFilterStories.Filled} />
 
+## Typing suggestions
+
+Pass `properties` to turn on a real type-ahead dropdown for the field itself — an ARIA combobox (`role="combobox"` + `role="listbox"`, `aria-activedescendant` for the highlighted option) modeled directly on `<SearchInput>`'s own, not `<DropdownMenu>` (which would move real focus onto a menu item and steal it away from the input mid-type):
+
+```tsx
+const properties = [
+  {
+    key: "status",
+    label: "status",
+    values: [
+      { value: "overdue", label: "Overdue" },
+      { value: "paid", label: "Paid" },
+    ],
+  },
+];
+
+<SearchFilter label="Invoices" properties={properties} />
+```
+
+Typing a bare word (no colon yet) suggests matching *properties*, shown as `"status:"`. Typing `"status:"` (or `"status:pa"`) narrows the list to that property's own values instead — `key` is matched case-insensitively. Picking a property inserts `"key:"` with no trailing space, so typing continues straight into its values; picking a value inserts `"key:value "` (trailing space), completing that clause. Only the word currently being typed — the last whitespace-delimited run of the field's text — is ever replaced, so earlier finished clauses are left alone.
+
+<Canvas of={SearchFilterStories.Suggestions} />
+
+This is independent of, and coordinates with, the filter panel below: the two are separate popups sharing one field, so opening either one closes the other.
+
+<Canvas of={SearchFilterStories.SuggestionsAndFilters} />
+
 ## Examples
 
 <Canvas of={SearchFilterStories.Error} />
@@ -119,7 +146,12 @@ const [filtersOpen, setFiltersOpen] = useState(false);
 
 - The filter button gets `aria-haspopup="menu"` from `<DropdownMenuTrigger>` — not quite accurate (the panel isn't a menu), a known limitation shared with every other `<DropdownMenuPanel>` consumer; see the DropdownMenu docs.
 - Opening the panel doesn't move focus anywhere — there's no safe assumption about what inside arbitrary `filters` content should receive it. Escape closes the panel and returns focus to the filter button.
+- The suggestions dropdown never moves real focus either — the input keeps it the whole time. The highlighted option is tracked as plain state and exposed via `aria-activedescendant`, with the usual Arrow/Home/End/Enter/Escape keys wired to the input itself.
 - Sets `aria-invalid="true"` automatically when `status="error"`.
+
+## The filter panel's width
+
+The panel is at least as wide as the field it's anchored to (never narrower, so it can't clip its own content) but can grow wider when `filters` genuinely needs the room — it's a minimum, not an exact match.
 
 ## Props
 

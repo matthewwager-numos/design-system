@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Checkbox, SearchFilter, Slider, TextInput } from "@numosai/ui";
+import type { SearchFilterProperty } from "@numosai/ui";
 
 // DropdownMenuPanel is position: absolute, so it doesn't add height to its
 // in-flow parent — without an explicit min-height, Storybook's Canvas sizes
@@ -13,6 +14,7 @@ const meta: Meta<typeof SearchFilter> = {
   // No "autodocs" tag — SearchFilter.mdx is this component's docs page.
   argTypes: {
     filters: { control: false },
+    properties: { control: false },
     status: {
       control: "select",
       options: ["default", "error", "success"],
@@ -36,6 +38,34 @@ const meta: Meta<typeof SearchFilter> = {
 
 export default meta;
 type Story = StoryObj<typeof SearchFilter>;
+
+const SAMPLE_PROPERTIES: SearchFilterProperty[] = [
+  {
+    key: "status",
+    label: "status",
+    values: [
+      { value: "overdue", label: "Overdue" },
+      { value: "paid", label: "Paid" },
+      { value: "draft", label: "Draft" },
+    ],
+  },
+  {
+    key: "customer",
+    label: "customer",
+    values: [
+      { value: "acme", label: "Acme Co." },
+      { value: "globex", label: "Globex Corp." },
+    ],
+  },
+  {
+    key: "amount",
+    label: "amount",
+    values: [
+      { value: ">40", label: "> $40" },
+      { value: "<40", label: "< $40" },
+    ],
+  },
+];
 
 function SampleFilters() {
   return (
@@ -61,6 +91,29 @@ export const Default: Story = {
   render: (args) => (
     <div style={PREVIEW_STYLE}>
       <SearchFilter {...args} filters={<SampleFilters />} />
+    </div>
+  ),
+};
+
+// Type a bare word to see matching properties (e.g. "sta" → "status:");
+// finish one with a colon (e.g. "status:") to see just that property's own
+// values, narrowed further by whatever's typed after it.
+export const Suggestions: Story = {
+  name: "Typing suggestions",
+  render: (args) => (
+    <div style={PREVIEW_STYLE}>
+      <SearchFilter {...args} properties={SAMPLE_PROPERTIES} />
+    </div>
+  ),
+};
+
+// The suggestions dropdown and the filter panel are two separate popups
+// that share the same field — opening one always closes the other.
+export const SuggestionsAndFilters: Story = {
+  name: "Suggestions + filter panel together",
+  render: (args) => (
+    <div style={PREVIEW_STYLE}>
+      <SearchFilter {...args} properties={SAMPLE_PROPERTIES} filters={<SampleFilters />} />
     </div>
   ),
 };

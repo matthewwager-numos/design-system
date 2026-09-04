@@ -120,7 +120,7 @@ export { SearchInput } from "./SearchInput";
 export type { SearchInputProps, SearchInputSize, SearchInputStatus, SearchInputOption } from "./SearchInput";
 
 export { SearchFilter } from "./SearchFilter";
-export type { SearchFilterProps, SearchFilterSize, SearchFilterStatus } from "./SearchFilter";
+export type { SearchFilterProps, SearchFilterSize, SearchFilterStatus, SearchFilterProperty, SearchFilterPropertyValue } from "./SearchFilter";
 
 export { Pagination } from "./Pagination";
 export type { PaginationProps } from "./Pagination";

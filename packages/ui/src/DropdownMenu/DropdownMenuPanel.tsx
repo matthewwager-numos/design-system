@@ -10,7 +10,7 @@ import { useDropdownMenuPlacement } from "./useDropdownMenuPlacement";
 export interface DropdownMenuPanelProps extends HTMLAttributes<HTMLDivElement> {
   /** Defaults to the size set on the enclosing `<DropdownMenu>` — only needed here to override that for this one panel. */
   size?: DropdownMenuSize;
-  /** Matches the panel's width to the trigger's own measured width — on by default, since a panel is almost always anchored to a full-width field (e.g. `<SearchFilter>`'s filters). */
+  /** Gives the panel a *minimum* width matching the trigger's own measured width (it can still grow wider for its own content) — on by default, since a panel is almost always anchored to a full-width field (e.g. `<SearchFilter>`'s filters). */
   matchTriggerWidth?: boolean;
 }
 
