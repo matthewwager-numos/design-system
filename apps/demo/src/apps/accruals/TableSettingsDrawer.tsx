@@ -7,7 +7,7 @@ import { ACCRUAL_COLUMNS } from "../../data/accruals";
 export interface TableSettingsValues {
   columnIds: string[];
   freezeFirstColumn: boolean;
-  groupRegions: boolean;
+  groupVendors: boolean;
 }
 
 export interface TableSettingsDrawerProps extends TableSettingsValues {
@@ -33,7 +33,7 @@ export interface TableSettingsDrawerProps extends TableSettingsValues {
  * `<ModalBody>`/`<ModalFooter>` remain direct flex children of `.ds-modal`,
  * exactly as `Modal.css` expects.
  *
- * Columns are reordered/added/removed via `<DragList>`; "Region" isn't one
+ * Columns are reordered/added/removed via `<DragList>`; "Vendor" isn't one
  * of its items since it's the row label column, always shown first and
  * never reorderable or removable.
  *
@@ -48,7 +48,7 @@ export interface TableSettingsDrawerProps extends TableSettingsValues {
  * reset from the saved `columnIds` on open, so a Cancelled drag doesn't
  * linger into the next time the drawer's opened.
  */
-export function TableSettingsDrawer({ open, onClose, onSave, columnIds, freezeFirstColumn, groupRegions }: TableSettingsDrawerProps) {
+export function TableSettingsDrawer({ open, onClose, onSave, columnIds, freezeFirstColumn, groupVendors }: TableSettingsDrawerProps) {
   const [draftColumnIds, setDraftColumnIds] = useState(columnIds);
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export function TableSettingsDrawer({ open, onClose, onSave, columnIds, freezeFi
     onSave({
       columnIds: draftColumnIds,
       freezeFirstColumn: formData.get("freezeFirstColumn") === "on",
-      groupRegions: formData.get("groupRegions") === "on",
+      groupVendors: formData.get("groupVendors") === "on",
     });
   }
 
@@ -85,7 +85,7 @@ export function TableSettingsDrawer({ open, onClose, onSave, columnIds, freezeFi
           />
 
           <Setting label="Freeze first column" type="toggle" edit name="freezeFirstColumn" checked={freezeFirstColumn} />
-          <Setting label="Group regions" type="toggle" edit name="groupRegions" checked={groupRegions} />
+          <Setting label="Group by vendor" type="toggle" edit name="groupVendors" checked={groupVendors} />
         </ModalBody>
 
         <ModalFooter>

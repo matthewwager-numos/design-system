@@ -2,8 +2,16 @@ import { useState } from "react";
 import { ChevronDown, MoreVertical, Settings } from "lucide-react";
 import { Cell, Checkbox, CheckboxGroup, Column, IconButton, Pagination, Select, SearchFilter } from "@numosai/ui";
 import { useToast } from "../../toast/ToastProvider";
-import { ACCRUAL_COLUMNS, ACCRUAL_REGIONS, accrualCurrency, grandTotals, regionTotals } from "../../data/accruals";
-import type { AccrualCountry, AccrualRegion } from "../../data/accruals";
+import {
+  ACCRUAL_COLUMNS,
+  ACCRUAL_VENDORS,
+  accrualCurrency,
+  accrualCurrencyAccounting,
+  grandTotals,
+  subsidiaryTotals,
+  vendorTotals,
+} from "../../data/accruals";
+import type { AccrualSubsidiary, AccrualVendor } from "../../data/accruals";
 import { TableSettingsDrawer } from "./TableSettingsDrawer";
 
 const MONTH_OPTIONS = [
@@ -17,79 +25,67 @@ const PAGE_SIZE_OPTIONS = [{ value: "10", label: "Show 10 per page" }];
 interface Row {
   key: string;
   name: string;
-  regionId?: string;
+  vendorId?: string;
   indent?: boolean;
   emphasis?: boolean;
-  revenue: number;
-  expenses: number;
-  netProfit: number;
-  accrued: number;
-  budget: number;
-  variance: number;
-  costCenter?: string;
-  glAccount?: string;
+  mayActual: number;
+  junActual: number;
+  julActual: number;
+  augMtd: number;
+  momVariance: number;
+  threeMonthAverage: number;
+  accrualAmount: number;
+  ytdActual: number;
+  category?: string;
 }
 
-function countryRow(country: AccrualCountry, indent: boolean): Row {
-  return {
-    key: country.id,
-    name: country.name,
-    indent,
-    revenue: country.revenue,
-    expenses: country.expenses,
-    netProfit: country.revenue - country.expenses,
-    accrued: country.accrued,
-    budget: country.budget,
-    variance: country.revenue - country.budget,
-    costCenter: country.costCenter,
-    glAccount: country.glAccount,
-  };
+function subsidiaryRow(subsidiary: AccrualSubsidiary, indent: boolean): Row {
+  return { key: subsidiary.id, name: subsidiary.name, indent, category: subsidiary.category, ...subsidiaryTotals(subsidiary) };
 }
 
-function regionRow(region: AccrualRegion): Row {
-  const totals = regionTotals(region);
-  return { key: region.id, name: `${region.name} Total`, regionId: region.id, emphasis: true, ...totals };
+function vendorRow(vendor: AccrualVendor): Row {
+  return { key: vendor.id, name: `${vendor.name} Total`, vendorId: vendor.id, emphasis: true, ...vendorTotals(vendor) };
 }
 
 function compareRows(a: Row, b: Row, column: string, direction: "asc" | "desc"): number {
   const sign = direction === "asc" ? 1 : -1;
-  if (column === "region") return sign * a.name.localeCompare(b.name);
+  if (column === "vendor") return sign * a.name.localeCompare(b.name);
   const av = a[column as keyof Row];
   const bv = b[column as keyof Row];
   if (typeof av === "string" || typeof bv === "string") return sign * String(av ?? "").localeCompare(String(bv ?? ""));
   return sign * ((Number(av) || 0) - (Number(bv) || 0));
 }
 
-const REGION_FILTER_OPTIONS = ACCRUAL_REGIONS.map((region) => ({ value: region.id, label: region.name }));
+const VENDOR_FILTER_OPTIONS = ACCRUAL_VENDORS.map((vendor) => ({ value: vendor.id, label: vendor.name }));
 
 /**
- * Region → country breakdown with collapsible region rows — matches the
- * Figma selection this app was built from: North America starts expanded
- * (showing its three countries), every other region starts collapsed.
+ * Vendor → subsidiary spend/accrual breakdown, modeled on a real product
+ * screenshot: a vendor row rolls up its own subsidiaries, sorted by
+ * Accrual Amount (descending) by default, matching that reference exactly.
  * `<Cell>`/`<Column>` are the design system's own table primitives; there's
  * no built-in expand/collapse affordance on them, so the toggle here is
  * hand-rolled the same way `GanttChart`'s own collapsible groups are.
  *
- * Which columns show (and their order), whether the Region column is
- * frozen while scrolling, and whether rows group by region at all are all
+ * Which columns show (and their order), whether the Vendor column is
+ * frozen while scrolling, and whether rows group by vendor at all are all
  * configured via the settings drawer (the gear button next to the search
  * field) rather than hard-coded here.
  */
 export function TableTab() {
   const [month, setMonth] = useState("2027-01");
   const [query, setQuery] = useState("");
-  const [regionFilter, setRegionFilter] = useState<string[]>(ACCRUAL_REGIONS.map((region) => region.id));
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set(ACCRUAL_REGIONS.filter((region) => region.id !== "north-america").map((region) => region.id)));
-  const [sortColumn, setSortColumn] = useState("region");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [vendorFilter, setVendorFilter] = useState<string[]>(ACCRUAL_VENDORS.map((vendor) => vendor.id));
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set(ACCRUAL_VENDORS.filter((vendor) => vendor.id !== "aws").map((vendor) => vendor.id)));
+  const [sortColumn, setSortColumn] = useState("accrualAmount");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [columnIds, setColumnIds] = useState<string[]>(["revenue", "expenses", "netProfit"]);
+  const [columnIds, setColumnIds] = useState<string[]>(["mayActual", "junActual", "julActual", "augMtd", "momVariance", "threeMonthAverage", "accrualAmount"]);
   const [freezeFirstColumn, setFreezeFirstColumn] = useState(true);
-  const [groupRegions, setGroupRegions] = useState(true);
+  const [groupVendors, setGroupVendors] = useState(true);
   const showToast = useToast();
 
-  function toggleRegion(id: string) {
+  function toggleVendor(id: string) {
     setCollapsed((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -108,30 +104,31 @@ export function TableTab() {
   }
 
   const query_ = query.trim().toLowerCase();
-  const visibleRegions = ACCRUAL_REGIONS.filter((region) => regionFilter.includes(region.id)).filter(
-    (region) => !query_ || region.name.toLowerCase().includes(query_) || region.countries.some((country) => country.name.toLowerCase().includes(query_)),
+  const visibleVendors = ACCRUAL_VENDORS.filter((vendor) => vendorFilter.includes(vendor.id)).filter(
+    (vendor) => !query_ || vendor.name.toLowerCase().includes(query_) || vendor.subsidiaries.some((sub) => sub.name.toLowerCase().includes(query_)),
   );
 
   let rows: Row[];
-  if (groupRegions) {
-    const sortedRegions = [...visibleRegions].sort((a, b) => compareRows(regionRow(a), regionRow(b), sortColumn, sortDirection));
+  if (groupVendors) {
+    const sortedVendors = [...visibleVendors].sort((a, b) => compareRows(vendorRow(a), vendorRow(b), sortColumn, sortDirection));
     rows = [];
-    for (const region of sortedRegions) {
-      rows.push(regionRow(region));
-      if (!collapsed.has(region.id)) {
-        for (const country of region.countries) rows.push(countryRow(country, true));
+    for (const vendor of sortedVendors) {
+      rows.push(vendorRow(vendor));
+      if (!collapsed.has(vendor.id)) {
+        for (const subsidiary of vendor.subsidiaries) rows.push(subsidiaryRow(subsidiary, true));
       }
     }
   } else {
-    rows = visibleRegions
-      .flatMap((region) => region.countries.map((country) => countryRow(country, false)))
+    rows = visibleVendors
+      .flatMap((vendor) => vendor.subsidiaries.map((subsidiary) => subsidiaryRow(subsidiary, false)))
       .sort((a, b) => compareRows(a, b, sortColumn, sortDirection));
   }
-  const grand = grandTotals(ACCRUAL_REGIONS);
-  rows.push({ key: "grand-total", name: "Total", emphasis: true, ...grand });
+  const grand = grandTotals(ACCRUAL_VENDORS);
+  rows.push({ key: "grand-total", name: "Total (USD)", emphasis: true, ...grand });
 
-  function figure(value: number, emphasis?: boolean) {
-    return <span className={emphasis ? "accruals-figure accruals-figure--emphasis" : "accruals-figure"}>{accrualCurrency.format(value)}</span>;
+  function figure(value: number, emphasis?: boolean, accounting?: boolean) {
+    const formatted = accounting ? accrualCurrencyAccounting.format(value) : accrualCurrency.format(value);
+    return <span className={emphasis ? "accruals-figure accruals-figure--emphasis" : "accruals-figure"}>{formatted}</span>;
   }
 
   function text(value: string | undefined, emphasis?: boolean) {
@@ -164,13 +161,13 @@ export function TableTab() {
               onChange={setQuery}
               filters={
                 <CheckboxGroup>
-                  {REGION_FILTER_OPTIONS.map((option) => (
+                  {VENDOR_FILTER_OPTIONS.map((option) => (
                     <Checkbox
                       key={option.value}
                       label={option.label}
-                      checked={regionFilter.includes(option.value)}
+                      checked={vendorFilter.includes(option.value)}
                       onChange={(event) =>
-                        setRegionFilter((prev) => (event.target.checked ? [...prev, option.value] : prev.filter((id) => id !== option.value)))
+                        setVendorFilter((prev) => (event.target.checked ? [...prev, option.value] : prev.filter((id) => id !== option.value)))
                       }
                     />
                   ))}
@@ -184,17 +181,17 @@ export function TableTab() {
 
       <div className="accruals-table-wrapper">
         <div className="accruals-table">
-          <Column header={headerCell("Region", "region")} width={240} className={freezeFirstColumn ? "accruals-column--frozen" : undefined}>
+          <Column header={headerCell("Vendor", "vendor")} width={220} className={freezeFirstColumn ? "accruals-column--frozen" : undefined}>
             {rows.map((row) => (
               <Cell key={row.key} type="slot">
-                {row.regionId ? (
+                {row.vendorId ? (
                   <button
                     type="button"
                     className="accruals-region-cell accruals-region-cell--interactive"
-                    onClick={() => toggleRegion(row.regionId!)}
-                    aria-expanded={!collapsed.has(row.regionId)}
+                    onClick={() => toggleVendor(row.vendorId!)}
+                    aria-expanded={!collapsed.has(row.vendorId)}
                   >
-                    <ChevronDown size={16} className={`accruals-chevron${collapsed.has(row.regionId) ? " accruals-chevron--collapsed" : ""}`} aria-hidden />
+                    <ChevronDown size={16} className={`accruals-chevron${collapsed.has(row.vendorId) ? " accruals-chevron--collapsed" : ""}`} aria-hidden />
                     <span className="accruals-region-label accruals-region-label--emphasis">{row.name}</span>
                   </button>
                 ) : (
@@ -212,7 +209,7 @@ export function TableTab() {
               {rows.map((row) =>
                 column.numeric ? (
                   <Cell key={row.key} type="numeric">
-                    {figure(row[column.id as keyof Row] as number, row.emphasis)}
+                    {figure(row[column.id as keyof Row] as number, row.emphasis, row.key === "grand-total")}
                   </Cell>
                 ) : (
                   <Cell key={row.key} type="text">
@@ -257,11 +254,11 @@ export function TableTab() {
         onClose={() => setSettingsOpen(false)}
         columnIds={columnIds}
         freezeFirstColumn={freezeFirstColumn}
-        groupRegions={groupRegions}
+        groupVendors={groupVendors}
         onSave={(next) => {
           setColumnIds(next.columnIds);
           setFreezeFirstColumn(next.freezeFirstColumn);
-          setGroupRegions(next.groupRegions);
+          setGroupVendors(next.groupVendors);
           setSettingsOpen(false);
         }}
       />

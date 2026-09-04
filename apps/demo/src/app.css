@@ -658,8 +658,8 @@ a {
 
 .tasks-list__table {
   display: flex;
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-l1);
   overflow: hidden;
   overflow-x: auto;
   min-width: 40rem;
@@ -746,7 +746,7 @@ a {
 /* <SearchFilter>'s own root is width: 100% too, same reasoning as the
    Selects above. */
 .accruals-search-filter {
-  width: 10rem;
+  width: 20rem;
 }
 
 .accruals-settings-description {
@@ -784,8 +784,8 @@ a {
 
 .accruals-table-wrapper {
   overflow-x: auto;
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-l1);
 }
 
 .accruals-table {
@@ -877,3 +877,4 @@ a {
   justify-content: space-between;
   gap: var(--space-4);
 }
+

@@ -52,8 +52,8 @@ export function ObjectManagementTab({ onAddEmployee }: ObjectManagementTabProps)
             <div
               style={{
                 display: "flex",
-                border: "1px solid var(--border-subtle)",
                 borderRadius: "var(--radius-md)",
+                boxShadow: "var(--shadow-l1)",
                 overflow: "hidden",
                 minWidth: "40rem",
               }}
