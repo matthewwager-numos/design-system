@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Calculator } from "lucide-react";
 import { Header, MobileAppHeader, Tab, TabList, Tabs, useMeasuredHeightVar } from "@numosai/ui";
 import { OverviewTab } from "./OverviewTab";
@@ -6,7 +5,13 @@ import { TableTab } from "./TableTab";
 import { HistoryTab } from "./HistoryTab";
 import { SettingsTab } from "./SettingsTab";
 
-type AppTab = "overview" | "table" | "history" | "settings";
+export type AccrualsAppTab = "overview" | "table" | "history" | "settings";
+
+export interface AccrualsAppProps {
+  /** Lifted to `App.tsx` (rather than this component's own `useState`) so it survives switching to a different app and back — the last tab you had open here is what you see again next time. */
+  tab: AccrualsAppTab;
+  onTabChange: (tab: AccrualsAppTab) => void;
+}
 
 /**
  * The Accruals app — same header/tabs anatomy every left-nav app shares
@@ -14,8 +19,7 @@ type AppTab = "overview" | "table" | "history" | "settings";
  * out in detail: a region → country breakdown with collapsible region
  * rows, matching the reference design directly.
  */
-export function AccrualsApp() {
-  const [tab, setTab] = useState<AppTab>("table");
+export function AccrualsApp({ tab, onTabChange }: AccrualsAppProps) {
   const mobileHeaderRef = useMeasuredHeightVar<HTMLDivElement>("--mobile-app-header-height");
 
   return (
@@ -30,7 +34,7 @@ export function AccrualsApp() {
           }
           title="Accruals"
           subNav={
-            <Tabs value={tab} onValueChange={(value) => setTab(value as AppTab)}>
+            <Tabs value={tab} onValueChange={(value) => onTabChange(value as AccrualsAppTab)}>
               <TabList>
                 <Tab value="overview">Overview</Tab>
                 <Tab value="table">Table</Tab>
@@ -51,8 +55,8 @@ export function AccrualsApp() {
           }
           title="Accruals"
           value={tab}
-          onValueChange={(value) => setTab(value as AppTab)}
-          onIconClick={() => setTab("overview")}
+          onValueChange={(value) => onTabChange(value as AccrualsAppTab)}
+          onIconClick={() => onTabChange("overview")}
         >
           <Tab value="overview">Overview</Tab>
           <Tab value="table">Table</Tab>

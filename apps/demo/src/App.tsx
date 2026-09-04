@@ -4,8 +4,11 @@ import { NavContent, accountMenu } from "./NavContent";
 import { HomePage } from "./pages/HomePage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { EmployeesApp } from "./apps/employees/EmployeesApp";
+import type { EmployeesAppTab } from "./apps/employees/EmployeesApp";
 import { ReconciliationApp } from "./apps/reconciliation/ReconciliationApp";
+import type { ReconciliationAppTab } from "./apps/reconciliation/ReconciliationApp";
 import { AccrualsApp } from "./apps/accruals/AccrualsApp";
+import type { AccrualsAppTab } from "./apps/accruals/AccrualsApp";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { ToastProvider } from "./toast/ToastProvider";
 import type { PageId } from "./pages";
@@ -13,6 +16,14 @@ import type { PageId } from "./pages";
 export default function App() {
   const [page, setPage] = useState<PageId>("home");
   const mobileNavRef = useMeasuredHeightVar<HTMLDivElement>("--mobile-nav-height");
+
+  // Each app's own active tab lives here, not inside that app's own
+  // component — those unmount (losing local state) the moment you switch
+  // to a different app via the left nav, so "remember the last tab you had
+  // open" only works if this state survives that unmount, one level up.
+  const [employeesTab, setEmployeesTab] = useState<EmployeesAppTab>("overview");
+  const [reconciliationTab, setReconciliationTab] = useState<ReconciliationAppTab>("tasks");
+  const [accrualsTab, setAccrualsTab] = useState<AccrualsAppTab>("table");
 
   function handleSignOut() {
     // No real auth in this demo — just a stand-in for where a sign-out
@@ -38,9 +49,9 @@ export default function App() {
 
           <main className="app-shell__main">
             {page === "home" && <HomePage />}
-            {page === "employees" && <EmployeesApp />}
-            {page === "reconciliation" && <ReconciliationApp />}
-            {page === "accruals" && <AccrualsApp />}
+            {page === "employees" && <EmployeesApp tab={employeesTab} onTabChange={setEmployeesTab} />}
+            {page === "reconciliation" && <ReconciliationApp tab={reconciliationTab} onTabChange={setReconciliationTab} />}
+            {page === "accruals" && <AccrualsApp tab={accrualsTab} onTabChange={setAccrualsTab} />}
             {page === "settings" && <SettingsPage />}
           </main>
         </div>

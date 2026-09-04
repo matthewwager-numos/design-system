@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { CheckSquare } from "lucide-react";
 import { Header, MobileAppHeader, Tab, TabList, Tabs, useMeasuredHeightVar } from "@numosai/ui";
 import { TasksProvider } from "../../data/useTasks";
@@ -7,7 +6,13 @@ import { TasksTab } from "./TasksTab";
 import { HistoryTab } from "./HistoryTab";
 import { SettingsTab } from "./SettingsTab";
 
-type AppTab = "overview" | "tasks" | "history" | "settings";
+export type ReconciliationAppTab = "overview" | "tasks" | "history" | "settings";
+
+export interface ReconciliationAppProps {
+  /** Lifted to `App.tsx` (rather than this component's own `useState`) so it survives switching to a different app and back — the last tab you had open here is what you see again next time. */
+  tab: ReconciliationAppTab;
+  onTabChange: (tab: ReconciliationAppTab) => void;
+}
 
 /**
  * The "Close Checklist" app — same anatomy every left-nav app shares (see
@@ -17,16 +22,15 @@ type AppTab = "overview" | "tasks" | "history" | "settings";
  * (one-color mode) visualizing throughput across those same stages above
  * it, matching the reference design directly.
  */
-export function ReconciliationApp() {
+export function ReconciliationApp({ tab, onTabChange }: ReconciliationAppProps) {
   return (
     <TasksProvider>
-      <ReconciliationAppContent />
+      <ReconciliationAppContent tab={tab} onTabChange={onTabChange} />
     </TasksProvider>
   );
 }
 
-function ReconciliationAppContent() {
-  const [tab, setTab] = useState<AppTab>("tasks");
+function ReconciliationAppContent({ tab, onTabChange }: ReconciliationAppProps) {
   const mobileHeaderRef = useMeasuredHeightVar<HTMLDivElement>("--mobile-app-header-height");
 
   return (
@@ -41,7 +45,7 @@ function ReconciliationAppContent() {
           }
           title="Close Checklist"
           subNav={
-            <Tabs value={tab} onValueChange={(value) => setTab(value as AppTab)}>
+            <Tabs value={tab} onValueChange={(value) => onTabChange(value as ReconciliationAppTab)}>
               <TabList>
                 <Tab value="overview">Overview</Tab>
                 <Tab value="tasks">Tasks</Tab>
@@ -62,8 +66,8 @@ function ReconciliationAppContent() {
           }
           title="Close Checklist"
           value={tab}
-          onValueChange={(value) => setTab(value as AppTab)}
-          onIconClick={() => setTab("overview")}
+          onValueChange={(value) => onTabChange(value as ReconciliationAppTab)}
+          onIconClick={() => onTabChange("overview")}
         >
           <Tab value="overview">Overview</Tab>
           <Tab value="tasks">Tasks</Tab>

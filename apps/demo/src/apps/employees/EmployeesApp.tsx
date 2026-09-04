@@ -9,7 +9,13 @@ import { HistoryTab } from "./HistoryTab";
 import { SettingsTab } from "./SettingsTab";
 import { AddEmployeeWizard } from "./AddEmployeeWizard";
 
-type AppTab = "overview" | "objectManagement" | "history" | "settings";
+export type EmployeesAppTab = "overview" | "objectManagement" | "history" | "settings";
+
+export interface EmployeesAppProps {
+  /** Lifted to `App.tsx` (rather than this component's own `useState`) so it survives switching to a different app and back — the last tab you had open here is what you see again next time. */
+  tab: EmployeesAppTab;
+  onTabChange: (tab: EmployeesAppTab) => void;
+}
 
 /**
  * The "People" app — the anatomy every left-nav app shares: a header
@@ -23,16 +29,15 @@ type AppTab = "overview" | "objectManagement" | "history" | "settings";
  * Detail template shows `MobileNav` + `MobileAppHeader` stacked above the
  * page content, confirmed from Figma's own iPhone frames.
  */
-export function EmployeesApp() {
+export function EmployeesApp({ tab, onTabChange }: EmployeesAppProps) {
   return (
     <EmployeesProvider>
-      <EmployeesAppContent />
+      <EmployeesAppContent tab={tab} onTabChange={onTabChange} />
     </EmployeesProvider>
   );
 }
 
-function EmployeesAppContent() {
-  const [tab, setTab] = useState<AppTab>("overview");
+function EmployeesAppContent({ tab, onTabChange }: EmployeesAppProps) {
   const [adding, setAdding] = useState(false);
   const { addEmployee } = useEmployees();
   const showToast = useToast();
@@ -66,7 +71,7 @@ function EmployeesAppContent() {
           }
           title="People"
           subNav={
-            <Tabs value={tab} onValueChange={(value) => setTab(value as AppTab)}>
+            <Tabs value={tab} onValueChange={(value) => onTabChange(value as EmployeesAppTab)}>
               <TabList>
                 <Tab value="overview">Overview</Tab>
                 <Tab value="objectManagement">People</Tab>
@@ -87,8 +92,8 @@ function EmployeesAppContent() {
           }
           title="People"
           value={tab}
-          onValueChange={(value) => setTab(value as AppTab)}
-          onIconClick={() => setTab("overview")}
+          onValueChange={(value) => onTabChange(value as EmployeesAppTab)}
+          onIconClick={() => onTabChange("overview")}
         >
           <Tab value="overview">Overview</Tab>
           <Tab value="objectManagement">People</Tab>
