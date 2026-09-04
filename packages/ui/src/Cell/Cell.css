@@ -314,6 +314,14 @@
   padding: var(--space-4);
   border: none;
   background: none;
+  /* A plain <button> ships with its own UA-stylesheet text-align (commonly
+     center) that this class never otherwise overrides — harmless for
+     .ds-cell__sort (positioned via flex, not text-align), but
+     .ds-cell__head-label's own text sits inside a span whose *inherited*
+     text-align was quietly picking that default up instead of resolving
+     to normal left/start. .ds-cell--end .ds-cell__head-label above still
+     wins for numeric columns, since it's the more specific selector. */
+  text-align: left;
   cursor: pointer;
   transition: background-color var(--duration-fast) var(--ease-out);
 }

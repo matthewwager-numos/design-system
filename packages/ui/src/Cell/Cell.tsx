@@ -62,6 +62,8 @@ export interface CellProps {
   /** `checkbox` / `checkboxColumnHead` only. */
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
+  /** `checkbox` / `checkboxColumnHead` only — e.g. a "select all" header when some, not all, of a group's rows are checked. Independent of `checked`. */
+  indeterminate?: boolean;
   /** `checkbox` / `checkboxColumnHead` only — required, since the checkbox has no visible label of its own. */
   "aria-label"?: string;
   /** `button` / `checkbox` / `checkboxColumnHead` only. */
@@ -129,6 +131,7 @@ export function Cell({
   sublabel,
   checked,
   onCheckedChange,
+  indeterminate,
   disabled = false,
   onClick,
   actions = [],
@@ -204,7 +207,7 @@ export function Cell({
       })()}
 
       {(type === "checkbox" || type === "checkboxColumnHead") && (
-        <Checkbox checked={checked} onChange={(event) => onCheckedChange?.(event.target.checked)} disabled={disabled} aria-label={ariaLabel} />
+        <Checkbox checked={checked} indeterminate={indeterminate} onChange={(event) => onCheckedChange?.(event.target.checked)} disabled={disabled} aria-label={ariaLabel} />
       )}
 
       {type === "icon" && (
