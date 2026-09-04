@@ -1,0 +1,122 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as FileUploadStories from "./FileUpload.stories";
+
+<Meta of={FileUploadStories} />
+
+# FileUpload
+
+A file upload control — matches Figma's File Upload exactly across two real axes: `variant` (a bordered drag-and-drop **dropzone**, or a plain compact **link**) and `state` (empty/loading/complete/error).
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Uploading a document/attachment (an invoice, a receipt, an import file) where the user picks or drags in exactly one thing at a time.
+- `variant="dropzone"` for a prominent, standalone upload area (a modal, an empty state). `variant="link"` for a compact "Browse files" affordance inside a tighter layout (a form row, a table cell) where a full dashed box doesn't fit.
+
+## When NOT to use
+
+- Multiple independent files each with their own progress/removal, shown as a persistent list — build that from your own array of state plus one `FileUpload` (in its `loading`/`complete`/`error` states) per file, or a plain list of already-uploaded filenames instead.
+- A generic "pick a value from disk" control unrelated to file upload (e.g. choosing a saved template) — this is specifically for the browse-or-drop-then-upload flow, progress bar and all.
+
+## Implementation
+
+```tsx
+import { useState } from "react";
+import { FileUpload } from "@numosai/ui";
+import type { FileUploadState } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+function Example() {
+  const [state, setState] = useState<FileUploadState>("empty");
+  const [progress, setProgress] = useState(0);
+  const [filename, setFilename] = useState("");
+
+  function upload(file: File) {
+    setFilename(file.name);
+    setState("loading");
+    // ...drive `progress` from your real upload, then setState("complete") or setState("error")
+  }
+
+  return (
+    <FileUpload
+      state={state}
+      progress={progress}
+      filename={filename}
+      onFilesSelected={(files) => upload(files[0])}
+      onRemove={() => setState("empty")}
+      onRetry={() => upload(/* the same file again */)}
+    />
+  );
+}
+```
+
+`FileUpload` is fully controlled, same philosophy as everywhere else in this system — it never tracks its own upload progress or outcome. `onFilesSelected` fires with a real `FileList` (browsing and dropping both funnel through it); driving `state`/`progress` from whatever that upload actually does is on you.
+
+<Canvas of={FileUploadStories.Empty} />
+
+## The two variants
+
+**Dropzone** (default) — a dashed-bordered box you can drag a file onto, with a "Browse" link inside it for the native file picker:
+
+<Canvas of={FileUploadStories.Empty} />
+
+**Link** — a plain "Browse files" link with no box. Click-to-browse only; there's no visible drop target to drag onto:
+
+<Canvas of={FileUploadStories.EmptyLink} />
+
+## States
+
+Pass `state` directly for a specific snapshot (useful for testing/Storybook); wire it up from a real upload for actual use.
+
+**Loading** — a progress bar plus its own "N%" text, driven by your own `progress` (0–100):
+
+<Canvas of={FileUploadStories.Loading} />
+
+**Complete** — the uploaded `filename`, plus a remove button that calls `onRemove`:
+
+<Canvas of={FileUploadStories.Complete} />
+
+**Error** — a "Try again" link that calls `onRetry`. Doesn't reset back to `empty` itself — trying again re-enters `loading` for the same file, same as the demo below:
+
+<Canvas of={FileUploadStories.Error} />
+
+<Canvas of={FileUploadStories.AllStates} />
+
+## A real upload flow
+
+Browse or drop a file to see `empty → loading → complete` driven by real (if fake-network) progress, including a version where the first attempt fails and "Try again" retries it:
+
+<Canvas of={FileUploadStories.UploadFlow} />
+<Canvas of={FileUploadStories.UploadFlowWithFailure} />
+
+## Behavior
+
+- **Drag-and-drop** is native HTML5 (`dragover`/`drop`), the same technique `<DragList>`/the demo app's kanban board already use — not a drag library dependency. Only active for `variant="dropzone"` while `state="empty"`; there's nothing to drop onto in any other state or in `variant="link"`.
+- **Browsing** (both variants) opens the platform's native file picker via a visually hidden real `<input type="file">` — `accept`/`multiple` are forwarded to it directly.
+- **Dragging over the dropzone** highlights its border (`--border-brand`, the same "actively interacting" color used elsewhere in this system) — not a distinct Figma variant, but a real drop target with zero drag feedback would be broken UX.
+- **Not handled**: this component doesn't validate file type/size, upload anything itself, or persist between renders — it's a controlled view over whatever upload state you already have.
+
+## Accessibility
+
+- The hidden `<input type="file">` is genuinely off-screen, not just invisible-and-overlaid — every visible trigger (the "Browse" link, the dropzone's own drop handler) already has its own real handler, so there's nothing for a stray click to reach on the input itself.
+- "Browse" / "Browse files" / "Try again" are real `<button>`s, reachable and operable by keyboard like any other button.
+- The remove button requires `aria-label="Remove file"` (built in, not configurable) since it has no visible label of its own.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `"dropzone" \| "link"` | `"dropzone"` | Bordered drag-and-drop box, or a plain compact link. |
+| `state` | `"empty" \| "loading" \| "complete" \| "error"` | `"empty"` | |
+| `progress` | `number` | `0` | `loading` only — 0–100. |
+| `filename` | `ReactNode` | — | `complete` only — the uploaded file's display name. |
+| `accept` | `string` | — | Forwarded to the hidden native `<input type="file">`, e.g. `".pdf,.png"`. |
+| `multiple` | `boolean` | `false` | Allow picking/dropping more than one file at once. |
+| `disabled` | `boolean` | `false` | |
+| `onFilesSelected` | `(files: FileList) => void` | — | Fires with the picked or dropped files — browsing and dropping both funnel through here. |
+| `onRemove` | `() => void` | — | `complete` only — the file's own remove action. |
+| `onRetry` | `() => void` | — | `error` only — the "Try again" action. |
+| `className` | `string` | — | Applied to the root element. |

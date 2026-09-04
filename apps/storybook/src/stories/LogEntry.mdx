@@ -1,0 +1,69 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as LogEntryStories from "./LogEntry.stories";
+
+<Meta of={LogEntryStories} />
+
+# LogEntry
+
+One entry in a chronological changelog/audit-log feed — matches Figma's LogEntry exactly. Stack several directly (no gap needed) to get a continuous connecting timeline running down the page, a dot marking each entry.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A History/activity tab showing what changed, who changed it, and when — see `HistoryTimeline` in the demo app for a full worked page (month-grouped feed + search + jump-to-month sidebar) built from this.
+- Any audit trail where each row is naturally a single sentence, not a table row with many independent columns.
+
+## When NOT to use
+
+- Structured, filterable/sortable data with several independent fields — use `<Cell>`/`<Column>` instead.
+
+## Implementation
+
+```tsx
+import { LogEntry } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<LogEntry
+  subject="Mary Jane’s"
+  description="employment status changed from full-time to part-time"
+  actor="John Doe"
+  timestamp="Sep 15, 2026 at 3:45p PST"
+/>
+```
+
+<Canvas of={LogEntryStories.Default} />
+
+## The schema
+
+`subject` is the bold, link-colored lead segment — typically the record's own name, matching Figma's own possessive phrasing ("Mary Jane's ..."). `description` is the rest of the sentence: what happened, and however much of where/why/how belongs in it. Neither prop parses or generates this text — write whatever natural sentence fits, the same way `<SearchFilter>`'s own `value` is just plain text it doesn't interpret.
+
+`actor` and `timestamp` fill the fixed "by ... on ..." byline underneath — those connective words themselves aren't configurable, matching Figma exactly.
+
+## Without a subject
+
+Omit `subject` for an entry with no single clear record to point at:
+
+<Canvas of={LogEntryStories.WithoutASubject} />
+
+## Stacked, forming a timeline
+
+<Canvas of={LogEntryStories.Stacked} />
+
+## Long text truncates
+
+Both the subject+description line and the byline truncate with an ellipsis rather than wrapping — confirmed from Figma (`white-space: nowrap` + `text-overflow: ellipsis` on both, not a multi-line clamp):
+
+<Canvas of={LogEntryStories.LongDescription} />
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `subject` | `ReactNode` | — | The bold, link-colored lead segment. Omit for no single clear subject. |
+| `description` | `ReactNode` | — | The rest of the sentence. |
+| `actor` | `ReactNode` | — | Who performed the action — shown in the byline. |
+| `timestamp` | `ReactNode` | — | Already-formatted display text (not a `Date`) — this component doesn't format dates itself. |
+| `className` | `string` | — | Applied to the root element. |

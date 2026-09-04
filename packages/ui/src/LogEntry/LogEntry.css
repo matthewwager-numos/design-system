@@ -1,0 +1,96 @@
+/*
+ * LogEntry styles — pure token-driven CSS. Matches Figma's LogEntry
+ * exactly; confirmed via get_design_context/get_variable_defs rather than
+ * guessed, including its unusual (but real) type pairing: the subject is
+ * Paragraph S Medium while the description right next to it is Heading S —
+ * same 14px size, different line-height/tracking.
+ *
+ * No margin/gap needed *between* stacked entries — the rail's own bottom
+ * line segment (flex: 1 0 0, stretching through .ds-log-entry__content's
+ * own bottom padding) is what creates the continuous connecting line and
+ * the breathing room between one entry's text and the next.
+ */
+
+.ds-log-entry {
+  display: flex;
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+.ds-log-entry__rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 1.5rem;
+  flex-shrink: 0;
+}
+
+.ds-log-entry__line {
+  width: 2px;
+  border-radius: var(--radius-full);
+  background: var(--background-element);
+}
+
+.ds-log-entry__line--top {
+  height: var(--space-2);
+  flex-shrink: 0;
+}
+
+.ds-log-entry__line--bottom {
+  flex: 1 0 0;
+  min-height: var(--space-1);
+}
+
+.ds-log-entry__dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--background-active);
+}
+
+.ds-log-entry__content {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-start;
+  min-width: 0;
+  padding-bottom: var(--space-5);
+}
+
+.ds-log-entry__text {
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-log-entry__subject {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-link-default);
+}
+
+.ds-log-entry__description {
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-log-entry__byline {
+  margin: 0;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.ds-log-entry__actor {
+  color: var(--content-link-default);
+}

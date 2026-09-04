@@ -1,0 +1,68 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as DisplayMetricStories from "./DisplayMetric.stories";
+
+<Meta of={DisplayMetricStories} />
+
+# DisplayMetric
+
+A single headline metric on a dark card — matches Figma's DisplayMetric exactly across its 4 accent colors (Brand/Green/Magenta/Yellow), each tinting both the label text and a dithered glow in the corner (see [GrainCorner](?path=/docs/components-graincorner--docs), the shared motif this composes) from the same token.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A dashboard's headline stats — revenue, active users, open tickets — where each metric gets its own small card rather than sitting in a plain table.
+- When you want a categorical accent (a "kind" of metric — positive/informational/attention-needed/brand) rather than a literal good/bad judgment on the number itself; that's what `color` picks, not the value's sign.
+
+## When NOT to use
+
+- A metric that needs a trend indicator, sparkline, or comparison to a prior period — this is deliberately just a value and a label, matching Figma's own component exactly; compose your own richer card if you need more.
+- Anywhere that should follow the app's own light/dark setting — this component is always dark, by design (see below).
+
+## Implementation
+
+```tsx
+import { DisplayMetric } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<DisplayMetric value="$24.2K" label="Revenue" color="green" />
+```
+
+<Canvas of={DisplayMetricStories.Default} />
+
+## Always dark
+
+Confirmed from Figma: every real instance of this component is dark-mode-only, regardless of the app's own theme setting. `data-theme="dark"` on the root forces every token inside to resolve to its dark value — the same mechanism already used to keep a portaled `<DropdownMenuContent>` in whatever theme its trigger is in, just applied unconditionally here instead of dynamically.
+
+## The 4 colors
+
+Each `color` tints both the label text and the corner glow from the same token — there's no independent way to set one without the other.
+
+<Canvas of={DisplayMetricStories.AllColors} />
+
+Brand's label is the only one shown at reduced opacity (confirmed from Figma — Green/Magenta/Yellow are all full-opacity).
+
+<Canvas of={DisplayMetricStories.Brand} />
+<Canvas of={DisplayMetricStories.Magenta} />
+<Canvas of={DisplayMetricStories.Yellow} />
+
+## Sizing
+
+`width: 100%` by default — sized by whatever grid/flex cell contains it, not a fixed pixel width. Lay several out in a wrapping flex row (or a grid) for a real dashboard stat strip:
+
+<Canvas of={DisplayMetricStories.InAGrid} />
+
+## Accessibility
+
+- `value`/`label` are plain content — if the number itself needs a more specific accessible name (e.g. "$24.2K, up 12% from last month"), compose that into `value` or wrap the component with your own `aria-label`, same as any other presentational card.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `ReactNode` | — | The headline figure — e.g. `"$24.2K"`. |
+| `label` | `ReactNode` | — | The label under it — e.g. `"Revenue"`. |
+| `color` | `"brand" \| "green" \| "magenta" \| "yellow"` | `"green"` | Tints both the label and the corner glow. |
+| `className` | `string` | — | Applied to the root element. |

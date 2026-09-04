@@ -1,0 +1,45 @@
+/*
+ * GrainCorner — a dithered, corner-anchored glow. Hugs its own 160×153px
+ * box (Figma's own confirmed ornament size) rather than stretching to fill
+ * its parent; a consumer positions this element itself (see
+ * `<DisplayMetric>`'s own `.ds-display-metric__ornament` for the anchoring
+ * pattern: absolute, right/bottom negative offset, `overflow: hidden` on
+ * whatever contains it crops the rest naturally — confirmed to still look
+ * right even cropped down to about half this box's own height).
+ */
+
+.ds-grain-corner {
+  position: relative;
+  width: 160px;
+  height: 153px;
+  pointer-events: none;
+  overflow: hidden;
+  /* Wraps the *whole* isolated color+grain group — see this component's
+     own doc comment for why this can't sit one level further in. */
+  mask-image: radial-gradient(circle at 100% 100%, black 0%, transparent 68%);
+  -webkit-mask-image: radial-gradient(circle at 100% 100%, black 0%, transparent 68%);
+}
+
+.ds-grain-corner__group {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  isolation: isolate; /* scope mix-blend-mode to inside this group */
+}
+
+.ds-grain-corner__color {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 100% 100%, var(--ds-grain-corner-color) 0%, transparent 68%);
+}
+
+/* No background-color here — see this component's own doc comment for why
+   that silently breaks the blend below. */
+.ds-grain-corner__grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27160%27 height=%27153%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.3%27 numOctaves=%273%27 seed=%273%27 stitchTiles=%27stitch%27/%3E%3CfeColorMatrix type=%27saturate%27 values=%270%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E");
+  background-size: cover;
+  filter: contrast(110%) brightness(200%);
+  mix-blend-mode: soft-light;
+}

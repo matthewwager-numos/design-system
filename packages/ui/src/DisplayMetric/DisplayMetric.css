@@ -1,0 +1,64 @@
+/*
+ * DisplayMetric styles — pure token-driven CSS. Matches Figma's
+ * DisplayMetric exactly; confirmed via get_design_context/get_variable_defs
+ * rather than guessed. Figma's own "radius/s" (8px) is this project's
+ * `--radius-md` (also 8px) — a naming-scale drift between the two, same
+ * class of mismatch already seen elsewhere (e.g. `Button/Disabled`'s own
+ * "Subdued"/"Subtle"), confirmed by matching the raw pixel value, not the
+ * label.
+ */
+
+.ds-display-metric {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--background-default);
+  box-shadow: var(--shadow-l1);
+  overflow: hidden;
+}
+
+/* GrainCorner hugs its own fixed 160×153px box — this just anchors it to
+   Figma's own confirmed corner position. */
+.ds-display-metric__ornament {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+}
+
+.ds-display-metric__content {
+  position: relative; /* stack above .ds-display-metric__ornament */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.ds-display-metric__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-heading-xl);
+  letter-spacing: var(--type-heading-xl-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-display-metric__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+}
+
+/* Confirmed from Figma: the Brand variant's label is the only one dimmed —
+   Green/Magenta/Yellow are all full-opacity. */
+.ds-display-metric__label--brand {
+  opacity: 0.8;
+}

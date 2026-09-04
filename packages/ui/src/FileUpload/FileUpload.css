@@ -1,0 +1,183 @@
+/*
+ * FileUpload styles — pure token-driven CSS. Matches Figma's File Upload
+ * exactly across variant × state; confirmed via get_design_context /
+ * get_variable_defs rather than guessed. Figma's own "border/subdued" name
+ * resolves to this project's `--border-subtle` (a pre-existing naming drift
+ * between the Figma file and this codebase, same as `Button/Disabled`'s own
+ * "Subdued"/"Subtle" mismatch noted elsewhere) — confirmed by matching the
+ * raw hex value, not the label.
+ *
+ * Hugs its own content (`inline-flex`) rather than stretching to fill its
+ * parent — Figma's own frames are "hug contents" here (each state's literal
+ * width differs because the text differs, not because of a fixed-size
+ * spec). Override with a wrapping element's width if a consumer wants a
+ * bigger, stretched drop target.
+ */
+
+.ds-file-upload {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  box-sizing: border-box;
+  font-family: var(--font-sans);
+}
+
+.ds-file-upload--dropzone {
+  padding: var(--space-4);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--background-default);
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.ds-file-upload--dropzone.ds-file-upload--error {
+  border-color: var(--border-negative);
+}
+
+.ds-file-upload--dropzone.ds-file-upload--drag-active {
+  border-color: var(--border-brand);
+  background: var(--background-brand-subdued);
+}
+
+.ds-file-upload--disabled {
+  opacity: 0.5;
+}
+
+/* The real <input type="file"> is never a click/drop target itself — every
+   state routes to it via its own handler instead ("Browse"'s onClick calls
+   its own .click(), the dropzone's onDrop reads dataTransfer directly
+   without the input at all) — so this is a genuine off-screen hide, not an
+   invisible-overlay-that-still-receives-clicks like `<Checkbox>`'s own
+   native input; there's nothing for a click to reach here. */
+.ds-file-upload__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ds-file-upload__icon {
+  flex-shrink: 0;
+  color: var(--content-subtle);
+}
+
+.ds-file-upload__icon--file {
+  color: var(--content-link-default);
+}
+
+.ds-file-upload__icon--error {
+  color: var(--content-negative);
+}
+
+.ds-file-upload__text {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+
+/* Shared by every clickable word ("Browse" / "Browse files" / "Try again") —
+   a real <button>, unstyled down to plain inline text so it reads as part
+   of the surrounding sentence rather than a boxed control. */
+.ds-file-upload__link {
+  display: inline;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-link-default);
+  cursor: pointer;
+}
+.ds-file-upload__link:hover:not(:disabled) {
+  color: var(--content-link-hover);
+  text-decoration: underline;
+}
+.ds-file-upload__link:active:not(:disabled) {
+  color: var(--content-link-active);
+}
+.ds-file-upload__link:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+.ds-file-upload__link:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.ds-file-upload__browse-files {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.ds-file-upload__progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* A flex-grow track needs a real, non-hugging width to grow inside — this
+   is the one place FileUpload can't just hug its content (see the file
+   header comment), so it gets a fixed width instead. */
+.ds-file-upload__progress-bar {
+  width: 8rem;
+}
+
+.ds-file-upload__progress-value {
+  flex-shrink: 0;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+
+.ds-file-upload__filename {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-link-default);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12rem;
+}
+
+.ds-file-upload__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: var(--space-1);
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--content-subtle);
+  cursor: pointer;
+}
+.ds-file-upload__remove:hover:not(:disabled) {
+  background: var(--background-hover);
+  color: var(--content-base);
+}
+.ds-file-upload__remove:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-file-upload__error-text {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-negative);
+  white-space: nowrap;
+}

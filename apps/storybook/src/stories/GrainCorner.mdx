@@ -1,0 +1,63 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as GrainCornerStories from "./GrainCorner.stories";
+
+<Meta of={GrainCornerStories} />
+
+# GrainCorner
+
+A dithered, corner-anchored glow — `color` fading in from one corner, textured with a grainy dithered gradient rather than a flat, banded one. This is the shared "grain" motif, factored out so it can be reused anywhere in the design system that calls for the same effect, not just its first consumer ([DisplayMetric](?path=/docs/components-displaymetric--docs)'s own corner ornament).
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Anywhere a flat radial gradient would look banded or too clean/synthetic for the surface it's on — a dark card's corner, a hero panel, an empty state's backdrop.
+- Reach for this instead of re-implementing the underlying SVG-filter trick by hand each time — it's a genuinely non-obvious recipe with a few real, easy-to-get-wrong constraints (see below).
+
+## When NOT to use
+
+- A plain, flat accent color or a smooth gradient with no grain — just use CSS directly.
+- Full-bleed background texture — this hugs a fixed 160×153px box anchored to one corner (matching the one real design this was pulled from); stretching it to cover a much larger area hasn't been designed or tested.
+
+## Implementation
+
+`GrainCorner` positions itself nowhere on its own — position the box yourself (`position: absolute`, anchored wherever you need it) and give it a `color`:
+
+```tsx
+import { GrainCorner } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<div style={{ position: "relative", overflow: "hidden" }}>
+  <div style={{ position: "absolute", right: -8, bottom: -8 }}>
+    <GrainCorner color="var(--background-positive-base)" />
+  </div>
+  {/* your own content, stacked above via z-index or DOM order */}
+</div>
+```
+
+<Canvas of={GrainCornerStories.Default} />
+
+## The technique
+
+Per [css-tricks.com/grainy-gradients](https://css-tricks.com/grainy-gradients/), tuned against a real Figma export rather than guessed: a same-document SVG `feTurbulence` filter, desaturated to grayscale (raw turbulence has independently-random R/G/B channels, which reads as rainbow static otherwise), used as a plain `background-image`, punched up with a *CSS* `contrast()`/`brightness()` filter, and combined with a color layer via `mix-blend-mode: soft-light`. A radial `mask-image` fades the whole thing out toward the opposite corner.
+
+Three real constraints the implementation depends on, each confirmed against actual (Chromium) rendering rather than assumed from the CSS spec alone:
+
+- Referencing the SVG filter from CSS `filter: url("data:...")` directly silently no-ops in Chromium. The turbulence filter has to be applied *inside* its own self-contained SVG document (to a `<rect>`, via a same-document `#id`), with that whole SVG used as a plain `background-image` — only the contrast/brightness *functions* (no `url()`) belong in the real CSS `filter` property.
+- The `mask-image` has to wrap the *whole* isolated color+grain group, not sit on a wrapper between the isolation boundary and the grain layer itself — that placement silently produced a masked-but-untextured (flat) result.
+- The grain layer must not have its own `background-color` fallback sitting underneath the `background-image` — even fully overridden by a more specific `background-image` declaration, its mere presence in the cascade silently broke `mix-blend-mode` compositing for that element.
+
+## Any accent color
+
+`color` accepts any real CSS color — a token reference or a literal value:
+
+<Canvas of={GrainCornerStories.AllAccentColors} />
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `color` | `string` | — | Any real CSS color — tints both the glow and the grain blended over it. |
+| `className` | `string` | — | Applied to the root element. |

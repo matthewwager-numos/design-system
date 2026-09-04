@@ -176,6 +176,18 @@ export type {
 export { DragList } from "./DragList";
 export type { DragListProps, DragListItem, DragListAddOption } from "./DragList";
 
+export { FileUpload } from "./FileUpload";
+export type { FileUploadProps, FileUploadVariant, FileUploadState } from "./FileUpload";
+
+export { GrainCorner } from "./GrainCorner";
+export type { GrainCornerProps } from "./GrainCorner";
+
+export { DisplayMetric } from "./DisplayMetric";
+export type { DisplayMetricProps, DisplayMetricColor } from "./DisplayMetric";
+
+export { LogEntry } from "./LogEntry";
+export type { LogEntryProps } from "./LogEntry";
+
 // Not a component — a small utility `<Wizard>` uses internally to pin its
 // own footer, and that consuming apps can reuse for the same "fixed chrome
 // needs a real measured height, not a guess" problem (e.g. a fixed mobile
