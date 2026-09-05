@@ -649,7 +649,7 @@ a {
   -webkit-box-orient: vertical;
 }
 
-.task-detail {
+.drawer-body-stack {
   display: flex;
   flex-direction: column;
   align-items: flex-start;

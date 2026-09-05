@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { LogEntry } from "@numosai/ui";
 
@@ -72,6 +73,34 @@ export const Stacked: Story = {
       />
     </div>
   ),
+};
+
+// `onSubjectClick`/`onActorClick` are how a consumer opens that record's
+// own detail view (a drawer, a modal — LogEntry itself has no opinion) —
+// omit either one for a name with nothing to open (a departed employee, a
+// "System" actor).
+function ClickableDemo() {
+  const [lastClicked, setLastClicked] = useState("—");
+  return (
+    <div style={PREVIEW_STYLE}>
+      <p style={{ margin: "0 0 var(--space-3)", font: "var(--type-paragraph-s-regular)", color: "var(--content-subtle)" }}>
+        Last clicked: {lastClicked}
+      </p>
+      <LogEntry
+        subject="Mary Jane’s"
+        description="employment status changed from full-time to part-time"
+        actor="John Doe"
+        timestamp="Sep 15, 2026 at 3:45p PST"
+        onSubjectClick={() => setLastClicked("Mary Jane (subject)")}
+        onActorClick={() => setLastClicked("John Doe (actor)")}
+      />
+    </div>
+  );
+}
+
+export const Clickable: Story = {
+  name: "Subject and actor as links",
+  render: () => <ClickableDemo />,
 };
 
 export const LongDescription: Story = {

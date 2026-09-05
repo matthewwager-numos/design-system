@@ -13,6 +13,27 @@ export interface HistoryEntry {
   date: Date;
   /** Plain-text version of subject+description+actor, for the search field — `LogEntry`'s own props are `ReactNode`, not necessarily searchable strings. */
   searchText: string;
+  /** Opens `subject`'s own detail view (a drawer, most often) — omit when there's nothing real to open (a departed record, a settings change). Forwarded directly to `<LogEntry>`. */
+  onSubjectClick?: () => void;
+  /** Same idea, for `actor`. */
+  onActorClick?: () => void;
+}
+
+/**
+ * The shape each app's own history data file exports — everything
+ * `HistoryEntry` has except the two click handlers, which need a live
+ * component's state (which record is currently selected) to close over and
+ * so can't live in a plain, module-level data array. `subjectId`/
+ * `actorEmployeeId` are that array's own stand-in: opaque record ids each
+ * app's own `HistoryTab` resolves into a real `onSubjectClick`/
+ * `onActorClick` (and a real record to show) at render time — present only
+ * when the entry is actually about a record that still exists to show.
+ */
+export interface RawHistoryEntry extends Omit<HistoryEntry, "onSubjectClick" | "onActorClick"> {
+  /** App-specific meaning (a vendor id, an employee id, ...) — whatever `subject` refers to. */
+  subjectId?: string;
+  /** An employee id — the byline's own `actor`, when it's a real, still-employed person rather than "System" or someone no longer around. */
+  actorEmployeeId?: string;
 }
 
 export interface HistoryTimelineProps {
@@ -130,7 +151,15 @@ export function HistoryTimeline({ entries }: HistoryTimelineProps) {
                 <span className="history-timeline__group-label">{GROUP_FORMAT.format(groupEntries[0]!.date)}</span>
               </div>
               {groupEntries.map((entry) => (
-                <LogEntry key={entry.id} subject={entry.subject} description={entry.description} actor={entry.actor} timestamp={entry.timestamp} />
+                <LogEntry
+                  key={entry.id}
+                  subject={entry.subject}
+                  description={entry.description}
+                  actor={entry.actor}
+                  timestamp={entry.timestamp}
+                  onSubjectClick={entry.onSubjectClick}
+                  onActorClick={entry.onActorClick}
+                />
               ))}
             </div>
           ))

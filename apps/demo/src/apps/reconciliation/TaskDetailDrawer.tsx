@@ -30,7 +30,7 @@ export function TaskDetailDrawer({ task, onClose, onUpdate }: TaskDetailDrawerPr
         <>
           <Header variant="modal" title={task.id} onClose={onClose} />
           <ModalBody>
-            <div className="task-detail">
+            <div className="drawer-body-stack">
               <Badge status={task.done ? "positive" : "neutral"} size="md">
                 {stage?.label}
               </Badge>

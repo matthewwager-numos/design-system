@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Users } from "lucide-react";
 import { Header, MobileAppHeader, Tab, TabList, Tabs, useMeasuredHeightVar } from "@numosai/ui";
-import { EmployeesProvider, useEmployees } from "../../data/useEmployees";
+import { useEmployees } from "../../data/useEmployees";
 import { useToast } from "../../toast/ToastProvider";
 import { OverviewTab } from "./OverviewTab";
 import { ObjectManagementTab } from "./ObjectManagementTab";
@@ -30,14 +30,6 @@ export interface EmployeesAppProps {
  * page content, confirmed from Figma's own iPhone frames.
  */
 export function EmployeesApp({ tab, onTabChange }: EmployeesAppProps) {
-  return (
-    <EmployeesProvider>
-      <EmployeesAppContent tab={tab} onTabChange={onTabChange} />
-    </EmployeesProvider>
-  );
-}
-
-function EmployeesAppContent({ tab, onTabChange }: EmployeesAppProps) {
   const [adding, setAdding] = useState(false);
   const { addEmployee } = useEmployees();
   const showToast = useToast();

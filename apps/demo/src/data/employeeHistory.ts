@@ -1,4 +1,4 @@
-import type { HistoryEntry } from "../components/HistoryTimeline";
+import type { RawHistoryEntry } from "../components/HistoryTimeline";
 
 // Illustrative log entries for the People app's History tab — invented
 // content (not derived from `employees.ts`'s own live state), matching the
@@ -6,12 +6,20 @@ import type { HistoryEntry } from "../components/HistoryTimeline";
 // acted] on [when]. Fixed dates (not `new Date()`) so the demo always shows
 // the same "September 2026"/"August 2026" grouping, matching Figma's own
 // reference dates.
-export const EMPLOYEE_HISTORY: HistoryEntry[] = [
+//
+// `subjectId`/`actorEmployeeId` reference `employees.ts`'s own SEED ids —
+// only present when the name is a real, still-employed person (Maya Chen
+// e1 / Jordan Lee e2 / Priya Patel e3). "Sam Rivera" and "Diego Torres" are
+// invented past employees with no real backing record, and "System" isn't
+// a person at all, so those stay non-clickable.
+export const EMPLOYEE_HISTORY: RawHistoryEntry[] = [
   {
     id: "eh1",
     subject: "Maya Chen’s",
+    subjectId: "e1",
     description: "employment status changed from full-time to part-time",
     actor: "Jordan Lee",
+    actorEmployeeId: "e2",
     timestamp: "Sep 15, 2026 at 3:45p PST",
     date: new Date(2026, 8, 15, 15, 45),
     searchText: "maya chen employment status changed full-time part-time jordan lee",
@@ -19,8 +27,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh2",
     subject: "Jordan Lee’s",
+    subjectId: "e2",
     description: "role changed from Member to Admin",
     actor: "Priya Patel",
+    actorEmployeeId: "e3",
     timestamp: "Sep 12, 2026 at 11:02a PST",
     date: new Date(2026, 8, 12, 11, 2),
     searchText: "jordan lee role changed member admin priya patel",
@@ -28,8 +38,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh3",
     subject: "Priya Patel’s",
+    subjectId: "e3",
     description: "department changed from Sales to Design",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Sep 10, 2026 at 9:20a PST",
     date: new Date(2026, 8, 10, 9, 20),
     searchText: "priya patel department changed sales design maya chen",
@@ -37,8 +49,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh4",
     subject: "Jordan Lee’s",
+    subjectId: "e2",
     description: "job title changed from Software Engineer to Senior Software Engineer",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Sep 8, 2026 at 4:15p PST",
     date: new Date(2026, 8, 8, 16, 15),
     searchText: "jordan lee job title changed software engineer senior maya chen",
@@ -48,6 +62,7 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
     subject: "Sam Rivera",
     description: "was added to Engineering as a full-time employee",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Sep 5, 2026 at 1:30p PST",
     date: new Date(2026, 8, 5, 13, 30),
     searchText: "sam rivera added engineering full-time employee maya chen",
@@ -55,8 +70,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh6",
     subject: "Priya Patel’s",
+    subjectId: "e3",
     description: "notification preferences were updated",
     actor: "Priya Patel",
+    actorEmployeeId: "e3",
     timestamp: "Sep 3, 2026 at 10:00a PST",
     date: new Date(2026, 8, 3, 10, 0),
     searchText: "priya patel notification preferences updated",
@@ -64,6 +81,7 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh7",
     subject: "Maya Chen’s",
+    subjectId: "e1",
     description: "email changed from maya.chen@numosai.com to maya@numosai.com",
     actor: "System",
     timestamp: "Sep 1, 2026 at 8:00a PST",
@@ -73,8 +91,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh8",
     subject: "Jordan Lee’s",
+    subjectId: "e2",
     description: "employment status changed from contract to full-time",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Aug 28, 2026 at 2:10p PST",
     date: new Date(2026, 7, 28, 14, 10),
     searchText: "jordan lee employment status changed contract full-time maya chen",
@@ -84,6 +104,7 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
     subject: "Sam Rivera",
     description: "was removed from Engineering",
     actor: "Jordan Lee",
+    actorEmployeeId: "e2",
     timestamp: "Aug 20, 2026 at 3:00p PST",
     date: new Date(2026, 7, 20, 15, 0),
     searchText: "sam rivera removed engineering jordan lee",
@@ -91,8 +112,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh10",
     subject: "Priya Patel’s",
+    subjectId: "e3",
     description: "role changed from Member to Admin",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Aug 15, 2026 at 9:45a PST",
     date: new Date(2026, 7, 15, 9, 45),
     searchText: "priya patel role changed member admin maya chen",
@@ -102,6 +125,7 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
     subject: "Diego Torres",
     description: "was removed from Sales",
     actor: "Priya Patel",
+    actorEmployeeId: "e3",
     timestamp: "Jul 28, 2026 at 2:30p PST",
     date: new Date(2026, 6, 28, 14, 30),
     searchText: "diego torres removed sales priya patel",
@@ -109,8 +133,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh12",
     subject: "Jordan Lee’s",
+    subjectId: "e2",
     description: "employment status changed from contract to full-time",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Jul 20, 2026 at 4:00p PST",
     date: new Date(2026, 6, 20, 16, 0),
     searchText: "jordan lee employment status changed contract full-time maya chen",
@@ -118,8 +144,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh13",
     subject: "Jordan Lee’s",
+    subjectId: "e2",
     description: "notification preferences were updated",
     actor: "Jordan Lee",
+    actorEmployeeId: "e2",
     timestamp: "Jul 10, 2026 at 1:00p PST",
     date: new Date(2026, 6, 10, 13, 0),
     searchText: "jordan lee notification preferences updated",
@@ -129,6 +157,7 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
     subject: "Diego Torres’s",
     description: "employment status changed from contract to full-time",
     actor: "Priya Patel",
+    actorEmployeeId: "e3",
     timestamp: "Jun 25, 2026 at 9:40a PST",
     date: new Date(2026, 5, 25, 9, 40),
     searchText: "diego torres employment status changed contract full-time priya patel",
@@ -136,8 +165,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh15",
     subject: "Priya Patel’s",
+    subjectId: "e3",
     description: "job title changed from Account Executive to Senior Account Executive",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Jun 15, 2026 at 3:15p PST",
     date: new Date(2026, 5, 15, 15, 15),
     searchText: "priya patel job title changed account executive senior maya chen",
@@ -145,6 +176,7 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh16",
     subject: "Maya Chen’s",
+    subjectId: "e1",
     description: "email changed from maya@design.numosai.com to maya.chen@numosai.com",
     actor: "System",
     timestamp: "Jun 5, 2026 at 11:00a PST",
@@ -156,6 +188,7 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
     subject: "Diego Torres",
     description: "was added to Sales as a contract employee",
     actor: "Priya Patel",
+    actorEmployeeId: "e3",
     timestamp: "May 27, 2026 at 4:20p PST",
     date: new Date(2026, 4, 27, 16, 20),
     searchText: "diego torres added sales contract employee priya patel",
@@ -163,8 +196,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh18",
     subject: "Priya Patel’s",
+    subjectId: "e3",
     description: "notification preferences were updated",
     actor: "Priya Patel",
+    actorEmployeeId: "e3",
     timestamp: "May 18, 2026 at 10:30a PST",
     date: new Date(2026, 4, 18, 10, 30),
     searchText: "priya patel notification preferences updated",
@@ -172,8 +207,10 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh19",
     subject: "Jordan Lee’s",
+    subjectId: "e2",
     description: "employment status changed from full-time to contract",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "May 10, 2026 at 2:00p PST",
     date: new Date(2026, 4, 10, 14, 0),
     searchText: "jordan lee employment status changed full-time contract maya chen",
@@ -181,6 +218,7 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh20",
     subject: "Priya Patel",
+    subjectId: "e3",
     description: "was added to Sales as a contract employee",
     actor: "System",
     timestamp: "Apr 2, 2026 at 9:10a PST",
@@ -190,6 +228,7 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh21",
     subject: "Jordan Lee",
+    subjectId: "e2",
     description: "was added to Engineering as a full-time employee",
     actor: "System",
     timestamp: "Apr 2, 2026 at 9:05a PST",
@@ -199,6 +238,7 @@ export const EMPLOYEE_HISTORY: HistoryEntry[] = [
   {
     id: "eh22",
     subject: "Maya Chen",
+    subjectId: "e1",
     description: "was added to Design as a full-time employee",
     actor: "System",
     timestamp: "Apr 2, 2026 at 9:00a PST",

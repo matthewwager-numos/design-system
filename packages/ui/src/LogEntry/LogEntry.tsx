@@ -11,6 +11,10 @@ export interface LogEntryProps {
   actor: ReactNode;
   /** When it happened — already-formatted text (e.g. `"Sep 15, 2026 at 3:45p PST"`), not a `Date` — this component doesn't format dates itself. */
   timestamp: ReactNode;
+  /** Renders `subject` as a real button (e.g. to open that record's own detail view) instead of plain text. Omit when there's nothing to open — a departed employee, a settings change with no single record behind it, etc. */
+  onSubjectClick?: () => void;
+  /** Same idea, for `actor` — the byline's own name is just as often a real, clickable record (whoever performed the action) as `subject` is. */
+  onActorClick?: () => void;
   className?: string;
 }
 
@@ -26,8 +30,13 @@ export interface LogEntryProps {
  * and `description` (plain) are two genuinely different type styles in
  * Figma (Paragraph S Medium vs. Heading S, of all things — an intentional,
  * if oddly-named, pairing confirmed from the file itself, not a typo here).
+ *
+ * `subject`/`actor` render as real `<button>`s (not `<a href>` — there's no
+ * real URL, just "open this record's detail view somewhere else on the
+ * page") whenever `onSubjectClick`/`onActorClick` is given, matching the
+ * link-blue color they already render in either way.
  */
-export function LogEntry({ subject, description, actor, timestamp, className }: LogEntryProps) {
+export function LogEntry({ subject, description, actor, timestamp, onSubjectClick, onActorClick, className }: LogEntryProps) {
   return (
     <div className={clsx("ds-log-entry", className)}>
       <div className="ds-log-entry__rail">
@@ -37,12 +46,28 @@ export function LogEntry({ subject, description, actor, timestamp, className }: 
       </div>
       <div className="ds-log-entry__content">
         <p className="ds-log-entry__text">
-          {subject ? <span className="ds-log-entry__subject">{subject} </span> : null}
+          {subject ? (
+            <>
+              {onSubjectClick ? (
+                <button type="button" className="ds-log-entry__subject" onClick={onSubjectClick}>
+                  {subject}
+                </button>
+              ) : (
+                <span className="ds-log-entry__subject">{subject}</span>
+              )}{" "}
+            </>
+          ) : null}
           <span className="ds-log-entry__description">{description}</span>
         </p>
         <p className="ds-log-entry__byline">
           <span>by </span>
-          <span className="ds-log-entry__actor">{actor}</span>
+          {onActorClick ? (
+            <button type="button" className="ds-log-entry__actor" onClick={onActorClick}>
+              {actor}
+            </button>
+          ) : (
+            <span className="ds-log-entry__actor">{actor}</span>
+          )}
           <span> • </span>
           <span>on {timestamp}</span>
         </p>

@@ -52,6 +52,12 @@ Omit `subject` for an entry with no single clear record to point at:
 
 <Canvas of={LogEntryStories.Stacked} />
 
+## Subject and actor as links
+
+Pass `onSubjectClick`/`onActorClick` to render `subject`/`actor` as real buttons instead of plain text — the expected use is opening that record's own detail view (a drawer, most often) elsewhere on the page. Omit either one for a name with nothing to open — a departed employee, a "System" actor, a settings change with no single record behind it:
+
+<Canvas of={LogEntryStories.Clickable} />
+
 ## Long text truncates
 
 Both the subject+description line and the byline truncate with an ellipsis rather than wrapping — confirmed from Figma (`white-space: nowrap` + `text-overflow: ellipsis` on both, not a multi-line clamp):
@@ -66,4 +72,6 @@ Both the subject+description line and the byline truncate with an ellipsis rathe
 | `description` | `ReactNode` | — | The rest of the sentence. |
 | `actor` | `ReactNode` | — | Who performed the action — shown in the byline. |
 | `timestamp` | `ReactNode` | — | Already-formatted display text (not a `Date`) — this component doesn't format dates itself. |
+| `onSubjectClick` | `() => void` | — | Renders `subject` as a real button. Omit for plain text. |
+| `onActorClick` | `() => void` | — | Renders `actor` as a real button. Omit for plain text. |
 | `className` | `string` | — | Applied to the root element. |

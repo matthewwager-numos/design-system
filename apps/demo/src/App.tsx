@@ -11,6 +11,7 @@ import { AccrualsApp } from "./apps/accruals/AccrualsApp";
 import type { AccrualsAppTab } from "./apps/accruals/AccrualsApp";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { ToastProvider } from "./toast/ToastProvider";
+import { EmployeesProvider } from "./data/useEmployees";
 import type { PageId } from "./pages";
 
 export default function App() {
@@ -34,27 +35,29 @@ export default function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
-        <div className="app-shell">
-          <div className="app-shell__desktop-nav">
-            <Navigation>
-              <NavContent active={page} onNavigate={setPage} onSignOut={handleSignOut} />
-            </Navigation>
-          </div>
+        <EmployeesProvider>
+          <div className="app-shell">
+            <div className="app-shell__desktop-nav">
+              <Navigation>
+                <NavContent active={page} onNavigate={setPage} onSignOut={handleSignOut} />
+              </Navigation>
+            </div>
 
-          <div className="app-shell__mobile-nav" ref={mobileNavRef}>
-            <MobileNav name="Matthew Wager" accountMenu={accountMenu(handleSignOut)}>
-              <NavContent active={page} onNavigate={setPage} onSignOut={handleSignOut} />
-            </MobileNav>
-          </div>
+            <div className="app-shell__mobile-nav" ref={mobileNavRef}>
+              <MobileNav name="Matthew Wager" accountMenu={accountMenu(handleSignOut)}>
+                <NavContent active={page} onNavigate={setPage} onSignOut={handleSignOut} />
+              </MobileNav>
+            </div>
 
-          <main className="app-shell__main">
-            {page === "home" && <HomePage />}
-            {page === "employees" && <EmployeesApp tab={employeesTab} onTabChange={setEmployeesTab} />}
-            {page === "reconciliation" && <ReconciliationApp tab={reconciliationTab} onTabChange={setReconciliationTab} />}
-            {page === "accruals" && <AccrualsApp tab={accrualsTab} onTabChange={setAccrualsTab} />}
-            {page === "settings" && <SettingsPage />}
-          </main>
-        </div>
+            <main className="app-shell__main">
+              {page === "home" && <HomePage />}
+              {page === "employees" && <EmployeesApp tab={employeesTab} onTabChange={setEmployeesTab} />}
+              {page === "reconciliation" && <ReconciliationApp tab={reconciliationTab} onTabChange={setReconciliationTab} />}
+              {page === "accruals" && <AccrualsApp tab={accrualsTab} onTabChange={setAccrualsTab} />}
+              {page === "settings" && <SettingsPage />}
+            </main>
+          </div>
+        </EmployeesProvider>
       </ToastProvider>
     </ThemeProvider>
   );

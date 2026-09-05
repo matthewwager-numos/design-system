@@ -1,4 +1,4 @@
-import type { HistoryEntry } from "../components/HistoryTimeline";
+import type { RawHistoryEntry } from "../components/HistoryTimeline";
 
 // Illustrative log entries for the Accruals app's History tab — invented
 // content (not derived from `accruals.ts`'s own live state, though it
@@ -7,12 +7,24 @@ import type { HistoryEntry } from "../components/HistoryTimeline";
 // [when]. Fixed dates (not `new Date()`) so the demo always shows the same
 // "September 2026"/"August 2026" grouping, matching Figma's own reference
 // dates.
-export const ACCRUALS_HISTORY: HistoryEntry[] = [
+//
+// `subjectId` is the entry's *vendor-level* id from `ACCRUAL_VENDORS`
+// (not the subsidiary's own id) — every subsidiary here rolls up to a
+// real, currently-existing vendor, so the drawer opened from a subject
+// link always shows that vendor's full rollup, not just the one
+// subsidiary line the entry happens to be about. `actorEmployeeId`
+// references `employees.ts`'s SEED ids for real, still-employed actors
+// (Maya Chen e1 / Jordan Lee e2 / Priya Patel e3); "System" isn't a
+// person, and "The Table view's" (ah7) settings-change entry has no
+// vendor behind it at all, so those stay non-clickable.
+export const ACCRUALS_HISTORY: RawHistoryEntry[] = [
   {
     id: "ah1",
     subject: "AWS – Compute’s",
+    subjectId: "aws",
     description: "accrual amount changed from $498,200.00 to $512,300.00",
     actor: "Jordan Lee",
+    actorEmployeeId: "e2",
     timestamp: "Sep 14, 2026 at 2:30p PST",
     date: new Date(2026, 8, 14, 14, 30),
     searchText: "aws compute accrual amount changed jordan lee",
@@ -20,8 +32,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah2",
     subject: "Cursor – Seats’",
+    subjectId: "cursor",
     description: "category changed from Software to AI/ML Platform",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Sep 12, 2026 at 10:15a PST",
     date: new Date(2026, 8, 12, 10, 15),
     searchText: "cursor seats category changed software ai/ml platform maya chen",
@@ -29,8 +43,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah3",
     subject: "Anthropic – API’s",
+    subjectId: "anthropic",
     description: "accrual was approved for August 2026",
     actor: "Priya Patel",
+    actorEmployeeId: "e3",
     timestamp: "Sep 10, 2026 at 4:00p PST",
     date: new Date(2026, 8, 10, 16, 0),
     searchText: "anthropic api accrual approved august priya patel",
@@ -38,8 +54,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah4",
     subject: "Confluent Inc.",
+    subjectId: "confluent",
     description: "was added as a new vendor",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Sep 8, 2026 at 9:00a PST",
     date: new Date(2026, 8, 8, 9, 0),
     searchText: "confluent inc added new vendor maya chen",
@@ -47,8 +65,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah5",
     subject: "OpenAI – Enterprise’s",
+    subjectId: "openai",
     description: "accrual amount changed from $115,000.00 to $130,000.00",
     actor: "Jordan Lee",
+    actorEmployeeId: "e2",
     timestamp: "Sep 5, 2026 at 3:20p PST",
     date: new Date(2026, 8, 5, 15, 20),
     searchText: "openai enterprise accrual amount changed jordan lee",
@@ -56,8 +76,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah6",
     subject: "Iteration – Core’s",
+    subjectId: "iteration",
     description: "category changed from Uncategorized to AI/ML Platform",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Sep 3, 2026 at 11:40a PST",
     date: new Date(2026, 8, 3, 11, 40),
     searchText: "iteration core category changed uncategorized ai/ml platform maya chen",
@@ -67,6 +89,7 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
     subject: "The Table view’s",
     description: "Vendor column was frozen",
     actor: "Priya Patel",
+    actorEmployeeId: "e3",
     timestamp: "Sep 1, 2026 at 8:30a PST",
     date: new Date(2026, 8, 1, 8, 30),
     searchText: "table view vendor column frozen priya patel",
@@ -74,8 +97,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah8",
     subject: "SafetyKit – Core’s",
+    subjectId: "safetykit",
     description: "accrual amount changed from $65,200.00 to $76,940.00",
     actor: "Jordan Lee",
+    actorEmployeeId: "e2",
     timestamp: "Aug 27, 2026 at 1:15p PST",
     date: new Date(2026, 7, 27, 13, 15),
     searchText: "safetykit core accrual amount changed jordan lee",
@@ -83,8 +108,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah9",
     subject: "Anysphere – Enterprise’s",
+    subjectId: "anysphere",
     description: "accrual was flagged for review",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Aug 22, 2026 at 4:45p PST",
     date: new Date(2026, 7, 22, 16, 45),
     searchText: "anysphere enterprise accrual flagged review maya chen",
@@ -92,6 +119,7 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah10",
     subject: "AWS – Storage’s",
+    subjectId: "aws",
     description: "accrual amount changed from $210,000.00 to $233,679.00",
     actor: "System",
     timestamp: "Aug 18, 2026 at 6:00a PST",
@@ -101,8 +129,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah11",
     subject: "OpenAI – API’s",
+    subjectId: "openai",
     description: "accrual amount changed from $196,500.00 to $220,822.00",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Jul 25, 2026 at 3:10p PST",
     date: new Date(2026, 6, 25, 15, 10),
     searchText: "openai api accrual amount changed maya chen",
@@ -110,8 +140,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah12",
     subject: "AWS Inc. – Disaster Recovery’s",
+    subjectId: "amazon-web-services",
     description: "accrual was approved for June 2026",
     actor: "Priya Patel",
+    actorEmployeeId: "e3",
     timestamp: "Jul 16, 2026 at 1:45p PST",
     date: new Date(2026, 6, 16, 13, 45),
     searchText: "aws inc disaster recovery accrual approved priya patel",
@@ -119,8 +151,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah13",
     subject: "Anthropic – Enterprise’s",
+    subjectId: "anthropic",
     description: "accrual amount changed from $140,000.00 to $153,709.00",
     actor: "Jordan Lee",
+    actorEmployeeId: "e2",
     timestamp: "Jul 7, 2026 at 9:00a PST",
     date: new Date(2026, 6, 7, 9, 0),
     searchText: "anthropic enterprise accrual amount changed jordan lee",
@@ -128,6 +162,7 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah14",
     subject: "SafetyKit – Add-ons’",
+    subjectId: "safetykit",
     description: "accrual amount changed from $32,000.00 to $40,000.00",
     actor: "System",
     timestamp: "Jun 26, 2026 at 4:30p PST",
@@ -137,8 +172,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah15",
     subject: "Confluent – Support’s",
+    subjectId: "confluent",
     description: "accrual was flagged for review",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Jun 18, 2026 at 2:00p PST",
     date: new Date(2026, 5, 18, 14, 0),
     searchText: "confluent support accrual flagged review maya chen",
@@ -146,8 +183,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah16",
     subject: "AWS Inc. – Production’s",
+    subjectId: "amazon-web-services",
     description: "accrual amount changed from $75,000.00 to $89,721.00",
     actor: "Jordan Lee",
+    actorEmployeeId: "e2",
     timestamp: "Jun 8, 2026 at 11:20a PST",
     date: new Date(2026, 5, 8, 11, 20),
     searchText: "aws inc production accrual amount changed jordan lee",
@@ -155,8 +194,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah17",
     subject: "Iteration – Add-ons’",
+    subjectId: "iteration",
     description: "category changed from Uncategorized to AI/ML Platform",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "May 28, 2026 at 9:15a PST",
     date: new Date(2026, 4, 28, 9, 15),
     searchText: "iteration add-ons category changed uncategorized ai/ml platform maya chen",
@@ -164,8 +205,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah18",
     subject: "Anysphere – API’s",
+    subjectId: "anysphere",
     description: "accrual was approved for April 2026",
     actor: "Priya Patel",
+    actorEmployeeId: "e3",
     timestamp: "May 20, 2026 at 3:40p PST",
     date: new Date(2026, 4, 20, 15, 40),
     searchText: "anysphere api accrual approved priya patel",
@@ -173,8 +216,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah19",
     subject: "Cursor – Usage’s",
+    subjectId: "cursor",
     description: "accrual amount changed from $120,000.00 to $139,460.00",
     actor: "Jordan Lee",
+    actorEmployeeId: "e2",
     timestamp: "May 12, 2026 at 10:00a PST",
     date: new Date(2026, 4, 12, 10, 0),
     searchText: "cursor usage accrual amount changed jordan lee",
@@ -182,8 +227,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah20",
     subject: "OpenAI, LLC",
+    subjectId: "openai",
     description: "was added as a new vendor",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Apr 3, 2026 at 8:10a PST",
     date: new Date(2026, 3, 3, 8, 10),
     searchText: "openai added new vendor maya chen",
@@ -191,8 +238,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah21",
     subject: "Anthropic",
+    subjectId: "anthropic",
     description: "was added as a new vendor",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Apr 3, 2026 at 8:05a PST",
     date: new Date(2026, 3, 3, 8, 5),
     searchText: "anthropic added new vendor maya chen",
@@ -200,8 +249,10 @@ export const ACCRUALS_HISTORY: HistoryEntry[] = [
   {
     id: "ah22",
     subject: "Anysphere, Inc.",
+    subjectId: "anysphere",
     description: "was added as a new vendor",
     actor: "Maya Chen",
+    actorEmployeeId: "e1",
     timestamp: "Apr 3, 2026 at 8:00a PST",
     date: new Date(2026, 3, 3, 8, 0),
     searchText: "anysphere added new vendor maya chen",

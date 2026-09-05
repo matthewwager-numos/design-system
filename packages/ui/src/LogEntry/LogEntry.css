@@ -68,10 +68,41 @@
   white-space: nowrap;
 }
 
+/* Shared by both the span (plain text) and button (clickable) renders of
+   subject/actor — a <button> needs its own UA-stylesheet border/background/
+   padding/font reset to read as inline text rather than a boxed control;
+   harmless to apply unconditionally to the span too, since none of those
+   properties do anything there. */
+.ds-log-entry__subject,
+.ds-log-entry__actor {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  text-align: left;
+}
+
 .ds-log-entry__subject {
   font: var(--type-paragraph-s-medium);
   letter-spacing: var(--type-paragraph-s-medium-tracking);
   color: var(--content-link-default);
+}
+
+button.ds-log-entry__subject,
+button.ds-log-entry__actor {
+  cursor: pointer;
+}
+button.ds-log-entry__subject:hover,
+button.ds-log-entry__actor:hover {
+  color: var(--content-link-hover);
+  text-decoration: underline;
+}
+button.ds-log-entry__subject:focus-visible,
+button.ds-log-entry__actor:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .ds-log-entry__description {
