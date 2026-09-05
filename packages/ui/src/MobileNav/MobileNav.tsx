@@ -38,6 +38,8 @@ export interface MobileNavProps {
    */
   accountMenu?: ReactNode;
   onNotificationsClick?: () => void;
+  /** Extra action rendered in the collapsed bar, between notifications and the avatar — e.g. a consuming app's own global icon button. Renders as-is; style it to match `.ds-mobile-nav-bar__icon-button`'s own treatment (plain, `--content-brand-primary`, no fill) for visual consistency with the bell beside it. */
+  trailingAction?: ReactNode;
   /** Controlled open state for the full nav panel. Omit to let MobileNav manage its own. */
   expanded?: boolean;
   defaultExpanded?: boolean;
@@ -82,6 +84,7 @@ export function MobileNav({
   initials,
   accountMenu,
   onNotificationsClick,
+  trailingAction,
   expanded: controlledExpanded,
   defaultExpanded = false,
   onExpandedChange,
@@ -172,6 +175,7 @@ export function MobileNav({
           <button type="button" className="ds-mobile-nav-bar__icon-button" onClick={onNotificationsClick} aria-label="Notifications">
             <Bell size={24} aria-hidden />
           </button>
+          {trailingAction}
           {accountMenu ? (
             <DropdownMenu>
               <DropdownMenuTrigger>

@@ -1031,3 +1031,272 @@ a {
   align-items: center;
   text-align: center;
 }
+
+/* ── Numos Assistant (FAB + squeeze panel) ────────────────────────────
+   Desktop only (≥48rem, matching the rest of the app-shell's own squeeze
+   layout below) — see AssistantPanel.tsx's own doc comment for why mobile
+   is out of scope for this pass. */
+
+.assistant-fab {
+  display: none;
+}
+
+/* The mobile counterpart, rendered inside <MobileNav>'s own bar via its
+   `trailingAction` slot — matches `.ds-mobile-nav-bar__icon-button`'s own
+   treatment (plain, brand-primary, no fill) for visual consistency with
+   the bell button beside it, rather than looking like a stray floating
+   button awkwardly placed inline. <MobileNav> itself is already CSS-hidden
+   at desktop widths (see .app-shell__mobile-nav below), so this needs no
+   breakpoint handling of its own. */
+.assistant-fab--mobile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--content-brand-primary);
+  cursor: pointer;
+}
+.assistant-fab--mobile:hover {
+  background: var(--background-hover);
+}
+
+/* Desktop-only squeeze wrapper — the mobile equivalent is a separate
+   <Modal> (see .assistant-mobile-modal), not this element, so it must be
+   fully out of the mobile layout regardless of `assistantOpen`/`--closed`
+   below (both only apply ≥48rem). Without this, it fell into
+   `.app-shell`'s own mobile column flow as an unstyled full-width block —
+   the always-mounted refactor for the desktop transition lost the "simply
+   isn't rendered" behavior a conditional mount used to give it for free
+   on mobile. */
+.app-shell__assistant {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .assistant-fab {
+    display: inline-flex;
+    position: fixed;
+    top: 1rem;
+    right: 1.75rem;
+    /* Higher than Modal's overlay (100) and DropdownMenu (150) — this
+       button (and the panel it opens) must stay usable above any open
+       modal, per the squeeze-the-modal interaction below. */
+    z-index: 200;
+  }
+
+  /* A flex sibling of .app-shell__main, after it in DOM order — squeezes
+     the main content exactly the way .app-shell__desktop-nav already does
+     (flex:1;min-width:0 on .app-shell__main does the actual shrinking,
+     nothing JS-driven here). Unlike the old conditional-mount version,
+     this stays mounted at all times and toggles between two persistent
+     widths — the exact same "transition: width var(--motion-toggle),
+     never unmount" pattern <Navigation> itself already uses for its own
+     collapse/expand, per the user's own comparison. `overflow: hidden`
+     clips .assistant-panel's own fixed width (below) as this wrapper
+     animates, rather than letting its contents visually reflow/squish
+     mid-transition. */
+  .app-shell__assistant {
+    display: block;
+    flex-shrink: 0;
+    width: 30rem;
+    max-width: 100%;
+    height: 100%;
+    overflow: hidden;
+    transition: width var(--motion-toggle);
+  }
+
+  .app-shell__assistant--closed {
+    width: 0;
+    /* Keeps the (visually zero-width) panel out of tab order while
+       closed — it never unmounts, unlike <Modal>, so this is the only
+       thing standing in for that. */
+    visibility: hidden;
+  }
+}
+
+.assistant-panel {
+  display: flex;
+  flex-direction: column;
+  /* Fixed, not 100% of the animating wrapper above — so opening/closing
+     clips/reveals this at a constant internal layout instead of squishing
+     its own header/tabs/text smaller as the wrapper's width animates. */
+  width: 30rem;
+  max-width: 100%;
+  height: 100%;
+  background: var(--background-default);
+  border-left: 1px solid var(--border-disabled);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.assistant-panel__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-disabled);
+}
+
+.assistant-panel__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.assistant-panel__icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-full);
+  background: var(--button-primary-default);
+  color: var(--content-brand-inverse);
+}
+
+.assistant-panel__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font: var(--type-heading-xl);
+  letter-spacing: var(--type-heading-xl-tracking);
+  color: var(--content-brand-primary);
+}
+
+.assistant-panel__close {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-2);
+  color: var(--content-subtle);
+  cursor: pointer;
+}
+.assistant-panel__close:hover {
+  background: var(--background-hover);
+  color: var(--content-base);
+}
+
+.assistant-panel__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-5);
+}
+
+.assistant-panel__body--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--content-subtle);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+
+.assistant-panel__empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  color: var(--content-subtle);
+  text-align: center;
+}
+
+.assistant-panel__empty-title {
+  margin: 0;
+  font: var(--type-heading-xl);
+  letter-spacing: var(--type-heading-xl-tracking);
+  color: var(--content-subtle);
+}
+
+.assistant-panel__capabilities {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+
+.assistant-panel__messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.assistant-panel__message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.assistant-panel__message--user {
+  align-items: flex-end;
+}
+
+.assistant-panel__bubble {
+  margin: 0;
+  max-width: 90%;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--background-brand-subdued);
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+  color: var(--content-base);
+}
+
+.assistant-panel__message-timestamp {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.assistant-panel__reply {
+  margin: 0;
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+  color: var(--content-base);
+}
+
+.assistant-panel__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+  padding: var(--space-5);
+  border-top: 1px solid var(--border-disabled);
+}
+
+.assistant-panel__input {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  border: 1px solid var(--border-brand);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+  color: var(--content-base);
+  background: var(--background-default);
+}
+.assistant-panel__input::placeholder {
+  color: var(--content-placeholder);
+}
+.assistant-panel__input:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus-brand);
+}

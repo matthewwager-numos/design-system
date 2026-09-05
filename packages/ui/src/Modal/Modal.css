@@ -19,12 +19,29 @@
   display: flex;
   background: var(--overlay-default-50);
   opacity: 0;
-  /* Enter/exit ease differently — see .ds-modal's own comment below. */
-  transition: opacity var(--motion-exit);
+  /* Enter/exit ease differently — see .ds-modal's own comment below.
+     inset-inline-end shares --motion-toggle (see the media query below)
+     regardless of enter/exit, so a squeeze/un-squeeze eases the same way
+     whichever direction the modal's own opacity happens to be moving. */
+  transition: opacity var(--motion-exit), inset-inline-end var(--motion-toggle);
+}
+
+/* Consumer-app chrome that must sit *above* an open modal (e.g. a docked
+   assistant/chat panel) can claim screen space by setting this variable
+   on `document.documentElement` — the overlay (and by extension the
+   flex-positioned panel inside it) shrinks to leave room instead of being
+   covered. Defaults to 0, a no-op, when nothing sets it. Scoped to the
+   same breakpoint the rest of that squeeze layout uses. Transitioned so a
+   modal open when the panel toggles eases over in step with it, rather
+   than snapping instantly while the panel itself animates. */
+@media (min-width: 48rem) {
+  .ds-modal-overlay {
+    inset-inline-end: var(--assistant-panel-width, 0px);
+  }
 }
 .ds-modal-overlay--visible {
   opacity: 1;
-  transition: opacity var(--motion-enter);
+  transition: opacity var(--motion-enter), inset-inline-end var(--motion-toggle);
 }
 
 .ds-modal-overlay--default {
