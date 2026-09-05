@@ -90,8 +90,16 @@ export function Modal({
     };
   }, [open]);
 
+  // Depends on `rendered`, not just `open`: opening flips `open` true one
+  // render before the effect above's `setRendered(true)` actually commits
+  // the portaled panel into the DOM, so a `[open]`-only dependency here
+  // would run this effect while `panelRef.current` is still null — landing
+  // focus nowhere, silently breaking Escape-to-close and Tab-trapping
+  // (both live on the panel's own onKeyDown, which never receives a key
+  // event it isn't focused for) on every drawer/dialog that opens after
+  // its own initial mount, which is effectively all of them.
   useEffect(() => {
-    if (!open) return;
+    if (!open || !rendered) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -100,7 +108,7 @@ export function Modal({
       document.body.style.overflow = previousOverflow;
       previouslyFocused?.focus?.();
     };
-  }, [open]);
+  }, [open, rendered]);
 
   function handleTransitionEnd(event: React.TransitionEvent<HTMLDivElement>) {
     if (event.target === panelRef.current && !open) setRendered(false);
