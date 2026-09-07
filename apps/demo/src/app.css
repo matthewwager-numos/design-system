@@ -968,15 +968,27 @@ a {
 
 /* ── Overview template (shared by every app's own Overview tab) ───────── */
 
+/* Mobile-first, matching every other breakpoint in this file: a fixed 2x2
+   grid below 48rem (four metrics fit exactly, no remainder cell) rather
+   than however many columns the desktop flex-basis naturally happens to
+   wrap to on a given phone width — then flex-wrap takes over at desktop,
+   unchanged from before. */
 .overview-metrics {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-4);
 }
 
-.overview-metrics > * {
-  flex: 1 1 14rem;
-  min-width: 0;
+@media (min-width: 48rem) {
+  .overview-metrics {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .overview-metrics > * {
+    flex: 1 1 14rem;
+    min-width: 0;
+  }
 }
 
 .overview-section {

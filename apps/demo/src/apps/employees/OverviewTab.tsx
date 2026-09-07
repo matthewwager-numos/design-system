@@ -1,6 +1,7 @@
-import { BarChart, DisplayMetric, DonutChart } from "@numosai/ui";
+import { Users } from "lucide-react";
+import { BarChart, DisplayMetric, DonutChart, IconChart } from "@numosai/ui";
 import { useEmployees } from "../../data/useEmployees";
-import { departmentLabel, EMPLOYMENT_TYPE_OPTIONS } from "../../data/employees";
+import { departmentLabel, EMPLOYMENT_TYPE_OPTIONS, ROLE_OPTIONS } from "../../data/employees";
 
 export function OverviewTab() {
   const { employees } = useEmployees();
@@ -22,6 +23,11 @@ export function OverviewTab() {
   const byEmploymentType = EMPLOYMENT_TYPE_OPTIONS.map((option) => ({
     label: option.label,
     value: employees.filter((employee) => employee.employmentType === option.value).length,
+  }));
+
+  const byRole = ROLE_OPTIONS.map((option) => ({
+    label: option.label,
+    value: employees.filter((employee) => employee.role === option.value).length,
   }));
 
   return (
@@ -47,6 +53,10 @@ export function OverviewTab() {
           <div className="overview-chart-card">
             <h3 className="overview-chart-card__title">By employment type</h3>
             <BarChart data={byEmploymentType} height={220} />
+          </div>
+          <div className="overview-chart-card">
+            <h3 className="overview-chart-card__title">By role</h3>
+            <IconChart icon={Users} data={byRole} />
           </div>
         </div>
       </div>

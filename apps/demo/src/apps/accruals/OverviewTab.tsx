@@ -1,4 +1,5 @@
-import { AreaChart, BarChart, DisplayMetric, DonutChart } from "@numosai/ui";
+import { Receipt } from "lucide-react";
+import { AreaChart, BarChart, DisplayMetric, DonutChart, IconChart } from "@numosai/ui";
 import { ACCRUAL_VENDORS, accrualCurrency, accrualCurrencyCompact, grandTotals, vendorTotals } from "../../data/accruals";
 
 export function OverviewTab() {
@@ -28,6 +29,17 @@ export function OverviewTab() {
   const byVendor = ACCRUAL_VENDORS.map((vendor) => ({ label: vendor.name, value: Math.round(vendorTotals(vendor).accrualAmount / 1000) })).sort(
     (a, b) => b.value - a.value,
   );
+
+  // A count, not a dollar amount — how many accrual line items (not how
+  // much money) fall under each category, a complementary reading to the
+  // dollar-based donut above rather than the same data twice.
+  const subsidiaryCountByCategory = new Map<string, number>();
+  for (const vendor of ACCRUAL_VENDORS) {
+    for (const subsidiary of vendor.subsidiaries) {
+      subsidiaryCountByCategory.set(subsidiary.category, (subsidiaryCountByCategory.get(subsidiary.category) ?? 0) + 1);
+    }
+  }
+  const byCategoryCount = Array.from(subsidiaryCountByCategory.entries()).map(([label, value]) => ({ label, value }));
 
   return (
     <div className="page page--full-width">
@@ -60,6 +72,11 @@ export function OverviewTab() {
             <h3 className="overview-chart-card__title">By vendor</h3>
             <p className="overview-chart-card__description">Accrual amount, in thousands of dollars</p>
             <BarChart data={byVendor} orientation="horizontal" height={280} />
+          </div>
+          <div className="overview-chart-card">
+            <h3 className="overview-chart-card__title">Line items by category</h3>
+            <p className="overview-chart-card__description">Count of accrual line items, not dollar amount</p>
+            <IconChart icon={Receipt} data={byCategoryCount} />
           </div>
         </div>
       </div>
