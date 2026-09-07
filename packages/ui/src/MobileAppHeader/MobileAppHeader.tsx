@@ -1,10 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { Children, isValidElement, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { clsx } from "clsx";
 import { AppIcon } from "../AppIcon";
 import type { AppIconName } from "../AppIcon";
 import { Tabs, TabList } from "../Tabs";
+import type { TabProps } from "../Tabs";
 import "./MobileAppHeader.css";
+
+function firstTabValue(children: ReactNode): string | undefined {
+  const first = Children.toArray(children)[0];
+  return isValidElement<TabProps>(first) ? first.props.value : undefined;
+}
 
 export interface MobileAppHeaderProps {
   /**
@@ -25,11 +31,10 @@ export interface MobileAppHeaderProps {
   onValueChange?: (value: string) => void;
   /**
    * Called when the icon is tapped, in addition to its own built-in
-   * behavior (scrolling the title/tabs strip back to the start) — typically
-   * selects this app's "overview" tab, e.g. `onIconClick={() =>
-   * setTab("overview")}`. The icon doesn't know which of `children` that
-   * is; that's for the consumer already driving `value`/`onValueChange` to
-   * decide, the same way `<Tabs>` itself doesn't know what any tab means.
+   * behavior: scrolling the title/tabs strip back to the start, and
+   * selecting the first `<Tab>` (by DOM order, not necessarily one named
+   * "overview" or similar — pass `onIconClick` too if the tab you want
+   * selected isn't actually the first one).
    */
   onIconClick?: () => void;
   /** Trailing icon button(s) — Figma's own example reserves this slot but hides it by default (nothing to show there in that instance), so it's optional here too. */
@@ -52,25 +57,47 @@ export interface MobileAppHeaderProps {
  * The icon is the one thing that never scrolls — the title and the tabs
  * scroll together as a single strip beside it, so a long title doesn't
  * quietly disappear off-screen the way it would if only the tabs scrolled.
+ * A separator line between the title and the tabs rides along with that
+ * scroll too, at first — but it's `position: sticky`, so once it reaches
+ * the scroll container's own edge (a fixed 8px right of the icon) it
+ * anchors there instead of continuing, and the title (ahead of it) and
+ * tabs (behind it) keep scrolling independently past that fixed point —
+ * see `.ds-mobile-app-header__separator` in the CSS for the mechanics.
+ *
  * Tapping the icon scrolls that strip back to the start (animated, real
  * `scrollTo({ behavior: "smooth" })`, not a CSS transition — there's no
- * single property to transition when the thing moving is scroll position)
- * and calls `onIconClick`, if given, to let the page also select its
- * "overview" tab. A soft edge fade (a `mask-image`, toggled by real scroll
- * position via `data-fade-start`/`data-fade-end`, not always-on) hints
- * there's more to scroll to in whichever direction actually has more.
+ * single property to transition when the thing moving is scroll position),
+ * selects the first tab, and calls `onIconClick`, if given, for anything
+ * else the page wants to do. Since selecting a specific tab needs a
+ * concrete value to select even when this component is used uncontrolled,
+ * `MobileAppHeader` tracks that value itself (the same controlled/
+ * uncontrolled duality `<Tabs>` itself has) and always drives the nested
+ * `<Tabs>` in controlled mode, rather than leaving `<Tabs>` to manage its
+ * own internal state where `MobileAppHeader` couldn't reach it.
+ *
+ * A soft edge fade (a `mask-image`, toggled by real scroll position via
+ * `data-fade-start`/`data-fade-end`, not always-on) hints there's more to
+ * scroll to in whichever direction actually has more.
  */
 export function MobileAppHeader({
   icon,
   title,
   children,
-  value,
+  value: controlledValue,
   defaultValue,
   onValueChange,
   onIconClick,
   actions,
   className,
 }: MobileAppHeaderProps) {
+  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue ?? "");
+  const value = controlledValue ?? uncontrolledValue;
+
+  function setValue(next: string) {
+    setUncontrolledValue(next);
+    onValueChange?.(next);
+  }
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const [fadeStart, setFadeStart] = useState(false);
   const [fadeEnd, setFadeEnd] = useState(false);
@@ -102,6 +129,8 @@ export function MobileAppHeader({
 
   function handleIconClick() {
     scrollRef.current?.scrollTo({ left: 0, behavior: "smooth" });
+    const first = firstTabValue(children);
+    if (first !== undefined) setValue(first);
     onIconClick?.();
   }
 
@@ -114,10 +143,14 @@ export function MobileAppHeader({
 
         <div ref={scrollRef} className="ds-mobile-app-header__scroll" data-fade-start={fadeStart} data-fade-end={fadeEnd}>
           <span className="ds-mobile-app-header__title">{title}</span>
+          <div className="ds-mobile-app-header__separator" aria-hidden="true" />
 
-          <Tabs value={value} defaultValue={defaultValue} onValueChange={onValueChange} className="ds-mobile-app-header__tabs">
+          <Tabs value={value} onValueChange={setValue} className="ds-mobile-app-header__tabs">
             <TabList className="ds-mobile-app-header__tab-list">{children}</TabList>
           </Tabs>
+
+          <div className="ds-mobile-app-header__fade ds-mobile-app-header__fade--start" aria-hidden="true" />
+          <div className="ds-mobile-app-header__fade ds-mobile-app-header__fade--end" aria-hidden="true" />
         </div>
 
         {actions && <div className="ds-mobile-app-header__actions">{actions}</div>}

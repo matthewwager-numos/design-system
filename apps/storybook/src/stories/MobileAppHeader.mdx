@@ -59,13 +59,13 @@ An optional trailing slot — Figma's own example reserves this space but hides 
 
 ## Overflow
 
-Real phone screens can easily have more tabs than fit — the title and the tab row scroll horizontally together, as one strip, rather than wrapping or overflowing the header. Confirmed from Figma: the icon is the only thing that stays fixed, not just the tabs — a long title still scrolls out of view as you move through the tabs, rather than being pinned next to an icon that no longer sits beside it. A soft edge fade (real scroll position toggling it, not a static overlay) hints there's more to scroll to in whichever direction actually has more.
+Real phone screens can easily have more tabs than fit — the title and the tab row scroll horizontally together, as one strip, rather than wrapping or overflowing the header. Confirmed from Figma: the icon is the only thing that stays fixed, not just the tabs. A separator line between the title and the tabs rides along with that same scroll at first, but it's `position: sticky` — once it reaches the scroll container's own edge (a fixed 8px right of the icon), it anchors there instead of continuing, while the title (ahead of it) keeps scrolling out of view and the tabs (behind it) keep sliding past that same anchored point. A soft edge fade (real scroll position toggling it, not a static overlay) hints there's more to scroll to in whichever direction actually has more.
 
 <Canvas of={MobileAppHeaderStories.Overflow} />
 
 ## Tapping the icon
 
-The icon is a real button: tapping it scrolls the title/tabs strip back to the start (an actual animated `scrollTo`, since there's no single CSS property to transition when what's moving is scroll position) and calls `onIconClick`, if provided — typically to also select this app's "overview" tab. The icon itself doesn't know which of `children` that is; that's for whatever's already driving `value`/`onValueChange` to decide.
+The icon is a real button: tapping it scrolls the title/tabs strip back to the start (an actual animated `scrollTo`, since there's no single CSS property to transition when what's moving is scroll position) and selects the first `<Tab>` by DOM order. `MobileAppHeader` tracks the selected value itself for this (the same controlled/uncontrolled duality `<Tabs>` has on its own) rather than leaving that state inside the nested `<Tabs>` where it couldn't reach it. Pass `onIconClick` too for anything else that tap should also trigger, or if the tab you actually want selected isn't the first one.
 
 <Canvas of={MobileAppHeaderStories.IconNavigatesBack} />
 

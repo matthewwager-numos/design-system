@@ -39,9 +39,7 @@
   border: none;
   background: none;
   padding: 0;
-  padding-right: var(--space-2);
   margin: 0;
-  border-right: 1px solid var(--border-subtle);
   cursor: pointer;
 }
 
@@ -53,8 +51,13 @@
 
 /* Title and tabs scroll together as one strip — confirmed from Figma: the
    icon is the only fixed element, not just the tabs. Scrollbar hidden
-   since the edge fade below is the scroll affordance. */
+   since the edge fade below is the scroll affordance. `position: relative`
+   anchors the fade overlays below, and is also what `.ds-mobile-app-header__
+   separator`'s `position: sticky` needs a scrolling *ancestor* for (sticky
+   itself doesn't require this element specifically to be positioned, but
+   the fade overlays do). */
 .ds-mobile-app-header__scroll {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -69,18 +72,37 @@
 
 /* Soft fade hinting more content in whichever direction actually has more
    — toggled by real scroll position (see MobileAppHeader.tsx), not always
-   on, so it isn't shown fading content that's already fully in view. */
-.ds-mobile-app-header__scroll[data-fade-start="true"] {
-  -webkit-mask-image: linear-gradient(to right, transparent, black 1.5rem);
-  mask-image: linear-gradient(to right, transparent, black 1.5rem);
+   on, so it isn't shown fading content that's already fully in view.
+   A gradient *overlay* painted on top of the title/tabs, not a `mask-image`
+   on the scroll container itself — a mask there would affect its every
+   child uniformly, including .ds-mobile-app-header__separator, which
+   anchors right where the fade begins and would otherwise fade to
+   near-invisible the moment it stuck (confirmed the hard way: a mask-based
+   version left it at roughly a third of its own already-subtle opacity).
+   Sitting below the separator's own z-index (1) but above the title/tabs
+   (position: static, so anything positioned — sticky or absolute — paints
+   over them regardless of z-index) keeps the anchor line crisp while the
+   scrolling text still visibly fades under it. */
+.ds-mobile-app-header__fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1.5rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
 }
-.ds-mobile-app-header__scroll[data-fade-end="true"] {
-  -webkit-mask-image: linear-gradient(to right, black calc(100% - 1.5rem), transparent);
-  mask-image: linear-gradient(to right, black calc(100% - 1.5rem), transparent);
+.ds-mobile-app-header__fade--start {
+  left: 0;
+  background: linear-gradient(to right, var(--background-default), transparent);
 }
-.ds-mobile-app-header__scroll[data-fade-start="true"][data-fade-end="true"] {
-  -webkit-mask-image: linear-gradient(to right, transparent, black 1.5rem, black calc(100% - 1.5rem), transparent);
-  mask-image: linear-gradient(to right, transparent, black 1.5rem, black calc(100% - 1.5rem), transparent);
+.ds-mobile-app-header__fade--end {
+  right: 0;
+  background: linear-gradient(to left, var(--background-default), transparent);
+}
+.ds-mobile-app-header__scroll[data-fade-start="true"] .ds-mobile-app-header__fade--start,
+.ds-mobile-app-header__scroll[data-fade-end="true"] .ds-mobile-app-header__fade--end {
+  opacity: 1;
 }
 
 .ds-mobile-app-header__title {
@@ -89,6 +111,24 @@
   letter-spacing: var(--type-paragraph-s-medium-tracking);
   color: var(--content-brand-primary);
   white-space: nowrap;
+}
+
+/* Between the title and the tabs, not the icon and the title — scrolls
+   with them at first, like everything else in .ds-mobile-app-header__scroll,
+   but `position: sticky; left: 0;` catches it at the scroll container's own
+   left edge (already exactly `--space-2` — 8px — right of the icon, via
+   .ds-mobile-app-header__row's own `gap`) and holds it there instead of
+   letting it scroll further. The title (before it, not sticky) keeps going
+   and disappears off that same edge; the tabs (after it, not sticky) keep
+   going the other way, sliding underneath the now-anchored line. */
+.ds-mobile-app-header__separator {
+  flex-shrink: 0;
+  width: 1px;
+  align-self: stretch;
+  background: var(--border-subtle);
+  position: sticky;
+  left: 0;
+  z-index: 1;
 }
 
 .ds-mobile-app-header__tabs {

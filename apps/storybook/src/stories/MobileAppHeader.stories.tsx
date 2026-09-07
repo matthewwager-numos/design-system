@@ -85,9 +85,9 @@ function IconNavigatesBackDemo() {
   return (
     <div style={PREVIEW_STYLE}>
       <p style={{ margin: "0 0 0.75rem", font: "var(--type-paragraph-s-regular)", color: "var(--content-subtle)" }}>
-        Scroll the tabs, then tap the icon — it scrolls the title/tabs strip back to the start (the icon itself never scrolls) and selects "Section 1" via <code>onIconClick</code>.
+        Scroll the tabs, then tap the icon — it scrolls the title/tabs strip back to the start (the icon itself never scrolls) and selects "Section 1", the first tab, automatically. Pass <code>onIconClick</code> too for anything else that tap should also do.
       </p>
-      <MobileAppHeader icon="reports" title="Reports" value={tab} onValueChange={setTab} onIconClick={() => setTab("tab-1")}>
+      <MobileAppHeader icon="reports" title="Reports" value={tab} onValueChange={setTab}>
         {Array.from({ length: 8 }, (_, i) => (
           <Tab key={i} value={`tab-${i + 1}`}>
             Section {i + 1}
@@ -99,6 +99,6 @@ function IconNavigatesBackDemo() {
 }
 
 export const IconNavigatesBack: Story = {
-  name: "Tapping the icon scrolls back + selects a tab",
+  name: "Tapping the icon scrolls back + selects the first tab",
   render: () => <IconNavigatesBackDemo />,
 };
