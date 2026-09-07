@@ -13,6 +13,7 @@ const meta: Meta<typeof DisplayMetric> = {
     },
     value: { control: "text" },
     label: { control: "text" },
+    animate: { control: "boolean" },
   },
   args: {
     value: "$24.2K",
@@ -52,6 +53,26 @@ export const Magenta: Story = {
 
 export const Yellow: Story = {
   args: { color: "yellow", value: "12", label: "Open tickets" },
+  render: (args) => (
+    <div style={PREVIEW_STYLE}>
+      <DisplayMetric {...args} />
+    </div>
+  ),
+};
+
+export const AnimatedCountUp: Story = {
+  name: "Animated (counts up/down from 0 on mount)",
+  args: { animate: true },
+  render: (args) => (
+    <div style={PREVIEW_STYLE}>
+      <DisplayMetric {...args} />
+    </div>
+  ),
+};
+
+export const AnimatedNegative: Story = {
+  name: "Animated, counting down (negative value)",
+  args: { animate: true, value: "-$3.1K", label: "Refunds", color: "magenta" },
   render: (args) => (
     <div style={PREVIEW_STYLE}>
       <DisplayMetric {...args} />

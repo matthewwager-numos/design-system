@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { clsx } from "clsx";
 import { GrainCorner } from "../GrainCorner";
+import { useCountUp } from "../hooks/useCountUp";
 import "./DisplayMetric.css";
 
 export type DisplayMetricColor = "brand" | "green" | "magenta" | "yellow";
@@ -19,6 +20,14 @@ export interface DisplayMetricProps {
   label: ReactNode;
   /** Defaults to `"green"` (Figma's own default variant). */
   color?: DisplayMetricColor;
+  /**
+   * Counts `value` up from 0 (or down, for a negative value) on mount,
+   * rather than showing it immediately — only takes effect when `value` is
+   * a string containing a recognizable number (e.g. `"$24.2K"`, `"1,204"`,
+   * `"-$3.1K"`); anything else renders unanimated regardless. Defaults to
+   * `false`.
+   */
+  animate?: boolean;
   className?: string;
   id?: string;
 }
@@ -35,13 +44,14 @@ export interface DisplayMetricProps {
  * mechanism already used to keep a portaled `<DropdownMenuContent>` in
  * whatever theme its trigger is in.
  */
-export function DisplayMetric({ value, label, color = "green", className, id }: DisplayMetricProps) {
+export function DisplayMetric({ value, label, color = "green", animate = false, className, id }: DisplayMetricProps) {
   const accent = ACCENT_TOKEN[color];
+  const displayValue = useCountUp(value, animate);
   return (
     <div id={id} data-theme="dark" className={clsx("ds-display-metric", className)}>
       <GrainCorner color={accent} className="ds-display-metric__ornament" />
       <div className="ds-display-metric__content">
-        <div className="ds-display-metric__value">{value}</div>
+        <div className="ds-display-metric__value">{displayValue}</div>
         <div
           className={clsx("ds-display-metric__label", color === "brand" && "ds-display-metric__label--brand")}
           style={{ color: accent }}

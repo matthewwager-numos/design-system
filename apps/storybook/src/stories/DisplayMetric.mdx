@@ -48,6 +48,13 @@ Brand's label is the only one shown at reduced opacity (confirmed from Figma —
 <Canvas of={DisplayMetricStories.Magenta} />
 <Canvas of={DisplayMetricStories.Yellow} />
 
+## Animated on mount
+
+Pass `animate` to count `value` up from 0 (or down, for a negative value) on mount, instead of showing it immediately — a fade-in also plays on the corner glow regardless of `animate`, so a static card still gets a subtle page-load moment. The count only kicks in when `value` is a string containing a recognizable number (`"$24.2K"`, `"1,204"`, `"-$3.1K"`, `"12"`) — everything except the digits themselves (`$`, `-`, `K`, comma grouping) stays fixed throughout, and the animated frames match the same decimal precision and thousands-grouping the target string already has. A non-numeric `value` (or any `ReactNode` that isn't a plain string) just renders as-is, `animate` or not. Respects `prefers-reduced-motion` — reduced-motion users see the final value immediately, no counting.
+
+<Canvas of={DisplayMetricStories.AnimatedCountUp} />
+<Canvas of={DisplayMetricStories.AnimatedNegative} />
+
 ## Sizing
 
 `width: 100%` by default — sized by whatever grid/flex cell contains it, not a fixed pixel width. Lay several out in a wrapping flex row (or a grid) for a real dashboard stat strip:
@@ -65,4 +72,5 @@ Brand's label is the only one shown at reduced opacity (confirmed from Figma —
 | `value` | `ReactNode` | — | The headline figure — e.g. `"$24.2K"`. |
 | `label` | `ReactNode` | — | The label under it — e.g. `"Revenue"`. |
 | `color` | `"brand" \| "green" \| "magenta" \| "yellow"` | `"green"` | Tints both the label and the corner glow. |
+| `animate` | `boolean` | `false` | Counts `value` up/down from 0 on mount (numeric strings only). |
 | `className` | `string` | — | Applied to the root element. |

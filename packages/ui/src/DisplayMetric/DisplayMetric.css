@@ -25,11 +25,25 @@
 }
 
 /* GrainCorner hugs its own fixed 160×153px box — this just anchors it to
-   Figma's own confirmed corner position. */
+   Figma's own confirmed corner position. Scoped to this one consuming class
+   (not added to `<GrainCorner>`'s own stylesheet) since that component is
+   reused elsewhere in the design system and shouldn't always fade in. */
 .ds-display-metric__ornament {
   position: absolute;
   right: -8px;
   bottom: -8px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ds-display-metric-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .ds-display-metric__ornament {
+    animation: ds-display-metric-fade-in var(--motion-enter-slow) both;
+  }
 }
 
 .ds-display-metric__content {
