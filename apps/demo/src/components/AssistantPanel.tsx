@@ -1,6 +1,11 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { ArrowUp, Sparkles, X } from "lucide-react";
-import { IconButton, Tab, TabList, Tabs } from "@numosai/ui";
+import { Button, IconButton, Tab, TabList, Tabs, TextInput } from "@numosai/ui";
+import { loadAssistantSettings, saveAssistantSettings } from "../data/assistantSettings";
+import type { AssistantSettings } from "../data/assistantSettings";
+import { fetchAssistantReply } from "../data/openRouterAssistant";
+import { useToast } from "../toast/ToastProvider";
 
 type AssistantTab = "new" | "history" | "settings";
 
@@ -13,10 +18,11 @@ interface AssistantMessage {
 
 let nextMessageId = 1;
 
-// A single canned reply regardless of what's asked — there's no real model
-// behind this panel, matching every other demo interaction in this app
-// (fake, invented, no backend). Reusing Figma's own sample copy since it's
-// genuinely on-topic for this app's own domain (accruals), not filler text.
+// Only used when no API key is configured (see useAssistantConversation's
+// submitDraft) — the zero-config default so the panel still does
+// *something* out of the box, matching every other demo interaction in
+// this app. Reusing Figma's own sample copy since it's genuinely on-topic
+// for this app's own domain (accruals), not filler text.
 const CANNED_REPLY =
   "Yes. Accruals are an important part of the monthly close, although “accrual” itself refers to an accounting concept rather than specifically to the close process. Under accrual accounting, revenue and expenses are recorded in the period in which they were earned or incurred, rather than simply when cash changes hands. For example, suppose a company uses AWS throughout April but won't receive the $50,000 invoice until May. At April 30:";
 
@@ -46,19 +52,47 @@ export function useAssistantConversation() {
   const [tab, setTab] = useState<AssistantTab>("new");
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [draft, setDraft] = useState("");
+  const [settings, setSettings] = useState<AssistantSettings>(loadAssistantSettings);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function submitDraft() {
-    const text = draft.trim();
-    if (!text) return;
-    setMessages((prev) => [
-      ...prev,
-      { id: String(nextMessageId++), role: "user", text, timestamp: timestamp() },
-      { id: String(nextMessageId++), role: "assistant", text: CANNED_REPLY, timestamp: timestamp() },
-    ]);
-    setDraft("");
+  function updateSettings(next: AssistantSettings) {
+    setSettings(next);
+    saveAssistantSettings(next);
   }
 
-  return { tab, setTab, messages, draft, setDraft, submitDraft };
+  async function submitDraft() {
+    const text = draft.trim();
+    if (!text || pending) return;
+
+    const userMessage: AssistantMessage = { id: String(nextMessageId++), role: "user", text, timestamp: timestamp() };
+    const history = [...messages, userMessage];
+    setMessages(history);
+    setDraft("");
+    setError(null);
+
+    // No key configured — the zero-config demo experience, same canned
+    // reply this panel always gave before real API wiring existed.
+    if (!settings.apiKey.trim() || !settings.model.trim()) {
+      setMessages((prev) => [...prev, { id: String(nextMessageId++), role: "assistant", text: CANNED_REPLY, timestamp: timestamp() }]);
+      return;
+    }
+
+    setPending(true);
+    try {
+      const reply = await fetchAssistantReply(
+        settings,
+        history.map((message) => ({ role: message.role, content: message.text })),
+      );
+      setMessages((prev) => [...prev, { id: String(nextMessageId++), role: "assistant", text: reply, timestamp: timestamp() }]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong talking to the model.");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return { tab, setTab, messages, draft, setDraft, submitDraft, settings, updateSettings, pending, error };
 }
 
 export type AssistantConversation = ReturnType<typeof useAssistantConversation>;
@@ -82,7 +116,7 @@ export interface AssistantPanelProps {
  * add an icon would contradict its documented, confirmed-from-Figma shape.
  */
 export function AssistantPanel({ onClose, conversation }: AssistantPanelProps) {
-  const { tab, setTab, messages, draft, setDraft, submitDraft } = conversation;
+  const { tab, setTab, messages, draft, setDraft, submitDraft, settings, updateSettings, pending, error } = conversation;
 
   return (
     <div className="assistant-panel">
@@ -132,6 +166,18 @@ export function AssistantPanel({ onClose, conversation }: AssistantPanelProps) {
                     </div>
                   ),
                 )}
+                {pending && (
+                  <div className="assistant-panel__message assistant-panel__message--assistant">
+                    <p className="assistant-panel__pending" aria-live="polite">
+                      Thinking…
+                    </p>
+                  </div>
+                )}
+                {error && (
+                  <div className="assistant-panel__error" role="alert">
+                    {error}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -155,8 +201,16 @@ export function AssistantPanel({ onClose, conversation }: AssistantPanelProps) {
               }}
               placeholder="Ask about anything...."
               rows={1}
+              disabled={pending}
             />
-            <IconButton type="submit" variant="primary" size="md" icon={<ArrowUp size={24} />} aria-label="Send" disabled={!draft.trim()} />
+            <IconButton
+              type="submit"
+              variant="primary"
+              size="md"
+              icon={<ArrowUp size={24} />}
+              aria-label="Send"
+              disabled={!draft.trim() || pending}
+            />
           </form>
         </>
       )}
@@ -167,11 +221,54 @@ export function AssistantPanel({ onClose, conversation }: AssistantPanelProps) {
         </div>
       )}
 
-      {tab === "settings" && (
-        <div className="assistant-panel__body assistant-panel__body--placeholder">
-          <p>Assistant settings will show up here.</p>
-        </div>
-      )}
+      {tab === "settings" && <AssistantSettingsForm settings={settings} onSave={updateSettings} />}
     </div>
+  );
+}
+
+interface AssistantSettingsFormProps {
+  settings: AssistantSettings;
+  onSave: (settings: AssistantSettings) => void;
+}
+
+/**
+ * A real API key + model, not a placeholder — but deliberately not built
+ * on `<SettingsCard>`/`<Setting>` like every other Settings tab in this
+ * app: `Setting`'s read mode shows its value as plain text, which would
+ * mean an API key sitting unmasked on screen. A bespoke form with a real
+ * `type="password"` field is a better fit for a secret than stretching a
+ * component built for ordinary display values.
+ */
+function AssistantSettingsForm({ settings, onSave }: AssistantSettingsFormProps) {
+  const [apiKey, setApiKey] = useState(settings.apiKey);
+  const [model, setModel] = useState(settings.model);
+  const showToast = useToast();
+
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    onSave({ apiKey: apiKey.trim(), model: model.trim() });
+    showToast({ status: "positive", title: "Assistant settings saved" });
+  }
+
+  return (
+    <form className="assistant-panel__body assistant-panel__settings" onSubmit={handleSubmit}>
+      <TextInput
+        type="password"
+        label="OpenRouter API key"
+        value={apiKey}
+        onChange={(event) => setApiKey(event.target.value)}
+        placeholder="sk-or-..."
+        helpText="Stored only in this browser's own local storage, sent only to openrouter.ai — never anywhere else. Get a free key at openrouter.ai/keys."
+        autoComplete="off"
+      />
+      <TextInput
+        label="Model"
+        value={model}
+        onChange={(event) => setModel(event.target.value)}
+        placeholder="e.g. meta-llama/llama-3.1-8b-instruct:free"
+        helpText="Any model id from openrouter.ai/models. Without a key, this panel just gives a single canned reply."
+      />
+      <Button type="submit">Save</Button>
+    </form>
   );
 }
