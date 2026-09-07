@@ -1,5 +1,5 @@
 import { useId } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { clsx } from "clsx";
 import "./GaugeChart.css";
 
@@ -127,6 +127,24 @@ export function GaugeChart({ value, label, showValue, mode = "negative-to-positi
   // correct if the thickness ratio ever changes.
   const readoutTop = ((cy - innerRadius / 2) / viewBoxHeight) * 100;
   const labelId = useId();
+  const maskId = useId();
+  // Same masked stroke-dasharray/dashoffset "circular progress" reveal as
+  // DonutChart's own radial fill, sized to a half circumference instead of
+  // a full one — the fill arc only ever spans the top semicircle, so
+  // there's nothing to gain from sweeping the (otherwise-empty) bottom
+  // half too. `rotate(180 cx cy)` lands the mask circle's own implicit
+  // start point (3 o'clock, sweeping clockwise) at 9 o'clock instead,
+  // where the gauge's own 0% reading sits — from there, clockwise traces
+  // 9 → 12 → 3, i.e. exactly the top semicircle the fill occupies.
+  const maskRadius = (innerRadius + outerRadius) / 2;
+  const maskStrokeWidth = outerRadius - innerRadius + 2;
+  const maskHalfCircumference = Math.PI * maskRadius;
+  // The needle is drawn at its real, final angle already (see `needle`
+  // above) — the entrance animation rotates it *away* from that position
+  // by exactly the angle a 0% reading would sit at, then eases back to 0
+  // extra rotation (its own true position), rather than computing a second
+  // separate "0%" coordinate to animate between.
+  const needleSweepDeg = (clamped / 100) * 180;
 
   return (
     <div
@@ -139,7 +157,25 @@ export function GaugeChart({ value, label, showValue, mode = "negative-to-positi
     >
       <svg className="ds-gauge-chart__svg" viewBox={`0 0 ${width} ${viewBoxHeight}`}>
         <path className="ds-gauge-chart__track" d={gaugeArcPath(cx, cy, innerRadius, outerRadius, 0, 1)} />
-        <path className={clsx("ds-gauge-chart__fill", `ds-gauge-chart__fill--${resolvedStatus}`)} d={gaugeArcPath(cx, cy, innerRadius, outerRadius, 0, clamped / 100)} />
+        <defs>
+          <mask id={maskId} maskUnits="userSpaceOnUse">
+            <circle
+              className="ds-gauge-chart__reveal"
+              cx={cx}
+              cy={cy}
+              r={maskRadius}
+              fill="none"
+              stroke="white"
+              strokeWidth={maskStrokeWidth}
+              strokeDasharray={maskHalfCircumference}
+              transform={`rotate(180 ${cx} ${cy})`}
+              style={{ "--ds-gauge-half-circumference": maskHalfCircumference } as CSSProperties}
+            />
+          </mask>
+        </defs>
+        <g mask={`url(#${maskId})`}>
+          <path className={clsx("ds-gauge-chart__fill", `ds-gauge-chart__fill--${resolvedStatus}`)} d={gaugeArcPath(cx, cy, innerRadius, outerRadius, 0, clamped / 100)} />
+        </g>
       </svg>
       {label && !shouldShowValue && (
         <span id={labelId} className="ds-sr-only">
@@ -162,7 +198,14 @@ export function GaugeChart({ value, label, showValue, mode = "negative-to-positi
           otherwise just DOM order here, not something z-index alone fixes
           across the two. */}
       <svg className="ds-gauge-chart__svg ds-gauge-chart__svg--needle" viewBox={`0 0 ${width} ${viewBoxHeight}`}>
-        <line className="ds-gauge-chart__needle" x1={cx} y1={cy} x2={needle.x} y2={needle.y} />
+        <line
+          className="ds-gauge-chart__needle"
+          x1={cx}
+          y1={cy}
+          x2={needle.x}
+          y2={needle.y}
+          style={{ transformOrigin: `${cx}px ${cy}px`, "--ds-gauge-needle-sweep": `${needleSweepDeg}deg` } as CSSProperties}
+        />
         <circle className="ds-gauge-chart__pivot" cx={cx} cy={cy} r={pivotRadius} />
       </svg>
     </div>

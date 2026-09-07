@@ -39,7 +39,15 @@
   align-items: center;
   justify-content: space-between;
   border-top: 1px solid var(--border-subtle);
-  padding: 0 var(--space-4);
+  /* Deliberately less than .ds-bar-chart__bars' own padding (--space-4)
+     below, not matched to it: the first/last tick is positioned via
+     space-between against *this* padding, and its text renders flush
+     against whichever edge it's anchored to (only the far, floating edge
+     moves with this element's own padding — its own padding can't create
+     margin from something outside itself). Giving the row less padding
+     than the bars area leaves genuine clearance between the two, verified
+     via real bounding-rect measurement (not guessed). */
+  padding: 0 var(--space-2);
 }
 
 .ds-bar-chart__baseline {
@@ -95,6 +103,62 @@
   width: min(100%, 2rem);
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   transition: height var(--motion-toggle), background-color var(--duration-base) var(--ease-out);
+  transform-origin: bottom;
+}
+
+/* ── Clustered ──────────────────────────────────────────────────────── */
+
+.ds-bar-chart__cluster {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+  gap: var(--space-1);
+}
+
+.ds-bar-chart__bar--clustered {
+  width: var(--space-2);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  cursor: pointer;
+  transition: height var(--motion-toggle), background-color var(--duration-base) var(--ease-out);
+  transform-origin: bottom;
+}
+
+.ds-bar-chart__bar--clustered:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}
+
+/* ── Stacked ────────────────────────────────────────────────────────── */
+
+.ds-bar-chart__stack {
+  display: flex;
+  /* First datum first in the DOM, but rendered at the *bottom* of the
+     stack — column-reverse's main-start is the bottom edge, so normal
+     source order stacks bottom-up, matching the legend's own left-to-right
+     (= bottom-to-top) reading order confirmed from Figma. */
+  flex-direction: column-reverse;
+  width: var(--space-4);
+  height: 100%;
+}
+
+.ds-bar-chart__segment {
+  width: 100%;
+  cursor: pointer;
+  transition: height var(--motion-toggle), background-color var(--duration-base) var(--ease-out);
+  transform-origin: bottom;
+}
+
+.ds-bar-chart__segment:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+}
+
+/* Only the topmost segment gets rounded corners — confirmed from Figma,
+   where every other segment in the stack is square. Last in DOM order is
+   topmost (see .ds-bar-chart__stack's own comment above). */
+.ds-bar-chart__segment:last-child {
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
 /* ── Horizontal ─────────────────────────────────────────────────────── */
@@ -162,4 +226,38 @@
   height: min(100%, 0.5rem);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   transition: width var(--motion-toggle), background-color var(--duration-base) var(--ease-out);
+  transform-origin: left;
+}
+
+/* ── Page-load entrance ────────────────────────────────────────────────
+   Bars grow from the axis they sit on — the baseline for vertical (up),
+   the category column for horizontal (rightward) — rather than just
+   appearing. `animation`, not the `transition` above: a transition only
+   plays on a property *change*, so a first paint has nothing to animate
+   from without extra mount-state bookkeeping; a keyframe animation always
+   plays from its own `from` state on mount, no JS needed. Respects
+   prefers-reduced-motion by simply not existing outside that query —
+   elements render at their final, correct size either way. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ds-bar-chart-grow-vertical {
+    from {
+      transform: scaleY(0);
+    }
+  }
+
+  @keyframes ds-bar-chart-grow-horizontal {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  .ds-bar-chart__grid--vertical .ds-bar-chart__bar,
+  .ds-bar-chart__bar--clustered,
+  .ds-bar-chart__segment {
+    animation: ds-bar-chart-grow-vertical var(--motion-enter-slow) both;
+  }
+
+  .ds-bar-chart__grid--horizontal .ds-bar-chart__bar {
+    animation: ds-bar-chart-grow-horizontal var(--motion-enter-slow) both;
+  }
 }

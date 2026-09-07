@@ -103,6 +103,7 @@ export function BubbleChart({
                     height: size,
                     background: hovered ? color : chartColorMuted(color),
                     borderColor: color,
+                    animationDelay: `${i * 40}ms`,
                   }}
                   tabIndex={0}
                   role="img"

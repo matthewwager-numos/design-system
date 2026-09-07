@@ -30,6 +30,32 @@
   outline-offset: 2px;
 }
 
+/* ── Page-load entrance ────────────────────────────────────────────────
+   The ring sweeps in from 12 o'clock — a masking circle (see
+   DonutChart.tsx), dashed all the way around its own circumference and
+   revealed via the standard "circular progress" stroke-dashoffset
+   technique, applied to a <mask> rather than a visible stroke so it
+   sweeps the real annular-wedge segments into view. `stroke-dashoffset: 0`
+   here (outside the media query) is the safe, fully-revealed default for
+   reduced-motion — the animation below only ever animates *away* from
+   that resting value, never past it, so this can't strand the ring
+   invisible if the animation is skipped. */
+.ds-donut-chart__reveal {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ds-donut-chart-reveal {
+    from {
+      stroke-dashoffset: var(--ds-donut-circumference);
+    }
+  }
+
+  .ds-donut-chart__reveal {
+    animation: ds-donut-chart-reveal var(--motion-enter-slow) both;
+  }
+}
+
 .ds-donut-chart__center {
   position: absolute;
   inset: 0;

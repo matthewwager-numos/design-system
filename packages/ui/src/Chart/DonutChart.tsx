@@ -1,4 +1,5 @@
-import type { FocusEvent, MouseEvent } from "react";
+import { useId } from "react";
+import type { CSSProperties, FocusEvent, MouseEvent } from "react";
 import { clsx } from "clsx";
 import { ChartLegend } from "./ChartLegend";
 import { ChartTooltip } from "./ChartTooltip";
@@ -80,9 +81,24 @@ export function DonutChart({
   const total = data.reduce((sum, d) => sum + d.value, 0) || 1;
   const legendItems = data.map((d, i) => ({ label: d.label, color: d.color ?? chartColor(i) }));
   const { hoveredKey, tooltip, tooltipVisible, showTooltipAtPoint, showTooltipAtElement, hideTooltip } = useChartHover();
+  // Scopes the <mask> id to this instance — SVG ids are document-global, so
+  // two DonutCharts on one page would otherwise silently share (and fight
+  // over) the same mask.
+  const maskId = useId();
 
   const outerRadius = 50;
   const innerRadius = 50 - thickness;
+  // The reveal mask: a circle stroked thick enough to cover the whole ring,
+  // dashed all the way around its own circumference and animated from
+  // fully-offset (nothing showing) to 0 (fully showing) — the standard
+  // "circular progress" technique, applied to a <mask> instead of a visible
+  // stroke so it sweeps the real annular-wedge segments into view instead
+  // of drawing its own ring on top of them. +2 on the stroke width and
+  // radius clears the wedges' own outer/inner edges with a little to
+  // spare, so antialiasing at the mask's boundary never clips them.
+  const maskRadius = (innerRadius + outerRadius) / 2;
+  const maskStrokeWidth = outerRadius - innerRadius + 2;
+  const maskCircumference = 2 * Math.PI * maskRadius;
 
   let cumulative = 0;
   const segments = data.map((d, i) => {
@@ -114,38 +130,56 @@ export function DonutChart({
     <div className={clsx("ds-donut-chart", className)}>
       <div className="ds-donut-chart__ring" style={{ width: size, height: size }}>
         <svg viewBox="0 0 100 100" width={size} height={size}>
-          {segments.map((segment) => {
-            const tooltipPoint = { label: segment.key, value: `${segment.value} · ${segment.percent}%`, color: segment.color };
-            return (
-              <path
-                key={segment.key}
-                d={donutSlicePath(innerRadius, outerRadius, segment.startFraction, segment.endFraction)}
-                fill={hoveredKey && hoveredKey !== segment.key ? chartColorMuted(segment.color) : segment.color}
-                tabIndex={0}
-                role="img"
-                aria-label={`${segment.key}: ${segment.value} (${segment.percent}%)`}
-                className="ds-donut-chart__segment"
-                onMouseEnter={(event: MouseEvent) => showTooltipAtPoint(segment.key, event.clientX, event.clientY, tooltipPoint)}
-                onMouseMove={(event: MouseEvent) => showTooltipAtPoint(segment.key, event.clientX, event.clientY, tooltipPoint)}
-                onMouseLeave={hideTooltip}
-                onFocus={(event: FocusEvent) => showTooltipAtElement(segment.key, event.currentTarget, tooltipPoint)}
-                onBlur={hideTooltip}
+          <defs>
+            <mask id={maskId} maskUnits="userSpaceOnUse">
+              <circle
+                className="ds-donut-chart__reveal"
+                cx={50}
+                cy={50}
+                r={maskRadius}
+                fill="none"
+                stroke="white"
+                strokeWidth={maskStrokeWidth}
+                strokeDasharray={maskCircumference}
+                transform="rotate(-90 50 50)"
+                style={{ "--ds-donut-circumference": maskCircumference } as CSSProperties}
               />
-            );
-          })}
-          {dividers.map((divider) => (
-            <line
-              key={`divider-${divider.key}`}
-              x1={divider.x1}
-              y1={divider.y1}
-              x2={divider.x2}
-              y2={divider.y2}
-              stroke="var(--background-default)"
-              strokeWidth={1}
-              vectorEffect="non-scaling-stroke"
-              pointerEvents="none"
-            />
-          ))}
+            </mask>
+          </defs>
+          <g mask={`url(#${maskId})`}>
+            {segments.map((segment) => {
+              const tooltipPoint = { label: segment.key, value: `${segment.value} · ${segment.percent}%`, color: segment.color };
+              return (
+                <path
+                  key={segment.key}
+                  d={donutSlicePath(innerRadius, outerRadius, segment.startFraction, segment.endFraction)}
+                  fill={hoveredKey && hoveredKey !== segment.key ? chartColorMuted(segment.color) : segment.color}
+                  tabIndex={0}
+                  role="img"
+                  aria-label={`${segment.key}: ${segment.value} (${segment.percent}%)`}
+                  className="ds-donut-chart__segment"
+                  onMouseEnter={(event: MouseEvent) => showTooltipAtPoint(segment.key, event.clientX, event.clientY, tooltipPoint)}
+                  onMouseMove={(event: MouseEvent) => showTooltipAtPoint(segment.key, event.clientX, event.clientY, tooltipPoint)}
+                  onMouseLeave={hideTooltip}
+                  onFocus={(event: FocusEvent) => showTooltipAtElement(segment.key, event.currentTarget, tooltipPoint)}
+                  onBlur={hideTooltip}
+                />
+              );
+            })}
+            {dividers.map((divider) => (
+              <line
+                key={`divider-${divider.key}`}
+                x1={divider.x1}
+                y1={divider.y1}
+                x2={divider.x2}
+                y2={divider.y2}
+                stroke="var(--background-default)"
+                strokeWidth={1}
+                vectorEffect="non-scaling-stroke"
+                pointerEvents="none"
+              />
+            ))}
+          </g>
         </svg>
         {showCenterLabel && (
           <div className="ds-donut-chart__center">

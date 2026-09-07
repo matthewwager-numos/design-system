@@ -67,6 +67,29 @@
     height var(--motion-toggle);
 }
 
+/* ── Page-load entrance ────────────────────────────────────────────────
+   Bubbles scale up from their own center rather than just appearing —
+   same "animation, not transition" reasoning as the other chart types (a
+   transition can't play on first paint with nothing to change from). The
+   keyframe carries the full transform (translate *and* scale) rather than
+   layering a separate scale via a custom property, since interpolating a
+   plain `transform` list needs no `@property` registration to animate
+   smoothly — simpler than it would be to keep a custom property in sync. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ds-bubble-chart-scale-in {
+    from {
+      transform: translate(-50%, -50%) scale(0);
+    }
+    to {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  .ds-bubble-chart__bubble {
+    animation: ds-bubble-chart-scale-in var(--motion-enter-slow) both;
+  }
+}
+
 .ds-bubble-chart__bubble:focus-visible {
   outline: 2px solid var(--button-primary-default);
   outline-offset: 2px;

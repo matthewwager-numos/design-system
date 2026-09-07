@@ -5,7 +5,7 @@ import * as BarChartStories from "./Chart-Bar.stories";
 
 # BarChart
 
-A vertical or horizontal bar chart — matches Figma's Chart component's colors, typography, and grid/baseline treatment exactly. `orientation="horizontal"` is the same chart transposed, not a separate implementation.
+A vertical or horizontal bar chart — matches Figma's Chart component's colors, typography, and grid/baseline treatment exactly. `orientation="horizontal"` is the same chart transposed, not a separate implementation. Three variants: `"single"` (default, one bar per category), `"clustered"` (several series' bars side by side per category), and `"stacked"` (several series' segments stacked into one bar per category).
 
 <Primary />
 
@@ -49,8 +49,36 @@ import "@numosai/ui/styles.css"; // once, at your app entry
 Confirmed from the request behind this component: legend, grid lines (with their axis tick values), and category labels are three separate booleans, not one bundled "show chrome" switch — Figma's own static example always shows all three together, but nothing about the chart depends on that.
 
 <Canvas of={BarChartStories.GridLinesHidden} />
-<Canvas of={BarChartStories.LegendHidden} />
 <Canvas of={BarChartStories.Minimal} />
+
+## Legend defaults off for `variant="single"`
+
+The default variant is always one bar per labeled category. With `showCategoryLabels` on — the normal case — every bar already carries its own label, so a legend alongside it would just repeat the same names in a second place. It only earns its keep when there's no room for those per-bar labels in the first place:
+
+<Canvas of={BarChartStories.WithLegend} />
+
+## Clustered and stacked
+
+`variant="clustered"`/`variant="stacked"` group several *series* under one shared category instead — several colors sharing one axis label (e.g. a month), each color meaning something different. That's the actual scenario a legend is for: the axis identifies the category, color identifies the series, and neither one substitutes for the other — so both variants default `showLegend` to `true`. Their `data` shape is different from the single-bar variant's own: an array of `{ category, values }` (one shared axis label plus a value per series), alongside a `series` array (`{ key, label, color? }`) naming and coloring each one consistently across every category.
+
+Vertical-only for now — Figma's own reference only designed these two variants that way.
+
+```tsx
+<BarChart
+  variant="clustered" // or "stacked"
+  series={[
+    { key: "first", label: "First" },
+    { key: "second", label: "Second" },
+  ]}
+  data={[
+    { category: "Jan", values: { first: 58, second: 73 } },
+    { category: "Feb", values: { first: 40, second: 45 } },
+  ]}
+/>
+```
+
+<Canvas of={BarChartStories.Clustered} />
+<Canvas of={BarChartStories.Stacked} />
 
 ## Colors
 

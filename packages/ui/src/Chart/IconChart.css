@@ -1,0 +1,178 @@
+/*
+ * IconChart — an icon-multiples ("pictogram"/"isotype") chart, matching
+ * Figma's three reference layouts (horizontal rows, vertical columns, a
+ * single wrapping run) plus a fixed-grid "percentage of a whole" variant.
+ * Caption/legend text is Paragraph XS Regular in content-placeholder, the
+ * same convention every other chart in this library already uses.
+ */
+
+.ds-icon-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.ds-icon-chart__caption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-placeholder);
+}
+
+.ds-icon-chart__label {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-placeholder);
+  white-space: nowrap;
+}
+
+/* ── Horizontal ─────────────────────────────────────────────────────── */
+
+.ds-icon-chart--horizontal .ds-icon-chart__groups {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  row-gap: var(--space-2);
+  column-gap: var(--space-4);
+}
+
+/* Each datum's own label+icons stay one wrapper in the markup (shared with
+   the vertical/wrap orientations below), but need to act as two *direct*
+   grid children here — `display: contents` drops the wrapper out of the
+   box tree while keeping its children in place, letting the grid line up
+   every row's label column and icon column without any per-row width
+   measurement. */
+.ds-icon-chart--horizontal .ds-icon-chart__group {
+  display: contents;
+}
+
+.ds-icon-chart--horizontal .ds-icon-chart__icons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+/* ── Vertical ───────────────────────────────────────────────────────── */
+
+.ds-icon-chart--vertical .ds-icon-chart__groups {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: var(--space-4);
+  /* Without an explicit width, this row sizes to its own content instead of
+     the chart's available width — `.ds-icon-chart`'s `align-items:
+     flex-start` (so the caption/legend below don't stretch full-width) means
+     it won't stretch this child for free. */
+  width: 100%;
+}
+
+.ds-icon-chart--vertical .ds-icon-chart__group {
+  display: flex;
+  /* The label is first in the markup (shared with the horizontal grid
+     above, where it's the first *column* rather than the first row) —
+     reversing here puts it last visually, below the icon stack, without
+     needing different DOM order per orientation. */
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: var(--space-2);
+  /* A fixed, shared target width — not each column's own natural content —
+     is what makes every column line up the same regardless of label length.
+     `flex-grow: 1` still lets them all widen equally past that target when
+     the chart has room to spare, and `flex-shrink: 1` lets them all narrow
+     equally under real space pressure, so "uniform" holds in both
+     directions; only `min-width: 0` needs overriding, since a long
+     one-word label (which can't break) would otherwise refuse to shrink
+     below its own full width and blow the column out instead of
+     truncating. */
+  flex: 1 1 5rem;
+  min-width: 0;
+}
+
+.ds-icon-chart--vertical .ds-icon-chart__label {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.ds-icon-chart--vertical .ds-icon-chart__icons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Wrap ───────────────────────────────────────────────────────────── */
+
+.ds-icon-chart__wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+/* ── Icons ──────────────────────────────────────────────────────────── */
+
+.ds-icon-chart__groups svg,
+.ds-icon-chart__wrap svg,
+.ds-icon-chart__grid svg {
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color var(--duration-base) var(--ease-out), fill var(--duration-base) var(--ease-out);
+}
+
+/* Icons pop in one after another on load — each icon's own `animation-delay`
+   is set inline (see IconChart.tsx), spreading a fixed total budget across
+   however many icons are on screen so the reveal takes about the same time
+   whether there are 5 icons or 100. */
+@media (prefers-reduced-motion: no-preference) {
+  .ds-icon-chart__groups svg,
+  .ds-icon-chart__wrap svg,
+  .ds-icon-chart__grid svg,
+  .ds-icon-chart__caption svg {
+    animation: ds-icon-chart-pop-in var(--motion-enter) both;
+  }
+
+  @keyframes ds-icon-chart-pop-in {
+    from {
+      transform: scale(0);
+    }
+  }
+
+  /* Vertical columns read as a stack building upward, so each icon rises
+     into place from below instead of popping in symmetrically — the
+     stagger order is reversed to match (see IconChart.tsx), starting at
+     the base of the column and working up. */
+  .ds-icon-chart--vertical .ds-icon-chart__icons svg {
+    animation-name: ds-icon-chart-rise-up;
+  }
+
+  @keyframes ds-icon-chart-rise-up {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+  }
+}
+
+.ds-icon-chart__groups svg:focus-visible,
+.ds-icon-chart__wrap svg:focus-visible,
+.ds-icon-chart__grid svg:focus-visible {
+  outline: 2px solid var(--button-primary-default);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Percentage ─────────────────────────────────────────────────────── */
+
+/* The grid is the widest thing in this variant, so centering every child
+   (rather than the default left-aligned `flex-start`) centers the caption
+   and legend underneath it without needing to know the grid's own width. */
+.ds-icon-chart--percentage {
+  align-items: center;
+}
+
+.ds-icon-chart__grid {
+  display: grid;
+}

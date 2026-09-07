@@ -72,6 +72,41 @@
   fill: var(--content-emphasis);
 }
 
+/* ── Page-load entrance ────────────────────────────────────────────────
+   The fill arc sweeps in radially (a masked stroke-dasharray reveal, same
+   technique as DonutChart — see GaugeChart.tsx) and the needle swings up
+   from the 0% position to its real reading, together. `stroke-dashoffset:
+   0` / `transform: none` here (outside the media query) are the safe,
+   fully-revealed/fully-in-place defaults for reduced-motion — both
+   animations below only ever animate *away* from those resting values,
+   never past them, so skipping the animation can't strand either one in
+   a wrong position. */
+.ds-gauge-chart__reveal {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ds-gauge-chart-reveal {
+    from {
+      stroke-dashoffset: var(--ds-gauge-half-circumference);
+    }
+  }
+
+  @keyframes ds-gauge-chart-needle-sweep {
+    from {
+      transform: rotate(calc(-1 * var(--ds-gauge-needle-sweep)));
+    }
+  }
+
+  .ds-gauge-chart__reveal {
+    animation: ds-gauge-chart-reveal var(--motion-enter-slow) both;
+  }
+
+  .ds-gauge-chart__needle {
+    animation: ds-gauge-chart-needle-sweep var(--motion-enter-slow) both;
+  }
+}
+
 .ds-gauge-chart__readout {
   /* `top` is set inline from real arc geometry — see GaugeChart.tsx. */
   position: absolute;

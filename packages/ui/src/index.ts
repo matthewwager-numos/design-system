@@ -143,14 +143,19 @@ export type { CardProps, CardExpand, CardHeaderProps, CardHeaderAction, CardGrou
 export { SettingsCard } from "./SettingsCard";
 export type { SettingsCardProps } from "./SettingsCard";
 
-export { ChartLegend, BarChart, LineChart, AreaChart, DonutChart, SankeyChart, BubbleChart, GaugeChart, GanttChart, chartColor, chartColorMuted } from "./Chart";
+export { ChartLegend, BarChart, LineChart, AreaChart, DonutChart, SankeyChart, BubbleChart, GaugeChart, GanttChart, IconChart, chartColor, chartColorMuted } from "./Chart";
 export type {
   ChartLegendProps,
   ChartLegendItem,
   ChartLegendOrientation,
   BarChartProps,
   BarChartOrientation,
+  BarChartVariant,
   ChartDatum,
+  ChartSeries,
+  GroupedChartDatum,
+  SingleBarChartProps,
+  GroupedBarChartProps,
   LineChartProps,
   LineChartSeries,
   AreaChartProps,
@@ -171,6 +176,11 @@ export type {
   GanttGroup,
   GanttTask,
   GanttMilestone,
+  IconChartProps,
+  IconChartOrientation,
+  IconChartDatum,
+  IconChartCategoriesProps,
+  IconChartPercentageProps,
 } from "./Chart";
 
 export { DragList } from "./DragList";
