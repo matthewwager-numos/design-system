@@ -1,6 +1,6 @@
 /*
  * Carousel — matches Figma's Carousel exactly: space-l (16px) gaps between
- * the arrows/slot and between the viewer/dots, the slot's own radius-md
+ * the arrows/slot and between the viewer/dots, each slide's own radius-md
  * (Figma's "Radius/S" primitive is 8px — this codebase's --radius-md, not
  * --radius-sm, the same offset already confirmed for <Card>/<Popover>),
  * and dots where the active one is a wider pill in content-brand-primary
@@ -18,6 +18,11 @@
   align-items: center;
   gap: var(--space-4);
   width: 100%;
+  /* The gap between simultaneously-visible slides at itemsPerView > 1 — not
+     a prop, since every other spacing in this component (arrows/slot, dots)
+     is already this same fixed token rather than independently
+     configurable. */
+  --ds-carousel-gap: var(--space-4);
 }
 
 .ds-carousel__viewer {
@@ -28,28 +33,117 @@
   width: 100%;
 }
 
+/* `buttonPlacement="overlay"` — the two arrows go `position: absolute`
+   (floating over the slide content instead of reserving their own row
+   space), anchored to this row's box. */
+.ds-carousel__viewer--buttons-overlay {
+  position: relative;
+}
+
 .ds-carousel__slot {
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  border-radius: var(--radius-md);
+  /* No radius here — each *slide* now rounds its own corners (below), so
+     this is a plain rectangular clip window for whichever slides are
+     translated outside it, not a mask that would otherwise round only the
+     first/last slide's outer edge and leave every seam between slides
+     looking square. */
+  position: relative; /* anchor for `dotPlacement="overlay"` */
+  /* Let the browser keep handling vertical page scroll natively — only the
+     horizontal axis is captured by the drag/swipe handlers below. */
+  touch-action: pan-y;
+  transition: height var(--motion-toggle);
 }
 
 .ds-carousel__track {
   display: flex;
   width: 100%;
+  /* Must actually be applied here, not just folded into each slide's own
+     width calc below — the translate-per-step math (see Carousel.tsx)
+     assumes moving past one slide *and* one real gap lands exactly at the
+     start of the next, for every adjacent pair, not just the visible ones. */
+  gap: var(--ds-carousel-gap);
+  /* Not the flex default (`stretch`) — every slide keeping its own natural
+     height, rather than being forced to match whichever slide (including
+     off-screen ones) happens to be tallest, is what lets the viewer's own
+     height (set from JS, see Carousel.tsx) genuinely track just the
+     currently-visible slide(s). */
+  align-items: flex-start;
   transition: transform var(--motion-toggle);
+}
+
+/* No pointer-driven transition while a drag is in progress — the track
+   should follow the finger/cursor 1:1 with zero easing lag, then animate
+   the snap to its resting position (a new slide, or back to the old one)
+   once the transition is re-enabled on release. */
+.ds-carousel__track--dragging {
+  transition: none;
 }
 
 .ds-carousel__slide {
   flex: none;
-  width: 100%;
+  /* Set alongside the transform, from the same expression, on
+     `.ds-carousel__track` itself (see Carousel.tsx) — both need to move in
+     lockstep as `itemsPerView` changes, so they're computed together in one
+     place rather than kept in sync by hand across a prop change. */
+  width: calc(var(--ds-carousel-slide-basis));
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* Overlaid arrows sit on top of arbitrary slide content (a photo, a
+   thumbnail) rather than the page's own background, so — unlike the
+   perimeter default — they get their own fixed dark scrim and light icon
+   regardless of theme, the same reasoning a photo app's floating controls
+   use a consistent treatment independent of light/dark mode. */
+.ds-carousel__viewer--buttons-overlay .ds-carousel__button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  border-color: transparent;
+  background: color-mix(in srgb, black 40%, transparent);
+  color: var(--content-emphasis-inverse);
+}
+
+.ds-carousel__viewer--buttons-overlay .ds-carousel__button:hover:not(:disabled) {
+  background: color-mix(in srgb, black 55%, transparent);
+}
+
+.ds-carousel__viewer--buttons-overlay .ds-carousel__button:disabled {
+  border-color: transparent;
+  background: color-mix(in srgb, black 20%, transparent);
+  color: var(--content-emphasis-inverse);
+  opacity: 0.6;
+}
+
+.ds-carousel__viewer--buttons-overlay .ds-carousel__button--prev {
+  left: var(--space-3);
+}
+
+.ds-carousel__viewer--buttons-overlay .ds-carousel__button--next {
+  right: var(--space-3);
 }
 
 .ds-carousel__dots {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+/* `dotPlacement="overlay"` — floats over the bottom edge of the slide
+   content instead of its own row below the viewer; the same fixed dark
+   scrim reasoning as the overlaid arrows above. */
+.ds-carousel__dots--overlay {
+  position: absolute;
+  bottom: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, black 40%, transparent);
 }
 
 .ds-carousel__dot {
@@ -64,9 +158,17 @@
   transition: width var(--motion-toggle), background-color var(--duration-base) var(--ease-out);
 }
 
+.ds-carousel__dots--overlay .ds-carousel__dot {
+  background: color-mix(in srgb, white 40%, transparent);
+}
+
 .ds-carousel__dot--active {
   width: 1rem;
   background: var(--content-brand-primary);
+}
+
+.ds-carousel__dots--overlay .ds-carousel__dot--active {
+  background: var(--content-emphasis-inverse);
 }
 
 .ds-carousel__dot:focus-visible {

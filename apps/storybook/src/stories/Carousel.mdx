@@ -5,7 +5,7 @@ import * as CarouselStories from "./Carousel.stories";
 
 # Carousel
 
-A single-slide-at-a-time viewer with previous/next arrows and dot indicators — matches Figma's Carousel exactly: `<IconButton variant="secondary" size="md">` arrows and dots where the active one is a wider pill among plain circles. Figma's own mockup is a single static slot; sliding between real `slides` via a translated track is a genuine implementation, not a reproduction of that placeholder.
+A slide viewer with previous/next arrows, dot indicators, and drag/swipe navigation — matches Figma's Carousel exactly: `<IconButton variant="secondary" size="md">` arrows and dots where the active one is a wider pill among plain circles. Figma's own mockup is a single static slot; sliding between real `slides` via a translated track is a genuine implementation, not a reproduction of that placeholder. A second Figma variant shows multiple slides visible at once — that's `itemsPerView`, not a different component.
 
 <Primary />
 
@@ -47,13 +47,41 @@ Pass `loop` to wrap from the last slide back to the first (and vice versa) inste
 
 <Canvas of={CarouselStories.Loop} />
 
+## `itemsPerView` — multiple slides at once
+
+Defaults to 1 (Figma's original single-slide variant). Set it higher to show that many slides side by side instead — Figma's own multi-item variant. Navigation still steps one slide at a time (a sliding window revealing/hiding one slide at each edge), not by a full page of `itemsPerView` slides at once, and `index`'s valid range shrinks accordingly so the window never scrolls past the last slide into empty space — e.g. 5 slides at `itemsPerView={2}` can only stop at indices 0–3.
+
+<Canvas of={CarouselStories.MultipleItemsPerView} />
+
+## `showButtons` — hide the arrows for swipe-only navigation
+
+Defaults to true. Set to `false` at mobile sizes where an on-screen swipe gesture reads better than tappable arrows — dragging (via Pointer Events, so touch, mouse, and pen all work identically) is always available regardless of this prop, so hiding the buttons doesn't remove a way to navigate. A drag past a fixed 50px threshold advances/retreats one slide and animates the rest of the way to its resting position; releasing short of that snaps back to the current slide. `touch-action: pan-y` on the viewer keeps vertical page scrolling working normally on touch devices — only the horizontal gesture is captured.
+
+<Canvas of={CarouselStories.ButtonsHidden} />
+
 ## Dots
 
-One dot per slide, shown below the viewer — click one to jump straight to that slide. Hidden automatically when there's only one slide (no navigation possible), or pass `showDots={false}` to hide them regardless of slide count.
+One dot per valid position, shown below the viewer — click one to jump straight there. At `itemsPerView={1}` that's one per slide; at higher values, one per valid window start (see `itemsPerView` above), since a position beyond that would leave the window's tail end empty. Hidden automatically when there's only one position (no navigation possible), or pass `showDots={false}` to hide them regardless.
 
 <Canvas of={CarouselStories.NoDots} />
 <Canvas of={CarouselStories.TwoSlides} />
 <Canvas of={CarouselStories.SingleSlide} />
+
+## `buttonPlacement`/`dotPlacement` — perimeter or overlay
+
+Both default to `"perimeter"`: arrows in their own row beside the slot, dots in their own row below it — set independently of each other, e.g. perimeter arrows with overlaid dots. `"overlay"` instead floats them on top of the slide content (arrows centered on the left/right edges, dots centered along the bottom), for full-bleed media — a photo, a video — where a separate row would just waste space. Since overlaid controls sit on arbitrary content rather than the page's own background, they get a fixed dark scrim + light icon/dot color regardless of light/dark theme, the same reasoning a photo app's floating controls stay visually consistent independent of the OS setting.
+
+<Canvas of={CarouselStories.OverlayControls} />
+
+## Slides round their own corners
+
+Each slide — not just the outer edges of the viewer — has its own `border-radius`/`overflow: hidden`, so every slide reads as a self-contained rounded card, including the seams between simultaneously-visible ones at `itemsPerView > 1`. The slot itself clips as a plain rectangle (needed regardless, to hide slides translated outside the visible window) with no radius of its own.
+
+## Height follows the active slide
+
+Nothing here imposes a height — size your own slide content (an `<img>`, a fixed-height placeholder) — and the viewer's own height smoothly animates to match whichever slide(s) are actually visible as you navigate, rather than sitting fixed at whatever the tallest slide overall happens to be. That's what makes the same component work for a strip of small thumbnails or a single full-screen image without any extra configuration.
+
+<Canvas of={CarouselStories.AutoHeight} />
 
 ## Controlled index
 
@@ -63,15 +91,15 @@ Skip `defaultIndex` and drive the active slide yourself with `index`/`onIndexCha
 
 ## Behavior
 
-- **Navigation**: the arrows, clicking a dot, or the Left/Right arrow keys while focus is anywhere inside the carousel.
-- **Transition**: the track slides via `transform: translateX(...)` on `--motion-toggle` — a persistent-state change between two slides, not a mount/unmount, so it doesn't use an enter/exit token.
-- **Sizing**: slides aren't given a height by this component — size your own slide content (an `<img>`, a fixed-height placeholder), and the viewer sizes to whatever the tallest one ends up being.
-- **Not handled yet**: no autoplay, and no swipe/drag gesture support — navigation is arrows, dots, and keyboard only.
+- **Navigation**: the arrows (when `showButtons`), clicking a dot, the Left/Right arrow keys while focus is anywhere inside the carousel, or dragging/swiping the slot directly.
+- **Transition**: the track slides via `transform: translateX(...)` on `--motion-toggle` — a persistent-state change between two slides, not a mount/unmount, so it doesn't use an enter/exit token. Suppressed entirely while a drag is in progress, so the track follows the pointer with no lag, then re-enabled the instant it's released so the snap to a resting position animates.
+- **Sizing**: slides aren't given a height by this component — size your own slide content (an `<img>`, a fixed-height placeholder) — and the viewer's own height (measured via `ResizeObserver`, animated on `--motion-toggle`) follows just the currently-visible slide(s), not the tallest slide overall.
+- **Not handled yet**: no autoplay.
 
 ## Accessibility
 
 - The root is `role="region"` `aria-roledescription="carousel"` with an `aria-label` you provide (describe what the slides *are* — "Product photos" — not the word "carousel," which `aria-roledescription` already announces).
-- Each slide is `role="group"` `aria-roledescription="slide"` with an `aria-label` of "Slide X of N", and `aria-hidden` while it isn't the active one.
+- Each slide is `role="group"` `aria-roledescription="slide"` with an `aria-label` of "Slide X of N", and `aria-hidden` while it's outside the currently visible window.
 - Each dot is a real `<button>` with an `aria-label` ("Go to slide X") and `aria-current` on the active one.
 - Left/Right arrow keys navigate from anywhere inside the carousel, not just when an arrow button itself has focus.
 
