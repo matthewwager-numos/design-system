@@ -1,0 +1,145 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as JournalEntryStories from "./JournalEntry.stories";
+
+<Meta of={JournalEntryStories} />
+
+# JournalEntry
+
+A double-entry journal entry: metadata (date, reference #), a list of debit/credit line items, and a total row that validates debits equal credits — a "Balanced" pill when they match, an "Off by $X" pill when they don't, live in both read and edit mode. A compound component built from real primitives (`Select`, `TextInput`, `IconButton`, `Label`) rather than `<Form>` — its own chrome (a dashed box while editing, a plain bottom-border row while reading) doesn't match `<Form>`'s solid-card-plus-shadow treatment, so it isn't forced onto it.
+
+Read mode has no horizontal divider lines at all, between rows or above the total — spacing alone sets them apart, the same "no line, just room" approach a much earlier version of editing also used. Editing itself now keeps a divider under the header and under every line — matching Figma's own edit-mode reference exactly — with the total row set apart from the last line by spacing alone (a second divider there would just double up).
+
+While editing, the entry is literally nested `<fieldset>`s — one wrapping date/reference, one per line item. Neither fieldset has a visible legend (see Accessibility below); each line splits into two columns — left (Account, then Department+Location, then Description — three fixed, always-stacked rows) and right (Debit, Credit, delete). Below a phone-narrow width, the right column wraps below the left one as a whole unit (see Responsive layout below).
+
+<Canvas of={JournalEntryStories.Default} />
+
+## When to use
+
+- Recording or reviewing a double-entry accounting transaction — a fixed set of debit/credit lines against a chart of accounts, where the whole point is that the two sides reconcile.
+- Anywhere the "is this balanced?" check itself is part of what the UI needs to communicate, not just the raw numbers.
+
+## When NOT to use
+
+- A general-purpose editable table or line-item list with no debit/credit relationship — reach for `Cell`/`Column` or a plain table instead.
+- Free-form account creation — `accountOptions`/`departmentOptions`/`locationOptions` are closed sets of choices offered through `Select`, not text fields.
+
+## Implementation
+
+```tsx
+import { useState } from "react";
+import { JournalEntry } from "@numosai/ui";
+import type { JournalEntryValue } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+function Example() {
+  const [value, setValue] = useState<JournalEntryValue>({
+    date: "2027-01-14",
+    reference: "5678",
+    lines: [
+      { id: "line-1", account: "1002", debit: 1250, memo: "January vendor accrual reversal" },
+      { id: "line-2", account: "1001", credit: 1250, memo: "Cash settlement" },
+    ],
+  });
+
+  return (
+    <JournalEntry
+      value={value}
+      onSave={setValue}
+      accountOptions={[
+        { value: "1001", label: "000001 Cash operating account" },
+        { value: "1002", label: "000002 Intransit Vendor account" },
+      ]}
+      departmentOptions={[{ value: "smb", label: "10 – SMB" }]}
+      locationOptions={[{ value: "other", label: "03 Other" }]}
+    />
+  );
+}
+```
+
+`JournalEntry` reads its `lines` from one `value` prop (an array of homogeneous structured records — closer to `DragList`'s `items`+callbacks model than `SettingsCard`'s consumer-authored children), so there's no separate line-item sub-component to import or render yourself.
+
+## Editing
+
+<Canvas of={JournalEntryStories.Editing} />
+
+Edit mode follows the same controlled/uncontrolled `editing` pattern as `SettingsCard` (`editing?`, `defaultEditing`, `onEditingChange`) — omit `editing` to let the component manage its own, or control it yourself. Where it differs from `SettingsCard`: instead of uncontrolled fields that simply unmount on cancel (which works for a flat form but not a dynamic array of structured rows), entering edit mode seeds an internal `draft` copy of `value`. Every field — date, reference, and each line's account/department/location/memo/debit/credit — mutates only that draft:
+
+- **Save** (the check icon) calls `onSave(draft)` once, with the complete edited value, and returns to read mode.
+- **Cancel** (the × icon) discards the draft entirely and returns to read mode — `value` is untouched, so the next time you enter edit mode you're back to the original data, not whatever was typed before cancelling.
+
+Both are a plain `ghost` `IconButton` — quiet chrome, since they sit inside an already-busy header rather than needing to draw attention as the entry's primary action the way a standalone "Save" button might.
+
+`JournalEntry` never calls `onSave` on its own — nothing persists until the check icon (or Return, below) is clicked.
+
+**Keyboard**: Return saves, Escape cancels, from anywhere in the entry. Both are scoped carefully to avoid stepping on native behavior: Return only acts when focus is in a plain text/number/date `<input>` (Description, Debit, Credit, Date, Reference) — a `<button>` (a `Select` trigger, a dropdown option, even Save/Cancel themselves) already activates on Return via the browser's own behavior, so handling it again there would double-fire, e.g. picking an option from an open `Select` with Return would otherwise also save and exit edit mode. Escape only cancels when no `Select` dropdown is open anywhere in the entry — otherwise it just closes that dropdown, the way Escape closes any open menu elsewhere in this library.
+
+## Debit/credit exclusivity
+
+Each line is either a debit or a credit, never both. While editing, typing an amount into one side automatically clears and disables the other side of that same row — matching the two sample rows in Figma (one active-debit/disabled-credit, one the reverse). This is enforced per row, not globally: different lines in the same entry are free to be debits or credits independently.
+
+Debit always precedes Credit — in the field order, and in every aligned column below — matching standard accounting convention (debits on the left, credits on the right). Each field carries its own "DR"/"CR" tag as a `leadingIcon`, but neutrally colored — not the red/green read mode uses for a *settled* figure's sign, which would be premature for a field that's still being edited. That tag dims to a placeholder color on whichever side has no value yet (matching the "0.00" placeholder text right next to it), then switches to a plain, slightly-more-present color once a real value is entered.
+
+The *disabled* field (whichever side the row isn't using, once the other side has a value) drops its tag entirely and shows a plain em dash instead — once a row clearly has a debit, a "CR" label sitting next to a dash is just clutter repeating what the disabled, secondary-background field already makes obvious.
+
+## Adding and removing lines
+
+The **+** button next to "Total" (edit mode only, and ahead of it — not after) appends a blank line — its own new `<fieldset>`; each line's trash icon removes it. Both only mutate the in-progress draft, same as every other field — nothing commits until Save. Grouping each line as a real fieldset (rather than a styled `<div>`) means a screen reader announces entering and leaving a distinct group when a line is added or removed, not just a silent change in the number of rows — even though that group has no *visible* legend (see Accessibility below).
+
+A new line isn't always blank, though: if the entry is currently off balance, **+** pre-fills the new line with whichever side is short, by exactly the gap — the common reason to add a line at all is that it's the one about to close that gap, so it starts already holding that amount, ready to just pick an account for. Add a line to an entry that's already balanced (or empty) and it comes back plain, with nothing pre-filled.
+
+## Responsive layout
+
+<Canvas of={JournalEntryStories.Editing} />
+
+Resize the canvas above (or view it on a phone) to see the effect — a line's two columns wrap as a pair of whole units, purely through flexbox and `min-width` (no container query drives it):
+
+1. **Wide**: Account, then Department+Location, then the memo (left column) sit beside Debit/Credit/delete (right column) — two columns (`.ds-journal-entry__line-col`) side by side, each with room to spare.
+2. **Narrow**: the right column (Debit/Credit/delete) wraps below the left one, as one whole unit — not one field peeling off at a time. Both columns carry a real `min-width`, so it's the *columns* that wrap against each other once they no longer fit side by side, matching read mode's own row (`__row-main` + `__row-amounts`), which already has this same two-part shape. Within the left column, Account and Department+Location always stay on their own fixed, sequential rows — they never wrap relative to each other, matching Figma's own edit-mode reference exactly.
+
+The component measures its own box (`container-type: inline-size`), not the viewport, so it reflows correctly even when it's the viewport that's wide but the entry itself is embedded in a narrow column or side panel.
+
+Read-mode amounts follow the same accounting convention as edit mode: Debit and Credit are real, fixed-width, aligned columns (matching Figma's finished read-mode frame exactly), with a faint em dash for whichever side a line doesn't use — not two independently-sized values. That alignment is exactly what broke down at narrow widths in an earlier version of this component, so below the same phone-narrow breakpoint everything else here collapses at, each amount falls back to a small "DR"/"CR" tag next to it instead of relying on a column that no longer has room to exist — self-labeling, the same fix that alignment temporarily replaced, now scoped to only the width where it's actually needed.
+
+## Balance validation
+
+<Canvas of={JournalEntryStories.Unbalanced} />
+
+Totals are summed in cents (not floating-point dollars) to avoid rounding drift, then compared. The result renders as a `Label` — `status="positive"` reading "Balanced" when the sides match, `status="negative"` reading "Off by $X" (the absolute difference) when they don't, the same `Label` component and status pair used everywhere else in this library, not a bespoke pill — in **both** modes, not just after Save. Editing recomputes it from the in-progress draft on every change, so it's live feedback on whether the entry balances while you're still composing it, not something you only find out after committing.
+
+The pill itself is hidden whenever both totals are exactly zero — a brand-new entry with no amounts yet, or every line's Debit/Credit still blank. "Balanced" is trivially true for $0 = $0 and isn't meaningful until there's something real to validate, matching Figma's own empty-state frame, which shows the same dashes for both totals with no pill at all next to "Total".
+
+## Formatting amounts
+
+Amounts default to USD with 2 decimal places (`Intl.NumberFormat`). Pass `formatAmount` to override — applied to read-mode line amounts and both total rows. Edit-mode amount fields are always plain `<input type="number" step="0.01">`s regardless of `formatAmount`, since a masked currency input isn't something this library has built yet.
+
+## A new, empty entry
+
+<Canvas of={JournalEntryStories.Empty} />
+
+Pass a `value` with an empty `lines` array (plus `defaultEditing`, if you want to open straight into edit mode for a brand-new entry) to start from scratch.
+
+## Accessibility
+
+- The root element differs by mode: a real `<fieldset>` while editing (it's grouping real form controls), a plain `role="group"` `<div>` while reading (there are no controls to group). `aria-label` sets the accessible name either way — e.g. "Journal entry #5678".
+- Every field in this component is labelless-by-display, `Fieldset`-style — placeholder text only, no visible `FieldLabel` anywhere, not even Date/Reference. That's a *display* choice, not a dropped accessible name: `TextInput`'s `placeholder` vanishes once you start typing, so Reference/Description/Debit/Credit each still carry a real `aria-label`. `Select` (Account/Department/Location) doesn't need one — its placeholder is real visible button text, not a vanishing attribute. `Date` needs neither — a native `<input type="date">` doesn't render a `placeholder` at all, and `aria-label="Date"` covers it.
+- Both fieldsets — the entry metadata and each line — are `aria-label`led ("Entry details", "Line 1", "Line 2", …) with no *visible* legend. Assistive tech still gets the group boundary; sighted users just don't see a redundant on-screen caption repeated down the page for every line.
+- Every icon-only control (save, cancel, edit, delete, add) is a real `IconButton` with its own required `aria-label`; each line's delete button is `aria-label`led "Remove line N" so multiple lines stay distinguishable to assistive tech.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `JournalEntryValue` | — | `{ date: string; reference?: string; lines: JournalEntryLine[] }`. `date` is an ISO `"yyyy-mm-dd"` string. |
+| `onSave` | `(value: JournalEntryValue) => void` | — | Called once with the full edited draft when Save is confirmed. |
+| `onCancel` | `() => void` | — | Called when Cancel is clicked, before the draft is discarded. |
+| `accountOptions` | `SelectOption[]` | — | Options offered by each line's Account `Select`. |
+| `departmentOptions` | `SelectOption[]` | — | Options offered by each line's Department `Select`. |
+| `locationOptions` | `SelectOption[]` | — | Options offered by each line's Location `Select`. |
+| `editing` | `boolean` | — | Controlled edit mode. Omit to let `JournalEntry` manage its own. |
+| `defaultEditing` | `boolean` | `false` | Initial edit mode when uncontrolled. |
+| `onEditingChange` | `(editing: boolean) => void` | — | Called whenever edit mode toggles, controlled or not. |
+| `formatAmount` | `(amount: number) => string` | USD, 2-decimal | Applied to read-mode amounts and both totals. |
+| `aria-label` | `string` | — | Accessible name for the root element (a `<fieldset>` while editing, `role="group"` while reading). |
+| `className` | `string` | — | Applied to the root element. |
+
+`JournalEntryLine` is `{ id: string; account?: string; department?: string; location?: string; memo?: string; debit?: number; credit?: number }` — at most one of `debit`/`credit` should be set per line.

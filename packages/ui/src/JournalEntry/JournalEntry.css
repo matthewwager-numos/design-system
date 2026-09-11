@@ -1,0 +1,367 @@
+/*
+ * JournalEntry styles — pure token-driven CSS. Bespoke chrome (not
+ * `<Form>`'s own): editing is a dashed box, read is a plain bottom-border
+ * row.
+ *
+ * A container query, not a viewport media query — this component can end
+ * up in a narrow sidebar on a wide screen just as easily as on an actual
+ * phone, so it needs to respond to its own box, not the viewport. Most of
+ * the responsive behavior comes for free from `repeat(auto-fit, minmax())`
+ * grids below, though — the container query only trims padding once the
+ * box is genuinely phone-narrow.
+ */
+
+.ds-journal-entry {
+  container-type: inline-size;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+
+.ds-journal-entry--editing {
+  gap: var(--space-4);
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px dashed var(--border-base);
+  border-radius: var(--radius-sm);
+  background: var(--background-secondary);
+}
+
+/* No horizontal dividers of its own — spacing alone (this gap, plus
+   `.ds-journal-entry__row`'s own padding) separates the header, each
+   row, and the total, the same "set apart by spacing, not a line"
+   approach editing already uses for its own lines. */
+.ds-journal-entry--read {
+  gap: var(--space-3);
+  background: var(--background-default);
+}
+
+@container (max-width: 26rem) {
+  .ds-journal-entry--editing {
+    padding: var(--space-2);
+  }
+}
+
+/* Every fieldset in this component (the root while editing, `__meta`,
+   `__line`) needs `min-width: 0` — a fieldset's default UA min-width is
+   the width of its widest content, which otherwise silently refuses to
+   shrink below that in a flex/grid ancestor, the classic "fieldset won't
+   respect its container" bug. */
+.ds-journal-entry--editing,
+.ds-journal-entry__meta,
+.ds-journal-entry__line {
+  min-width: 0;
+}
+
+.ds-journal-entry__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+/* Editing gets a divider under the header and under every line below —
+   read mode stays unlined (see `.ds-journal-entry--read` above), set
+   apart by spacing alone. */
+.ds-journal-entry--editing .ds-journal-entry__header {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ds-journal-entry__meta {
+  flex: 1 1 16rem;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.ds-journal-entry__meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: var(--space-2);
+  max-width: 20rem;
+}
+
+.ds-journal-entry__header-date {
+  padding-top: var(--space-1);
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-subtle);
+}
+
+/* More muted than the date next to it — the reference number is the
+   less important half of this line. */
+.ds-journal-entry__header-reference {
+  color: var(--content-disabled);
+}
+
+.ds-journal-entry__header-spacer {
+  flex: 1 0 0;
+}
+
+.ds-journal-entry__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.ds-journal-entry__lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Editing separates lines with each one's own border-bottom + padding
+   instead — the `gap` above is a read-mode-only concern here. */
+.ds-journal-entry--editing .ds-journal-entry__lines {
+  gap: 0;
+}
+
+/* Each line, editing — a real fieldset group (labeled only via
+   `aria-label`, no visible legend — its position in the list already
+   says enough), not a styled div, so adding/removing one is a
+   well-defined unit for assistive tech, not just a visual row
+   appearing/disappearing. A border-bottom + vertical padding of its own
+   (see the editing-only rule below) is what actually separates
+   consecutive lines — `__lines`' own `gap` is zeroed out while editing
+   for exactly that reason.
+
+   Two `__line-col`s — left (Account/Department/Location + the memo) and
+   right (Debit/Credit/delete) — each a real flex column with its own
+   `min-width`, so the *whole* right column wraps below the left one
+   once they no longer fit side by side (pure flex-wrap, driven by each
+   column's own floor — no container query). */
+.ds-journal-entry__line {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  border: none;
+  padding: 0;
+}
+
+.ds-journal-entry--editing .ds-journal-entry__line {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ds-journal-entry__line-col {
+  display: flex;
+  min-width: 15rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  flex: 1 0 0;
+}
+
+/* The left column is a fixed 3-row stack — Account, then Department+
+   Location side by side, then the memo — not a dynamic wrap between
+   Account and Department+Location (that was an earlier, since-corrected
+   guess; Figma's own edit-mode reference shows these as two plain
+   sequential rows, full width, with no independent wrap point of their
+   own). Department and Location still share one row and split it evenly:
+   `flex-basis: 0`, not `auto` — `<Select>`'s own root is `width: 100%`,
+   and an `auto` basis resolves against that (both would each claim the
+   row's full width as their starting size) rather than their actual
+   content — the same pitfall already fixed once in this file for the
+   date/reference header fields. */
+.ds-journal-entry__line-dept-location {
+  display: flex;
+  gap: var(--space-1);
+  align-self: stretch;
+}
+
+.ds-journal-entry__line-dept-location > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.ds-journal-entry__line-description {
+  align-self: stretch;
+}
+
+.ds-journal-entry__line-amounts {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  gap: var(--space-2);
+  align-self: stretch;
+  flex-wrap: wrap;
+}
+
+.ds-journal-entry__line-delete {
+  flex-shrink: 0;
+}
+
+/* Debit/Credit get a fixed width (not the equal-share `flex: 1 1 0` every
+   other field in a row gets) — same width `.ds-journal-entry__amount`
+   (read mode's line/total figures) uses, so every amount in this
+   component — editable or not — lines up in the same two columns.
+   Declared after the generic rule above so it wins at equal (one-class)
+   specificity. Right-aligned to match a plain number's own reading
+   direction, and how the read-mode figures next to it align. */
+.ds-journal-entry__amount-input {
+  flex: 0 0 5.5rem;
+  width: 5.5rem;
+}
+.ds-journal-entry__amount-input .ds-text-input__control {
+  text-align: right;
+}
+
+.ds-journal-entry__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+}
+
+.ds-journal-entry__row-main {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.ds-journal-entry__row-summary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-journal-entry__account {
+  color: var(--content-base);
+}
+
+.ds-journal-entry__subtle {
+  color: var(--content-subtle);
+}
+
+.ds-journal-entry__memo-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--content-placeholder);
+}
+
+/* Debit always precedes Credit, in both the markup and every column
+   width/gap below — matching standard accounting convention (debits on
+   the left, credits on the right), which is exactly why these need to
+   land in real, consistent columns rather than each sizing to its own
+   content. Same `space-2` gap and `5.5rem` per-figure width as
+   `.ds-journal-entry__amount-input` (the editable Debit/Credit fields),
+   so a value lines up in the same column whether it's editable or not. */
+.ds-journal-entry__row-amounts {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.ds-journal-entry__amount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  width: 5.5rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The de-emphasized "—" for whichever side a line doesn't use — a
+   plain `--content-placeholder`, not literally invisible, so the column
+   still reads as "nothing here" without vanishing outright. */
+.ds-journal-entry__amount-blank {
+  color: var(--content-placeholder);
+}
+
+/* Hidden at this width — the fixed-column layout above already makes
+   clear which side a figure is on. Shown again below, once there's no
+   more column left to align to (see the container query below): a
+   "DR"/"CR" tag is what keeps a stacked, self-labeled figure readable
+   without one, the same problem this solved before column alignment
+   came back for wider views. Read-mode-only sizing/hiding — editing has
+   its own always-visible, neutrally-colored use of this same tag, both
+   as each Debit/Credit field's own `leadingIcon` and on this total row,
+   overridden below. */
+.ds-journal-entry__amount-tag {
+  display: none;
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+}
+
+.ds-journal-entry__amount-tag--debit {
+  color: var(--content-negative);
+}
+
+.ds-journal-entry__amount-tag--credit {
+  color: var(--content-positive);
+}
+
+@container (max-width: 26rem) {
+  .ds-journal-entry__amount-tag {
+    display: inline;
+  }
+
+  .ds-journal-entry__amount {
+    width: auto;
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+/* Editing's own DR/CR tags (a Debit/Credit field's `leadingIcon`, and
+   this same total row while editing) are always shown, Regular weight,
+   and neutral — never the red/green read-mode convention above, which
+   is what a *settled* figure's sign means, not what an in-progress
+   field's label means. Two classes, same specificity as the red/green
+   modifiers above; wins on source order alone. */
+.ds-journal-entry--editing .ds-journal-entry__amount-tag {
+  display: inline;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+
+/* A field with no value yet (neither side of the line decided) reads as
+   pure placeholder — the tag matches the "0.00" placeholder text next to
+   it rather than standing out as already-meaningful. */
+.ds-journal-entry__amount-tag.ds-journal-entry__amount-tag--empty {
+  color: var(--content-placeholder);
+}
+
+.ds-journal-entry__total {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Just top padding while editing, no border of its own — the last line
+   above already ends in its own border-bottom (see `.ds-journal-entry__line`
+   above), so a second divider here would double up. Read mode has no
+   horizontal lines anywhere (see `.ds-journal-entry--read` above), so its
+   own total stays unlined too, set apart by `gap` alone. */
+.ds-journal-entry--editing .ds-journal-entry__total {
+  padding-top: var(--space-2);
+}
+
+.ds-journal-entry__total-label {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-base);
+}
+
+/* Same width as a `sm` `IconButton` (see IconButton.css) — reserves the
+   exact space a line's own delete button occupies, so the totals row's
+   content ends at the same right edge as each line's field stack does
+   (the delete button sits outside that stack), not the entry's true
+   right edge. */
+.ds-journal-entry__total-gutter {
+  flex: 0 0 auto;
+  width: 1.5rem;
+}

@@ -201,6 +201,9 @@ export type { DisplayMetricProps, DisplayMetricColor } from "./DisplayMetric";
 export { LogEntry } from "./LogEntry";
 export type { LogEntryProps } from "./LogEntry";
 
+export { JournalEntry } from "./JournalEntry";
+export type { JournalEntryProps, JournalEntryValue, JournalEntryLine } from "./JournalEntry";
+
 export { EmptyState } from "./EmptyState";
 export type { EmptyStateProps } from "./EmptyState";
 
@@ -209,3 +212,9 @@ export type { EmptyStateProps } from "./EmptyState";
 // needs a real measured height, not a guess" problem (e.g. a fixed mobile
 // nav bar).
 export { useMeasuredHeightVar } from "./hooks/useMeasuredHeightVar";
+
+// Not a component — drives a scroll-spy nav (an anchor strip whose active
+// item tracks scroll position over one continuously-scrolling page of
+// sections), for consuming apps building an object-detail layout like
+// Figma's Drawer template.
+export { useScrollSpy } from "./hooks/useScrollSpy";
