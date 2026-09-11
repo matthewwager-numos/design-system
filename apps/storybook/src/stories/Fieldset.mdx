@@ -1,0 +1,104 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as FieldsetStories from "./Fieldset.stories";
+
+<Meta of={FieldsetStories} />
+
+# Fieldset
+
+A single group label sitting above otherwise-unlabeled fields. Matches Figma's Fieldset exactly — its reference example is an "Address" group: one legend, then Street Address 1, Street Address 2, City, and a State/Zip row, with only `placeholder` text (not a per-field `label`) distinguishing them.
+
+<Canvas of={FieldsetStories.Default} />
+
+## When to use
+
+- A group of fields that reads as one real-world concept a user already recognizes — an address, a name, a date range — where a per-field `label` above every input would mostly just repeat what the placeholder already says.
+- Anywhere you want one accessible group name announced once, rather than duplicating context into every field's own label.
+
+## When NOT to use
+
+- Fields that aren't self-evident from placeholder text alone, or where getting one wrong has real cost (a password field, a field with validation rules) — give those their own visible `label` via the field's own `label` prop instead.
+- A single field — `Fieldset` groups more than one; a lone field doesn't need a wrapping legend.
+
+## Implementation
+
+```tsx
+import { Fieldset, FieldsetRow, Select, TextInput } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+function AddressFields() {
+  return (
+    <Fieldset label="Address" size="md">
+      <TextInput size="md" placeholder="Street Address 1" aria-label="Street address 1" />
+      <TextInput size="md" placeholder="Street Address 2" aria-label="Street address 2" />
+      <TextInput size="md" placeholder="City" aria-label="City" />
+      <FieldsetRow>
+        <Select size="md" options={stateOptions} placeholder="State or Province" />
+        <TextInput size="md" placeholder="Zip or Postal Code" aria-label="Zip or postal code" />
+      </FieldsetRow>
+    </Fieldset>
+  );
+}
+```
+
+`Fieldset` renders a real `<fieldset>` with a `<FieldLabel as="legend">` — same reasoning as `<RadioGroup>`: assistive tech announces the group's label once, instead of needing every field inside to repeat it.
+
+## Fields are plain, unlabeled inputs
+
+Every child is just an ordinary `<TextInput>`/`<Select>`, used without its own `label` prop — `Fieldset` doesn't wrap or specialize them. That has one real accessibility consequence worth handling deliberately: dropping the visible `label` is a *display* choice, not an invitation to drop the accessible name too. A `placeholder` disappears the moment someone starts typing, so:
+
+- **`TextInput`** needs an explicit `aria-label` (or `aria-labelledby`) alongside its `placeholder` — its `placeholder` is a real HTML attribute, not reliable as an accessible name on its own.
+- **`Select`** doesn't need one — its "placeholder" is real visible text rendered inside the trigger button (not a vanishing attribute), so the button already has a valid accessible name from its own content.
+
+## Rows of side-by-side fields
+
+<Canvas of={FieldsetStories.Sizes} />
+
+Use `<FieldsetRow>` to put fields on one line sharing the width equally (State next to Zip, City next to State, etc.) — it's a pure layout helper with no label or grouping semantics of its own, since the parent `<Fieldset>` already supplies those for the whole group.
+
+## Sizes
+
+`size` (`sm`/`md`/`lg`) only scales the legend's own type, via `<FieldLabel>`'s existing size scale — it does **not** cascade to the fields inside. Pass the same `size` to each field explicitly, same as everywhere else in this library that takes a `size` prop. This also means the legend already gets `<FieldLabel>`'s existing mobile behavior for free: below 768px, `sm`/`md` legends render at `lg`'s larger type automatically.
+
+## Error states
+
+<Canvas of={FieldsetStories.ErrorState} />
+
+An error belongs to the one field it's about, not to the group — `Fieldset` has no `error`/`helpText` prop of its own. Give the invalid field its own `status="error"` and `helpText`, exactly as you would outside a `Fieldset`:
+
+```tsx
+<FieldsetRow>
+  <Select size="md" options={stateOptions} placeholder="State or Province" defaultValue="ca" />
+  <TextInput
+    size="md"
+    placeholder="Zip or Postal Code"
+    aria-label="Zip or postal code"
+    status="error"
+    helpText="Enter a valid ZIP code"
+  />
+</FieldsetRow>
+```
+
+That's a deliberate contrast with `<RadioGroup>`, which *does* have a group-level `error`/`helpText`: a radio group's options are really one answer, so there's only ever one thing to be wrong about. A `Fieldset`'s fields are independent — Street Address 1 can be fine while Zip is invalid — so the error, the red border, and the inline message all stay scoped to the one field that's actually wrong. Multiple fields can be in error at once, each with its own message, with no coordination needed between them.
+
+## Accessibility
+
+- Renders a real `<fieldset>`/`<legend>` pair, not a styled `<div>` — the group's label is announced once by assistive tech, not repeated per field.
+- `Fieldset` itself doesn't set any field's accessible name — see "Fields are plain, unlabeled inputs" above for what each field type needs on its own.
+
+## Props
+
+### `Fieldset`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `ReactNode` | — | The group's own label, rendered as a real `<legend>`. |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Scales the legend's own type only — pass the same size to each field yourself. |
+| `children` | `ReactNode` | — | The fields themselves. |
+| `className` | `string` | — | Applied to the root `<fieldset>`. |
+
+### `FieldsetRow`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `ReactNode` | — | Fields to lay out side by side, sharing the row's width equally. |
+| `className` | `string` | — | Applied to the row's root element. |

@@ -18,6 +18,9 @@ export type { LabelProps, LabelStatus, LabelSize } from "./Label";
 export { FieldLabel } from "./FieldLabel";
 export type { FieldLabelProps, FieldLabelSize } from "./FieldLabel";
 
+export { Fieldset, FieldsetRow } from "./Fieldset";
+export type { FieldsetProps, FieldsetRowProps, FieldsetSize } from "./Fieldset";
+
 export { AppIcon } from "./AppIcon";
 export type { AppIconProps, AppIconName } from "./AppIcon";
 

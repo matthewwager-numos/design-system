@@ -1,0 +1,62 @@
+/*
+ * Fieldset styles — pure token-driven CSS. The legend-to-fields gap stays
+ * a constant Space/S (8px) at every size, confirmed against Figma's own
+ * Address example via get_design_context/get_variable_defs — but the gap
+ * *between* fields steps up with size (space-1/2/3, 4/8/12px), the same
+ * space-token progression `<TextInput>`'s own per-size field padding
+ * already uses. A fixed 4px gap read as the same density at every size
+ * once the fields around it were visibly bigger — this keeps rhythm
+ * proportional to the fields it separates instead.
+ */
+
+.ds-fieldset {
+  display: flex;
+  flex-direction: column;
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+/* Element-qualified so this reliably wins over `<FieldLabel>`'s own
+   `margin: 0` at equal (one-class) specificity, regardless of CSS import
+   order — same reasoning as `<RadioGroup>`'s own `legend.ds-radio-group__label`.
+   Explicit margin rather than the fieldset's own flex `gap`: `<legend>`
+   has historically not participated cleanly in a flex parent's gap, even
+   when the fieldset itself is `display: flex`. */
+legend.ds-fieldset__legend {
+  margin: 0 0 var(--space-2) 0;
+}
+
+.ds-fieldset__fields {
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-fieldset__row {
+  display: flex;
+}
+
+.ds-fieldset__row > * {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+/* `.ds-fieldset__row`'s own gap steps up in lockstep with `__fields`' —
+   a row is just one line of that same vertical rhythm turned sideways. */
+
+.ds-fieldset--sm .ds-fieldset__fields,
+.ds-fieldset--sm .ds-fieldset__row {
+  gap: var(--space-1);
+}
+
+.ds-fieldset--md .ds-fieldset__fields,
+.ds-fieldset--md .ds-fieldset__row {
+  gap: var(--space-2);
+}
+
+.ds-fieldset--lg .ds-fieldset__fields,
+.ds-fieldset--lg .ds-fieldset__row {
+  gap: var(--space-3);
+}
