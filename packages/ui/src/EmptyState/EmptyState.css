@@ -1,0 +1,38 @@
+/*
+ * EmptyState styles — pure token-driven CSS. No width of its own: the
+ * description alone gets a measure (`max-width`) for readable wrapping,
+ * matching Figma's reference exactly, but the root just centers its
+ * content in whatever box its parent gives it.
+ */
+
+.ds-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.ds-empty-state__icon {
+  display: inline-flex;
+  color: var(--content-subtle);
+}
+.ds-empty-state__icon svg {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ds-empty-state__title {
+  margin: 0;
+  font: var(--type-heading-xl);
+  letter-spacing: var(--type-heading-xl-tracking);
+  color: var(--content-subtle);
+}
+
+.ds-empty-state__description {
+  max-width: 18.5rem;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}

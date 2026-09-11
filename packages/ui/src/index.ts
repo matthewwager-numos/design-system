@@ -201,6 +201,9 @@ export type { DisplayMetricProps, DisplayMetricColor } from "./DisplayMetric";
 export { LogEntry } from "./LogEntry";
 export type { LogEntryProps } from "./LogEntry";
 
+export { EmptyState } from "./EmptyState";
+export type { EmptyStateProps } from "./EmptyState";
+
 // Not a component — a small utility `<Wizard>` uses internally to pin its
 // own footer, and that consuming apps can reuse for the same "fixed chrome
 // needs a real measured height, not a guess" problem (e.g. a fixed mobile

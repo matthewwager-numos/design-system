@@ -1,0 +1,89 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as EmptyStateStories from "./EmptyState.stories";
+
+<Meta of={EmptyStateStories} />
+
+# EmptyState
+
+A centered placeholder for an empty collection — a table with no rows yet, a search with no matches, a list before its first item is added. Matches Figma's reference exactly: a decorative icon, a title, a description, and an optional pair of stacked buttons, all centered in a column.
+
+<Canvas of={EmptyStateStories.Default} />
+
+## When to use
+
+- A table, list, or grid that currently has nothing in it — instead of just rendering nothing, explain what's missing and (if there's a next step) how to fix that.
+- A search or filtered view with no matches — pair with a description that suggests what to try next (see the "No results found" example below).
+
+## When NOT to use
+
+- A loading state — this is for "there's genuinely nothing here," not "the data hasn't arrived yet." Reach for a skeleton or spinner instead.
+- An error state — a failed request isn't an empty collection; use `Banner`/`Alert` (`status="negative"`) instead, so it reads as a problem rather than a normal empty state.
+
+## Implementation
+
+```tsx
+import { Sparkles } from "lucide-react";
+import { Button, ButtonGroup, EmptyState } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+function Example() {
+  return (
+    <EmptyState
+      icon={<Sparkles size={24} />}
+      title="Title"
+      description="Description description description description description"
+      actions={
+        <ButtonGroup orientation="vertical">
+          <Button size="sm" variant="secondary">Button</Button>
+          <Button size="sm" variant="primary">Button</Button>
+        </ButtonGroup>
+      }
+    />
+  );
+}
+```
+
+## Icon, title, and description
+
+`icon` is any decorative content — typically a `lucide-react` icon at `size={24}`, matching Figma's own reference — rendered `--content-subtle` above the title and hidden from assistive tech (`aria-hidden`), since the title/description already say the same thing in words. Omit it for a text-only empty state (see `WithoutIcon` below).
+
+`title` renders in `Heading XL` (the same scale used for large numeric callouts elsewhere in this library), and `description` in `Paragraph S Regular` — both `--content-subtle`, both centered. `description` gets a fixed measure (`max-width: 18.5rem`) so it wraps onto a readable two- or three-line block instead of stretching edge to edge of whatever container it's in, matching Figma's own reference exactly.
+
+## Actions
+
+<Canvas of={EmptyStateStories.NoItemsYet} />
+
+`actions` is typically a `<ButtonGroup orientation="vertical">` wrapping one or two `<Button size="sm">`s — matching Figma's own reference exactly (a `secondary` button stacked above a `primary` one) — but it accepts any content. It renders as a plain flex child below the description, at its own natural width rather than stretched to fill the space the title/description take up, so a short one- or two-word button doesn't end up awkwardly full-width. Omit it entirely for an empty state with no action to offer (see `WithoutActions` below).
+
+<Canvas of={EmptyStateStories.WithoutActions} />
+
+## Without an icon, or text only
+
+<Canvas of={EmptyStateStories.WithoutIcon} />
+
+Every part but `title` is optional. A search-results empty state, for instance, often reads better with just a title and a suggestion, no icon or action:
+
+<Canvas of={EmptyStateStories.NoResults} />
+
+<Canvas of={EmptyStateStories.TitleOnly} />
+
+## Layout
+
+`EmptyState` has no width, background, or border of its own — it centers its own content (`display: flex; flex-direction: column; align-items: center`) but otherwise fills whatever box its parent gives it. Centering the whole block within a larger region — a tall empty table body, a full page section — is the parent's job: wrap it in a container with its own `display: flex; align-items: center; justify-content: center; min-height: ...` (or a CSS Grid `place-items: center`), the same way you'd center any other block of content.
+
+## Accessibility
+
+- `icon` is always `aria-hidden` — it's decorative, and the title/description already convey the same thing as text.
+- The root accepts any `<div>` prop (e.g. `role`, `aria-live`), since whether an empty state needs to announce itself to assistive tech depends on how it appears: a search-results empty state that replaces content live on the page is a good candidate for `role="status"`; a static empty state present from first render generally isn't.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `ReactNode` | — | Decorative icon above the title, `--content-subtle`. Omit for a text-only empty state. |
+| `title` | `ReactNode` | — | Required. Rendered in `Heading XL`, `--content-subtle`. |
+| `description` | `ReactNode` | — | Rendered in `Paragraph S Regular`, `--content-subtle`, wrapped to an 18.5rem measure. |
+| `actions` | `ReactNode` | — | Typically a `<ButtonGroup orientation="vertical">` of `<Button size="sm">`s. Rendered at its own natural width, not stretched. |
+| `className` | `string` | — | Applied to the root element. |
+
+Also accepts every other standard `<div>` prop (`id`, `role`, `aria-*`, etc.), spread onto the root element.
