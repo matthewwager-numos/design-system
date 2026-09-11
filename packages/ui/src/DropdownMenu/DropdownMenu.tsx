@@ -6,9 +6,10 @@ import { DropdownMenuContext, useDropdownMenuContext } from "./DropdownMenuConte
 import type { DropdownMenuSize } from "./DropdownMenuContext";
 import { useAnchorRect } from "./useAnchorRect";
 import { useDropdownMenuPlacement } from "./useDropdownMenuPlacement";
+import type { DropdownMenuPlacement } from "./useDropdownMenuPlacement";
 import "./DropdownMenu.css";
 
-export type { DropdownMenuSize };
+export type { DropdownMenuSize, DropdownMenuPlacement };
 
 export interface DropdownMenuProps {
   children: ReactNode;
@@ -96,8 +97,6 @@ export function DropdownMenuTrigger({ children }: DropdownMenuTriggerProps) {
     },
   });
 }
-
-export type DropdownMenuPlacement = "bottom" | "top";
 
 export interface DropdownMenuContentProps extends HTMLAttributes<HTMLUListElement> {
   /** Defaults to the size set on the enclosing `<DropdownMenu>` — only needed here to override that for this one panel. */

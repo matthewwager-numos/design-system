@@ -33,7 +33,13 @@ const withThemeSplit: Decorator = (Story, context) => {
           style={{
             font: "var(--type-paragraph-xs-medium)",
             letterSpacing: "var(--type-paragraph-xs-medium-tracking)",
-            color: "var(--content-subtle)",
+            // Not --content-subtle — its contrast against --background-default
+            // falls just short of WCAG AA at this size (confirmed by the new
+            // Storybook Test Runner + axe a11y check: 4.12:1 vs the 4.5:1 this
+            // small text needs), which isn't a real component issue, just this
+            // decorator's own "LIGHT"/"DARK" caption failing the exact check
+            // it's meant to help catch. --content-placeholder passes.
+            color: "var(--content-base)",
             padding: "var(--space-2) var(--space-4) 0",
             background: "var(--background-default)",
             textTransform: "uppercase",

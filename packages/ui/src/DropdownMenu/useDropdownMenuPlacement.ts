@@ -1,6 +1,11 @@
 import { useLayoutEffect, useState } from "react";
 import type { CSSProperties, RefObject } from "react";
-import type { DropdownMenuPlacement } from "./DropdownMenu";
+
+// Canonical home for this type (not DropdownMenu.tsx, which re-exports it) —
+// it previously lived there instead, which made DropdownMenu.tsx and this
+// file import from each other (a real circular dependency, caught by
+// dependency-cruiser's no-circular rule, not just a type-only formality).
+export type DropdownMenuPlacement = "bottom" | "top";
 
 interface Anchor {
   rect: DOMRect;

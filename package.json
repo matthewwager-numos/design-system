@@ -12,13 +12,17 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "stylelint": "turbo run stylelint",
     "test": "turbo run test",
+    "depgraph": "turbo run depgraph",
     "storybook": "pnpm --filter @numosai/storybook dev",
     "playgrounds": "pnpm --filter @numosai/playgrounds dev",
     "demo": "pnpm --filter @numosai/demo dev",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
+    "stylelint": "^16.10.0",
+    "stylelint-declaration-strict-value": "^1.10.6",
     "turbo": "^2.1.0",
     "typescript": "^5.6.0"
   }

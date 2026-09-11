@@ -10,8 +10,13 @@
       "persistent": true
     },
     "lint": {},
+    "stylelint": {},
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": ["test-results/**"]
+    },
+    "depgraph": {
+      "outputs": ["depgraph/**"]
     },
     "clean": {
       "cache": false

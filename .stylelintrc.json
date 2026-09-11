@@ -1,0 +1,42 @@
+{
+  "plugins": ["stylelint-declaration-strict-value"],
+  "rules": {
+    "color-no-hex": true,
+    "scale-unlimited/declaration-strict-value": [
+      [
+        "/^color$/",
+        "/^background(-color)?$/",
+        "/^border(-top|-right|-bottom|-left)?-color$/",
+        "fill",
+        "stroke",
+        "/^padding/",
+        "/^margin/",
+        "gap",
+        "row-gap",
+        "column-gap",
+        "/^border-radius/"
+      ],
+      {
+        "ignoreValues": [
+          "0",
+          "none",
+          "inherit",
+          "initial",
+          "unset",
+          "transparent",
+          "currentColor",
+          "auto",
+          "100%",
+          "50%",
+          "0px",
+          "1px",
+          "-1px",
+          "1.5px",
+          "2px"
+        ],
+        "disableFix": true,
+        "message": "Use a semantic token (var(--...)) from packages/tokens instead of a hardcoded value — see packages/tokens/src/tokens.css. If this value is a deliberate one-off (documented in a comment above it), add it to this rule's ignoreValues in .stylelintrc.json rather than disabling the rule inline."
+      }
+    ]
+  }
+}

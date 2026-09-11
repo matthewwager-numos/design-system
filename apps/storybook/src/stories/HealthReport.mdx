@@ -1,0 +1,30 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Health Report" />
+
+# Component Health Report
+
+A weekly, automated check across every component in `packages/ui` — not a visual reproduction of any one story, but a report about the library as a whole.
+
+**[View the latest report →](../health-report/)**
+
+## What it checks
+
+- **Unit tests** ([Vitest](https://vitest.dev)) — component logic and hooks, colocated as `<Component>.test.tsx` files. Coverage grows incrementally; this isn't a claim that every component has tests yet.
+- **Token compliance** ([Stylelint](https://stylelint.io) + `stylelint-declaration-strict-value`) — flags hardcoded colors/spacing/radii in `packages/ui/src/**/*.css` that should be a semantic token (`var(--...)`) from `packages/tokens/src/tokens.css` instead.
+- **Dependency graph** ([dependency-cruiser](https://github.com/sverweij/dependency-cruiser)) — maps which components compose which other components internally, hard-fails on circular dependencies, and reports each component's computed tier (0 = no internal dependencies) and how many other components in this library depend on it directly.
+- **Every story, rendered** ([Storybook Test Runner](https://github.com/storybookjs/test-runner)) — visits every story in this Storybook and fails on render/console errors or [axe](https://www.deque.com/axe/) accessibility violations, giving baseline regression coverage across the whole library without needing a dedicated test file per component.
+
+## Why this exists
+
+Every component here should mirror the same atomic discipline the Figma file itself is built with — small pieces composed into bigger ones, styled from a shared token vocabulary, not reimplemented from scratch each time. It's hard to verify that by reading code alone, especially as the library grows and a change to something widely-depended-on (`FieldLabel`, `DropdownMenu`, and `Tooltip` are the components with the most internal dependents today) could silently break something built on top of it. This report doesn't replace code review — it surfaces the data (a real dependency graph, a real token-compliance count, a real per-story pass/fail) that review depends on, on a predictable weekly cadence rather than only when someone happens to notice.
+
+## Reading it
+
+- **Internal dependents** — how many other `packages/ui` components import this one directly.
+- **External usage** — how many files in `apps/demo`/`apps/storybook` import it directly. Often much larger than internal dependents, since apps consume components directly rather than through other components — a component's real blast radius is usually the external number, not the internal one.
+- **Tier** — computed topological depth, descriptive only. It's not an enforced layering rule yet; the deeper structure is worth a look before treating any specific tier boundary as load-bearing.
+
+## Fast checks run on every push/PR too
+
+Unit tests, Stylelint, and the dependency-cruiser circular-dependency check all run on every push and pull request (`.github/workflows/component-health.yml`) — the full story sweep and the aggregated report you're reading about here stay weekly (plus a manual `workflow_dispatch` trigger), since visiting every story in a real browser is the expensive part.

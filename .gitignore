@@ -36,3 +36,6 @@ pnpm-debug.log*
 
 # Test
 coverage
+test-results
+depgraph
+health-report-dist

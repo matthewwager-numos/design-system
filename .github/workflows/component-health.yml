@@ -1,0 +1,141 @@
+name: Component Health
+
+on:
+  push:
+  pull_request:
+  schedule:
+    # Mondays at 06:00 UTC — the full report + Pages deploy only runs here
+    # (and on manual dispatch below), not on every push/PR; see the
+    # `fast-checks` job for what runs on every push/PR instead.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  # Runs on every push/PR — cheap, seconds-scale checks that catch a broken
+  # component (unit tests), a hardcoded value that should be a token
+  # (Stylelint), a circular dependency (dependency-cruiser), or a
+  # cross-package type break (tsc, since apps/demo and apps/storybook both
+  # resolve @numosai/ui straight from source with no build step in between).
+  fast-checks:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter @numosai/ui test
+      - run: pnpm --filter @numosai/ui stylelint
+      - run: pnpm --filter @numosai/ui depgraph
+      - run: pnpm --filter @numosai/ui lint
+      - run: pnpm --filter @numosai/demo lint
+      - run: pnpm --filter @numosai/storybook lint
+      # Not @numosai/playgrounds — it has pre-existing tsc errors unrelated
+      # to this pipeline (dither.ts/sankey.ts strict-null-check issues from
+      # earlier work), which would make this check permanently red rather
+      # than a reliable signal. Worth fixing separately, then adding back.
+
+  # Runs only weekly (+ manual dispatch) — the expensive full sweep: every
+  # Storybook story smoke-tested for render errors and a11y violations
+  # (Storybook Test Runner), plus a fresh aggregated report covering all of
+  # the above, republished as its own page in the same combined GitHub
+  # Pages site `deploy-pages.yml` already manages. This is a full,
+  # independent rebuild of that whole site (not a patch/splice into the
+  # live one, and not a commit back to the repo) — see the plan doc for why.
+  weekly-report-build:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/storybook
+
+      # Each check keeps running even if an earlier one finds real
+      # violations — the point of this job is to capture the current state
+      # for the report, not stop at the first red check.
+      - name: Unit tests (Vitest)
+        continue-on-error: true
+        run: CI=true pnpm --filter @numosai/ui test
+
+      - name: Token compliance (Stylelint)
+        continue-on-error: true
+        run: pnpm --filter @numosai/ui stylelint:json
+
+      - name: Dependency graph (dependency-cruiser)
+        continue-on-error: true
+        run: pnpm --filter @numosai/ui depgraph
+
+      - run: pnpm --filter @numosai/playgrounds build
+        env:
+          BASE_PATH: /design-system/
+
+      - run: pnpm --filter @numosai/demo build
+        env:
+          BASE_PATH: /design-system/demo/
+
+      - run: pnpm --filter @numosai/storybook build
+
+      - name: Serve built Storybook
+        run: |
+          npx http-server storybook-static -p 6007 --silent &
+          npx wait-on http://127.0.0.1:6007 --timeout 30000
+        working-directory: apps/storybook
+
+      - name: Storybook stories — render + a11y smoke test
+        continue-on-error: true
+        run: mkdir -p test-results && npx test-storybook --url http://127.0.0.1:6007 --maxWorkers=2 --json --outputFile test-results/test-storybook-results.json
+        working-directory: apps/storybook
+
+      - name: Generate the aggregated health report
+        run: node scripts/generate-health-report.mjs
+
+      # One Pages site, four things: playgrounds at the root (unchanged
+      # URL), storybook/demo/health-report nested under their own subpaths —
+      # matches deploy-pages.yml's own layout exactly, plus the report.
+      - run: |
+          mkdir -p site
+          cp -r apps/playgrounds/dist/. site/
+          mkdir -p site/demo
+          cp -r apps/demo/dist/. site/demo/
+          mkdir -p site/storybook
+          cp -r apps/storybook/storybook-static/. site/storybook/
+          mkdir -p site/health-report
+          cp -r health-report-dist/. site/health-report/
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  weekly-report-deploy:
+    needs: weekly-report-build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
