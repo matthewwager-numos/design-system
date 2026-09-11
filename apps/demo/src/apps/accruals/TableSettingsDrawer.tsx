@@ -2,12 +2,19 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Button, ButtonGroup, DragList, FieldLabel, Header, Modal, ModalBody, ModalFooter, Setting } from "@numosai/ui";
 import type { DragListItem } from "@numosai/ui";
-import { ACCRUAL_COLUMNS } from "../../data/accruals";
+import { ACCRUAL_COLUMNS, ACCRUAL_DIMENSION_LABELS } from "../../data/accruals";
+import type { AccrualDimensionKey } from "../../data/accruals";
+
+const DIMENSION_KEYS: AccrualDimensionKey[] = ["vendor", "subsidiary", "department", "location", "glAccount"];
+const DIMENSION_OPTIONS = DIMENSION_KEYS.map((key) => ({ value: key, label: ACCRUAL_DIMENSION_LABELS[key] }));
 
 export interface TableSettingsValues {
   columnIds: string[];
   freezeFirstColumn: boolean;
-  groupVendors: boolean;
+  /** The parent/rollup row shown per value of this dimension — e.g. "vendor" gives an "AWS Total" row per vendor. */
+  primaryDimension: AccrualDimensionKey;
+  /** What each primary-key group's rows break down by when expanded — always a different dimension than `primaryDimension` (see `handleSubmit`'s own fallback below). */
+  breakdownDimension: AccrualDimensionKey;
 }
 
 export interface TableSettingsDrawerProps extends TableSettingsValues {
@@ -48,7 +55,7 @@ export interface TableSettingsDrawerProps extends TableSettingsValues {
  * reset from the saved `columnIds` on open, so a Cancelled drag doesn't
  * linger into the next time the drawer's opened.
  */
-export function TableSettingsDrawer({ open, onClose, onSave, columnIds, freezeFirstColumn, groupVendors }: TableSettingsDrawerProps) {
+export function TableSettingsDrawer({ open, onClose, onSave, columnIds, freezeFirstColumn, primaryDimension, breakdownDimension }: TableSettingsDrawerProps) {
   const [draftColumnIds, setDraftColumnIds] = useState(columnIds);
 
   useEffect(() => {
@@ -58,13 +65,27 @@ export function TableSettingsDrawer({ open, onClose, onSave, columnIds, freezeFi
   const items: DragListItem[] = draftColumnIds.map((id) => ({ id, label: ACCRUAL_COLUMNS.find((column) => column.id === id)?.label ?? id }));
   const addOptions = ACCRUAL_COLUMNS.filter((column) => !draftColumnIds.includes(column.id)).map((column) => ({ value: column.id, label: column.label }));
 
+  // Computed from the currently-saved `primaryDimension`, not any
+  // in-progress edit to the "Group by" field below — `Setting`'s own
+  // "select" type is uncontrolled (matching every other field in this
+  // form), so there's no live onChange to react to. `handleSubmit`'s own
+  // fallback below is what catches the rarer case where someone changes
+  // *both* fields to the same dimension in one sitting.
+  const breakdownOptions = DIMENSION_OPTIONS.filter((option) => option.value !== primaryDimension);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const nextPrimary = (formData.get("primaryDimension") as AccrualDimensionKey | null) ?? primaryDimension;
+    let nextBreakdown = (formData.get("breakdownDimension") as AccrualDimensionKey | null) ?? breakdownDimension;
+    if (nextBreakdown === nextPrimary) {
+      nextBreakdown = DIMENSION_KEYS.find((key) => key !== nextPrimary) ?? nextBreakdown;
+    }
     onSave({
       columnIds: draftColumnIds,
       freezeFirstColumn: formData.get("freezeFirstColumn") === "on",
-      groupVendors: formData.get("groupVendors") === "on",
+      primaryDimension: nextPrimary,
+      breakdownDimension: nextBreakdown,
     });
   }
 
@@ -85,7 +106,8 @@ export function TableSettingsDrawer({ open, onClose, onSave, columnIds, freezeFi
           />
 
           <Setting label="Freeze first column" type="toggle" edit name="freezeFirstColumn" checked={freezeFirstColumn} />
-          <Setting label="Group by vendor" type="toggle" edit name="groupVendors" checked={groupVendors} />
+          <Setting label="Group by" type="select" edit name="primaryDimension" value={primaryDimension} options={DIMENSION_OPTIONS} />
+          <Setting label="Breakdown by" type="select" edit name="breakdownDimension" value={breakdownDimension} options={breakdownOptions} />
         </ModalBody>
 
         <ModalFooter>

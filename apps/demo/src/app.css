@@ -849,14 +849,37 @@ a {
   color: var(--content-base);
 }
 
-.accruals-region-label--indent {
-  padding-left: var(--space-5);
+/* A subsidiary row's name — it opens the detail drawer, so it reads as a
+   real link (same default/hover/active treatment as `<Breadcrumb>`'s own
+   ancestor crumbs), not plain body text. Deliberately flush with the
+   vendor row's own label above it, not indented further — both sit right
+   after the same 16px `.accruals-region-spacer`/chevron column. */
+.accruals-region-label--link {
+  color: var(--content-link-default);
+}
+.accruals-region-cell--interactive:hover .accruals-region-label--link {
+  color: var(--content-link-hover);
+  text-decoration: underline;
+}
+.accruals-region-cell--interactive:active .accruals-region-label--link {
+  color: var(--content-link-active);
+  text-decoration: underline;
 }
 
 .accruals-region-label--emphasis {
   font: var(--type-paragraph-s-medium);
   letter-spacing: var(--type-paragraph-s-medium-tracking);
   color: var(--content-emphasis);
+}
+
+/* The "(N)" count next to a group's own name — Regular weight and a more
+   subdued color than the bold name it sits next to, so it reads as a
+   secondary annotation (how many non-empty breakdown rows this group
+   has), not part of the name itself. */
+.accruals-region-count {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
 }
 
 .accruals-figure {
@@ -1335,4 +1358,166 @@ a {
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-5);
+}
+
+/* ── Accrual detail drawer ─────────────────────────────────────────── */
+
+.accrual-detail__amount {
+  font: var(--type-heading-l);
+  letter-spacing: var(--type-heading-l-tracking);
+  color: var(--content-emphasis);
+  white-space: nowrap;
+}
+
+/* `.ds-tab`/`.ds-tab-list--horizontal` give this the same color/hover/
+   padding treatment `<Tabs>` itself uses — reused directly since this is
+   a scroll-spy anchor nav, not real tab-panel switching (see
+   AccrualDetailDrawer.tsx), so it can't be `<Tabs>` itself. `<TabList>`'s
+   own selected indicator is a bar it measures and animates in JS; this
+   is a plain static border instead, which is all a "highlight whichever
+   section is in view" nav needs. */
+.accrual-detail__nav-item.ds-tab--selected {
+  border-bottom-color: var(--border-brand);
+}
+
+.accrual-detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.accrual-detail__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.accrual-detail__section-title {
+  margin: 0;
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+  color: var(--content-emphasis);
+}
+
+.accrual-detail__reasoning {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--background-brand-subdued);
+}
+
+.accrual-detail__reasoning-icon {
+  flex-shrink: 0;
+  color: var(--content-info);
+}
+
+.accrual-detail__reasoning-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.accrual-detail__reasoning-title {
+  margin: 0;
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+  color: var(--content-info);
+}
+
+.accrual-detail__reasoning-text {
+  margin: 0;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-info);
+}
+
+.accrual-detail__documents {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+.accrual-detail__documents .ds-file-upload--dropzone {
+  width: 100%;
+}
+
+.accrual-detail__comments-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-6) 0;
+  text-align: center;
+  color: var(--content-subtle);
+}
+
+.accrual-detail__comments-empty-title {
+  margin: 0;
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
+  color: var(--content-subtle);
+}
+
+.accrual-detail__comments-empty-text {
+  margin: 0;
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+
+.accrual-detail__comments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.accrual-detail__comment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+
+.accrual-detail__comment-bubble {
+  margin: 0;
+  max-width: 90%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--background-brand-subdued);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+
+.accrual-detail__comment-meta {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.accrual-detail__comment-form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.accrual-detail__comment-input {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  border: 1px solid var(--border-brand);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+  background: var(--background-default);
+}
+.accrual-detail__comment-input::placeholder {
+  color: var(--content-placeholder);
+}
+.accrual-detail__comment-input:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus-brand);
 }
