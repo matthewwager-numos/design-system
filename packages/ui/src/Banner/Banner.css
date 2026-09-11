@@ -11,8 +11,8 @@
   gap: var(--space-2);
   padding: var(--space-2);
   border-radius: var(--radius-md);
-  font: var(--type-paragraph-xs-regular);
-  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
 }
 
 .ds-banner--neutral {
@@ -61,8 +61,8 @@
 
 .ds-banner__title {
   margin: 0;
-  font: var(--type-paragraph-xs-medium);
-  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
 }
 
 .ds-banner__description {

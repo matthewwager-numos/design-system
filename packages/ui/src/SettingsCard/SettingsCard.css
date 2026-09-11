@@ -10,6 +10,13 @@
   max-width: 45rem; /* 720px, confirmed from Figma */
 }
 
+/* Extra bottom padding versus <FormBody>'s own default (space-4 on every
+   side) — scoped to this component specifically, not a change to <Form>'s
+   own shared body padding used elsewhere. */
+.ds-settings-card .ds-form-body {
+  padding: var(--space-4) var(--space-4) var(--space-6) var(--space-4);
+}
+
 .ds-settings-card__description {
   margin: 0;
   font: var(--type-paragraph-s-regular);
