@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, MoreVertical, Settings } from "lucide-react";
-import { Cell, Checkbox, CheckboxGroup, Column, IconButton, Pagination, Select, SearchFilter, Tooltip } from "@numosai/ui";
+import { ChevronDown, Settings, UserPlus } from "lucide-react";
+import { Cell, Checkbox, CheckboxGroup, Column, IconButton, Label, Pagination, Select, SearchFilter, Tooltip } from "@numosai/ui";
 import { useToast } from "../../toast/ToastProvider";
 import {
   ACCRUAL_COLUMNS,
@@ -9,11 +9,15 @@ import {
   ACCRUAL_LINE_ITEMS,
   accrualCurrency,
   accrualCurrencyAccounting,
+  actionForLineItem,
+  assigneeForLineItem,
+  confidenceScoreForLineItem,
   isEmptyTotals,
+  journalEntryStatus,
   lineItemDimensionId,
   lineItemTotals,
 } from "../../data/accruals";
-import type { AccrualDimensionKey, AccrualDimensionValue, AccrualLineItem } from "../../data/accruals";
+import type { AccrualDimensionKey, AccrualDimensionValue, AccrualLineItem, JournalEntryCompleteness, RowAction } from "../../data/accruals";
 import { AccrualDetailDrawer } from "./AccrualDetailDrawer";
 import { TableSettingsDrawer } from "./TableSettingsDrawer";
 
@@ -35,6 +39,17 @@ interface Row {
   /** Present on a breakdown/leaf row *only* when it resolves to exactly one posting — drives opening the detail drawer for that one posting. */
   lineItemId?: string;
   emphasis?: boolean;
+  /** Leaf rows only, when that one posting is assigned. */
+  assigneeName?: string;
+  assigneeSubLabel?: string;
+  /** Parent rows only — the number of *distinct* assigned people among this group's own postings (unassigned ones don't count), shown as "N people". */
+  assigneeCount?: number;
+  /** Leaf rows only — `null` before the journal entry has started (nothing to be confident about yet), `undefined` on parent/grand-total rows (confidence isn't a thing a rollup has one value for). */
+  confidenceScore?: number | null;
+  /** Leaf rows only. */
+  journalEntryStatus?: JournalEntryCompleteness;
+  /** Leaf rows only — drives the Action column's own button label. */
+  action?: RowAction;
   mayActual: number;
   junActual: number;
   julActual: number;
@@ -43,19 +58,59 @@ interface Row {
   threeMonthAverage: number;
   accrualAmount: number;
   ytdActual: number;
+  /** The independent, budgeted figure these postings were expected to land at — a real per-posting input now (`AccrualLineItem.forecast`), summed by `lineItemTotals`, not derived from actual+accrual. */
+  forecast: number;
 }
 
 function primaryRow(value: AccrualDimensionValue, items: AccrualLineItem[], presentNames: string[]): Row {
-  return { key: `group:${value.id}`, name: value.name, groupId: value.id, presentNames, emphasis: true, ...lineItemTotals(items) };
+  const totals = lineItemTotals(items);
+  const assignedNames = new Set(
+    items.map((item) => assigneeForLineItem(item)?.name).filter((name): name is string => Boolean(name)),
+  );
+  return {
+    key: `group:${value.id}`,
+    name: value.name,
+    groupId: value.id,
+    presentNames,
+    emphasis: true,
+    assigneeCount: assignedNames.size,
+    ...totals,
+  };
 }
 
-/** `groupId` scopes the key to its parent — the same breakdown value (e.g. "New York") can appear as a child under several different primary-key groups at once, and each is a distinct row over distinct postings, not the same row repeated. */
+/**
+ * `groupId` scopes the key to its parent — the same breakdown value (e.g.
+ * "New York") can appear as a child under several different primary-key
+ * groups at once, and each is a distinct row over distinct postings, not
+ * the same row repeated.
+ */
 function breakdownRow(groupId: string, value: AccrualDimensionValue, items: AccrualLineItem[]): Row {
+  const totals = lineItemTotals(items);
+  // Every one of Confidence/Journal Entry/Action is a property of one real
+  // posting, not something a group of them could average or combine
+  // meaningfully — so all three stay `undefined` unless this row resolves
+  // to exactly one, same condition `lineItemId` already uses to decide
+  // whether the row opens a detail drawer at all. A cell CAN legitimately
+  // hold more than one posting now — `li-26`/`li-27` deliberately reuse an
+  // existing (vendor, GL account) pair under a second subsidiary — so that
+  // case falls back to the same "N people" rollup treatment a parent group
+  // row already gets, rather than silently going blank.
+  const resolvedItem = items.length === 1 ? items[0] : undefined;
+  const assignee = resolvedItem && assigneeForLineItem(resolvedItem);
+  const assignedNames = new Set(
+    items.map((item) => assigneeForLineItem(item)?.name).filter((name): name is string => Boolean(name)),
+  );
   return {
     key: `leaf:${groupId}:${value.id}`,
     name: value.name,
-    lineItemId: items.length === 1 ? items[0]!.id : undefined,
-    ...lineItemTotals(items),
+    lineItemId: resolvedItem?.id,
+    assigneeName: assignee ? assignee.name : undefined,
+    assigneeSubLabel: assignee ? assignee.subLabel : undefined,
+    assigneeCount: resolvedItem ? undefined : assignedNames.size,
+    confidenceScore: resolvedItem ? confidenceScoreForLineItem(resolvedItem) : undefined,
+    journalEntryStatus: resolvedItem ? journalEntryStatus(resolvedItem) : undefined,
+    action: resolvedItem ? actionForLineItem(resolvedItem) : undefined,
+    ...totals,
   };
 }
 
@@ -99,7 +154,7 @@ export function TableTab() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [columnIds, setColumnIds] = useState<string[]>(["mayActual", "junActual", "julActual", "augMtd", "momVariance", "threeMonthAverage", "accrualAmount"]);
+  const [columnIds, setColumnIds] = useState<string[]>(["assignedTo", "forecast", "ytdActual", "accrualAmount", "confidence", "journalEntry"]);
   const [freezeFirstColumn, setFreezeFirstColumn] = useState(true);
   const [selectedLineItemId, setSelectedLineItemId] = useState<string | null>(null);
   const showToast = useToast();
@@ -172,7 +227,8 @@ export function TableTab() {
 
   // Always the full, unfiltered set — a grand total shouldn't shrink just
   // because a search or filter is hiding some of the rows above it.
-  rows.push({ key: "grand-total", name: "Total (USD)", emphasis: true, ...lineItemTotals(ACCRUAL_LINE_ITEMS) });
+  const grandTotals = lineItemTotals(ACCRUAL_LINE_ITEMS);
+  rows.push({ key: "grand-total", name: "Total (USD)", emphasis: true, ...grandTotals });
 
   function figure(value: number, emphasis?: boolean, accounting?: boolean) {
     const formatted = accounting ? accrualCurrencyAccounting.format(value) : accrualCurrency.format(value);
@@ -188,6 +244,90 @@ export function TableTab() {
     return (
       <Cell type={isActive ? "sorted" : "columnHead"} direction={sortDirection} onClick={() => toggleSort(column)} className={end ? "ds-cell--end" : undefined}>
         {label}
+      </Cell>
+    );
+  }
+
+  // "Assigned to"/"Confidence"/"Journal Entry" are all properties of one
+  // real posting, not something a group of them has one combined value
+  // for — every row that isn't a resolved leaf (a parent/rollup row, or
+  // the grand total) shows a plain "—" (`type="null"`) instead. A
+  // breakdown row can itself now be an unresolved multi-posting rollup
+  // (see `breakdownRow`), which reads the same "N people" way a parent
+  // group row does rather than going blank — `assigneeCount` is only ever
+  // set in exactly that case, never alongside a real `lineItemId`.
+  function assignedToCell(row: Row) {
+    if (row.groupId || row.assigneeCount !== undefined) {
+      return (
+        <Cell key={row.key} type="slot">
+          {row.assigneeCount ? (
+            <button
+              type="button"
+              className="accruals-assign-link"
+              onClick={() => showToast({ status: "info", title: "Viewing assignees isn't designed yet" })}
+            >
+              {row.assigneeCount} {row.assigneeCount === 1 ? "person" : "people"}
+            </button>
+          ) : (
+            text(undefined)
+          )}
+        </Cell>
+      );
+    }
+    if (!row.lineItemId) return <Cell key={row.key} type="null" />;
+    if (row.assigneeName) {
+      return (
+        <Cell key={row.key} type="avatar" name={row.assigneeName} sublabel={row.assigneeSubLabel}>
+          {row.assigneeName}
+        </Cell>
+      );
+    }
+    return (
+      <Cell key={row.key} type="slot">
+        <button
+          type="button"
+          className="accruals-assign-link"
+          onClick={() => showToast({ status: "info", title: "Assigning isn't designed yet" })}
+        >
+          <UserPlus size={14} aria-hidden /> Assign
+        </button>
+      </Cell>
+    );
+  }
+
+  function confidenceCell(row: Row) {
+    if (!row.lineItemId) return <Cell key={row.key} type="null" />;
+    if (row.confidenceScore == null) {
+      return <Cell key={row.key} type="progress" value={0} formatValue={() => "—"} />;
+    }
+    return <Cell key={row.key} type="progress" value={row.confidenceScore} />;
+  }
+
+  function journalEntryCell(row: Row) {
+    if (!row.lineItemId || !row.journalEntryStatus) return <Cell key={row.key} type="null" />;
+    const label = row.journalEntryStatus === "Complete" ? "Ready" : row.journalEntryStatus;
+    const status = row.journalEntryStatus === "Complete" ? "positive" : row.journalEntryStatus === "Incomplete" ? "notice" : "neutral";
+    return (
+      <Cell key={row.key} type="slot">
+        <Label status={status}>{label}</Label>
+      </Cell>
+    );
+  }
+
+  function bodyCell(column: (typeof ACCRUAL_COLUMNS)[number], row: Row) {
+    if (column.id === "assignedTo") return assignedToCell(row);
+    if (column.id === "confidence") return confidenceCell(row);
+    if (column.id === "journalEntry") return journalEntryCell(row);
+    if (column.numeric) {
+      return (
+        <Cell key={row.key} type="numeric">
+          {figure(row[column.id as keyof Row] as number, row.emphasis, row.key === "grand-total")}
+        </Cell>
+      );
+    }
+    return (
+      <Cell key={row.key} type="text">
+        {text(row[column.id as keyof Row] as string | undefined, row.emphasis)}
       </Cell>
     );
   }
@@ -269,38 +409,20 @@ export function TableTab() {
 
           {visibleColumns.map((column) => (
             <Column key={column.id} header={headerCell(column.label, column.id, column.numeric)} className={freezeFirstColumn ? "accruals-column--metric" : undefined}>
-              {rows.map((row) =>
-                column.numeric ? (
-                  <Cell key={row.key} type="numeric">
-                    {figure(row[column.id as keyof Row] as number, row.emphasis, row.key === "grand-total")}
-                  </Cell>
-                ) : (
-                  <Cell key={row.key} type="text">
-                    {text(row[column.id as keyof Row] as string | undefined, row.emphasis)}
-                  </Cell>
-                ),
-              )}
+              {rows.map((row) => bodyCell(column, row))}
             </Column>
           ))}
 
-          <Column header={<Cell type="columnHead"> </Cell>} width={56}>
-            {rows.map((row) => (
-              <Cell
-                key={row.key}
-                type="icon"
-                actions={
-                  row.key === "grand-total"
-                    ? []
-                    : [
-                        {
-                          icon: <MoreVertical size={16} />,
-                          label: `Actions for ${row.name}`,
-                          onClick: () => showToast({ status: "info", title: `Actions for ${row.name} aren't designed yet` }),
-                        },
-                      ]
-                }
-              />
-            ))}
+          <Column header={<Cell type="columnHead">Action</Cell>} width={100}>
+            {rows.map((row) =>
+              row.lineItemId && row.action ? (
+                <Cell key={row.key} type="button" onClick={() => setSelectedLineItemId(row.lineItemId!)}>
+                  {row.action}
+                </Cell>
+              ) : (
+                <Cell key={row.key} type="null" />
+              ),
+            )}
           </Column>
         </div>
       </div>

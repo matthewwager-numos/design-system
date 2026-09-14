@@ -9,6 +9,8 @@ A double-entry journal entry: metadata (date, reference #), a list of debit/cred
 
 Read mode has no horizontal divider lines at all, between rows or above the total — spacing alone sets them apart, the same "no line, just room" approach a much earlier version of editing also used. Editing itself now keeps a divider under the header and under every line — matching Figma's own edit-mode reference exactly — with the total row set apart from the last line by spacing alone (a second divider there would just double up).
 
+Each read-mode row is three stacked lines, not one run-on line: the account name (bold), then Department and Location together on their own line below it (joined by a "|" divider, and only rendered at all if either is set), then the memo. The header's own date/reference pair uses that same "|" divider — a plain vertical rule between two related facts, reused wherever this component needs one instead of a bullet.
+
 While editing, the entry is literally nested `<fieldset>`s — one wrapping date/reference, one per line item. Neither fieldset has a visible legend (see Accessibility below); each line splits into two columns — left (Account, then Department+Location, then Description — three fixed, always-stacked rows) and right (Debit, Credit, delete). Below a phone-narrow width, the right column wraps below the left one as a whole unit (see Responsive layout below).
 
 <Canvas of={JournalEntryStories.Default} />
@@ -89,7 +91,7 @@ A new line isn't always blank, though: if the entry is currently off balance, **
 
 ## Responsive layout
 
-<Canvas of={JournalEntryStories.Editing} />
+<Canvas of={JournalEntryStories.ResponsiveEditing} />
 
 Resize the canvas above (or view it on a phone) to see the effect — a line's two columns wrap as a pair of whole units, purely through flexbox and `min-width` (no container query drives it):
 
@@ -98,7 +100,7 @@ Resize the canvas above (or view it on a phone) to see the effect — a line's t
 
 The component measures its own box (`container-type: inline-size`), not the viewport, so it reflows correctly even when it's the viewport that's wide but the entry itself is embedded in a narrow column or side panel.
 
-Read-mode amounts follow the same accounting convention as edit mode: Debit and Credit are real, fixed-width, aligned columns (matching Figma's finished read-mode frame exactly), with a faint em dash for whichever side a line doesn't use — not two independently-sized values. That alignment is exactly what broke down at narrow widths in an earlier version of this component, so below the same phone-narrow breakpoint everything else here collapses at, each amount falls back to a small "DR"/"CR" tag next to it instead of relying on a column that no longer has room to exist — self-labeling, the same fix that alignment temporarily replaced, now scoped to only the width where it's actually needed.
+Read-mode amounts follow the same accounting convention as edit mode: Debit always precedes Credit, in two aligned columns (a `min-width` floor, not an exact shared width, since each figure now carries its own label — see below). Each side that actually has a value shows a small "DR"/"CR" tag next to it — red for Debit, green for Credit, the same self-labeling treatment at every width rather than something that only appears once a column layout runs out of room. Whichever side a line doesn't use shows a faint em dash instead, with no tag at all — once a row clearly has a debit, a "CR" label next to a dash would just be clutter.
 
 ## Balance validation
 

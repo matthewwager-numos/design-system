@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { LogEntry, SearchFilter, Tab, TabList, Tabs } from "@numosai/ui";
+import { ChevronDown } from "lucide-react";
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, LogEntry, SearchFilter, Tab, TabList, Tabs } from "@numosai/ui";
 
 export interface HistoryEntry {
   id: string;
@@ -62,6 +63,17 @@ function monthKey(date: Date): string {
  * spy: scrolling the feed by hand (not just clicking a month) keeps the
  * selected tab in sync with whichever month is actually at the top of the
  * visible feed.
+ *
+ * Below the desktop breakpoint, that sidebar (a vertical `<Tabs>` list
+ * doesn't fit next to a single-column feed) is replaced by a mobile-only
+ * toolbar — the search field again, plus a single link-styled button
+ * showing the active month ("September 2026 ⌄") that opens a
+ * `<DropdownMenu>` of the same months the sidebar would otherwise list,
+ * matching Figma's own mobile History reference exactly. Both toolbars
+ * share the same `query`/`activeMonth` state and `jumpToMonth` handler —
+ * only which one is *rendered* (via CSS, the same render-both/toggle-with-
+ * a-media-query approach `<MobileAppHeader>` vs `<Header>` already use in
+ * `App.tsx`) depends on viewport width.
  */
 export function HistoryTimeline({ entries }: HistoryTimelineProps) {
   const [query, setQuery] = useState("");
@@ -80,6 +92,7 @@ export function HistoryTimeline({ entries }: HistoryTimelineProps) {
   }, [sorted]);
 
   const [activeMonth, setActiveMonth] = useState(() => allMonths[0]?.[0] ?? "");
+  const activeMonthDate = allMonths.find(([key]) => key === activeMonth)?.[1];
 
   const trimmedQuery = query.trim().toLowerCase();
   const filtered = trimmedQuery ? sorted.filter((entry) => entry.searchText.toLowerCase().includes(trimmedQuery)) : sorted;
@@ -135,6 +148,26 @@ export function HistoryTimeline({ entries }: HistoryTimelineProps) {
 
   return (
     <div className="history-timeline">
+      <div className="history-timeline__mobile-toolbar">
+        <SearchFilter size="md" placeholder="Search history" value={query} onChange={setQuery} />
+        {allMonths.length > 0 && activeMonthDate && (
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button variant="link" trailingIcon={<ChevronDown size={16} />}>
+                {GROUP_FORMAT.format(activeMonthDate)}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {allMonths.map(([key, date]) => (
+                <DropdownMenuItem key={key} active={key === activeMonth} onClick={() => jumpToMonth(key)}>
+                  {GROUP_FORMAT.format(date)}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
+
       <div className="history-timeline__feed" ref={feedRef}>
         {groups.length === 0 ? (
           <p className="history-timeline__empty">No log entries match &ldquo;{query}&rdquo;.</p>

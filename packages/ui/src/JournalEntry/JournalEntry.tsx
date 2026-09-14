@@ -267,7 +267,7 @@ export function JournalEntry({
               <TextInput
                 type="text"
                 size="sm"
-                placeholder="#ID"
+                placeholder="ID"
                 aria-label="Reference number"
                 value={displayed.reference ?? ""}
                 onChange={(event) => updateDraft((current) => ({ ...current, reference: event.target.value }))}
@@ -279,8 +279,10 @@ export function JournalEntry({
             {formatShortDate(value.date)}
             {value.reference ? (
               <>
-                {" • "}
-                <span className="ds-journal-entry__header-reference">#{value.reference}</span>
+                <span className="ds-journal-entry__divider" aria-hidden>
+                  |
+                </span>
+                <span className="ds-journal-entry__header-reference">{value.reference}</span>
               </>
             ) : null}
           </span>
@@ -409,25 +411,32 @@ export function JournalEntry({
               <div className="ds-journal-entry__row-main">
                 <div className="ds-journal-entry__row-summary">
                   <span className="ds-journal-entry__account">{optionLabel(accountOptions, line.account)}</span>
-                  {line.department ? (
-                    <span className="ds-journal-entry__subtle"> • {optionLabel(departmentOptions, line.department)}</span>
-                  ) : null}
-                  {line.location ? (
-                    <span className="ds-journal-entry__subtle"> • {optionLabel(locationOptions, line.location)}</span>
-                  ) : null}
                 </div>
+                {line.department || line.location ? (
+                  <div className="ds-journal-entry__row-tags">
+                    {line.department ? (
+                      <span className="ds-journal-entry__subtle">{optionLabel(departmentOptions, line.department)}</span>
+                    ) : null}
+                    {line.department && line.location ? (
+                      <span className="ds-journal-entry__divider" aria-hidden>
+                        |
+                      </span>
+                    ) : null}
+                    {line.location ? <span className="ds-journal-entry__subtle">{optionLabel(locationOptions, line.location)}</span> : null}
+                  </div>
+                ) : null}
                 {line.memo ? <div className="ds-journal-entry__memo-text">{line.memo}</div> : null}
               </div>
 
               <div className="ds-journal-entry__row-amounts">
                 <span className="ds-journal-entry__amount">
-                  <span className="ds-journal-entry__amount-tag ds-journal-entry__amount-tag--debit">DR</span>
+                  {line.debit != null ? <span className="ds-journal-entry__amount-tag ds-journal-entry__amount-tag--debit">DR</span> : null}
                   <span className={line.debit == null ? "ds-journal-entry__amount-blank" : undefined}>
                     {line.debit != null ? formatAmount(line.debit) : "—"}
                   </span>
                 </span>
                 <span className="ds-journal-entry__amount">
-                  <span className="ds-journal-entry__amount-tag ds-journal-entry__amount-tag--credit">CR</span>
+                  {line.credit != null ? <span className="ds-journal-entry__amount-tag ds-journal-entry__amount-tag--credit">CR</span> : null}
                   <span className={line.credit == null ? "ds-journal-entry__amount-blank" : undefined}>
                     {line.credit != null ? formatAmount(line.credit) : "—"}
                   </span>
@@ -455,13 +464,13 @@ export function JournalEntry({
 
         <div className="ds-journal-entry__row-amounts">
           <span className="ds-journal-entry__amount">
-            <span className="ds-journal-entry__amount-tag ds-journal-entry__amount-tag--debit">DR</span>
+            {editing || totalDebit > 0 ? <span className="ds-journal-entry__amount-tag ds-journal-entry__amount-tag--debit">DR</span> : null}
             <span className={totalDebit === 0 ? "ds-journal-entry__amount-blank" : undefined}>
               {totalDebit > 0 ? formatAmount(totalDebit) : "—"}
             </span>
           </span>
           <span className="ds-journal-entry__amount">
-            <span className="ds-journal-entry__amount-tag ds-journal-entry__amount-tag--credit">CR</span>
+            {editing || totalCredit > 0 ? <span className="ds-journal-entry__amount-tag ds-journal-entry__amount-tag--credit">CR</span> : null}
             <span className={totalCredit === 0 ? "ds-journal-entry__amount-blank" : undefined}>
               {totalCredit > 0 ? formatAmount(totalCredit) : "—"}
             </span>

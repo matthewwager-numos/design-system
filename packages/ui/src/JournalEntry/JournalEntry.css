@@ -99,6 +99,15 @@
   color: var(--content-disabled);
 }
 
+/* A literal "|" glyph, not a border — reused between the header's own
+   date/reference and each read-mode row's department/location, matching
+   Figma's own divider treatment in both places. Faint enough to read as
+   a separator, not content of its own, so it's `aria-hidden`. */
+.ds-journal-entry__divider {
+  margin: 0 var(--space-1);
+  color: var(--border-base);
+}
+
 .ds-journal-entry__header-spacer {
   flex: 1 0 0;
 }
@@ -199,16 +208,15 @@
   flex-shrink: 0;
 }
 
-/* Debit/Credit get a fixed width (not the equal-share `flex: 1 1 0` every
-   other field in a row gets) — same width `.ds-journal-entry__amount`
-   (read mode's line/total figures) uses, so every amount in this
-   component — editable or not — lines up in the same two columns.
-   Declared after the generic rule above so it wins at equal (one-class)
-   specificity. Right-aligned to match a plain number's own reading
-   direction, and how the read-mode figures next to it align. */
+/* Debit and Credit split the row evenly (same `flex: 1 1 0` pattern as
+   Department/Location above), expanding to fill the available width next
+   to the delete button rather than sitting in a small fixed-size box —
+   matching Figma's own edit-mode reference, where both fields span most
+   of the line's own right side. Right-aligned within that wider box to
+   match a plain number's own reading direction. */
 .ds-journal-entry__amount-input {
-  flex: 0 0 5.5rem;
-  width: 5.5rem;
+  flex: 1 1 0;
+  min-width: 0;
 }
 .ds-journal-entry__amount-input .ds-text-input__control {
   text-align: right;
@@ -221,7 +229,13 @@
   gap: var(--space-1) var(--space-2);
 }
 
+/* Three stacked rows — account, then department|location, then the memo
+   — not one run-on line; `<Fieldset>`'s own display convention for a
+   labelless group of facts about one thing, most-specific first. */
 .ds-journal-entry__row-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
   flex: 1 1 12rem;
   min-width: 0;
 }
@@ -233,27 +247,40 @@
 }
 
 .ds-journal-entry__account {
-  color: var(--content-base);
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-emphasis);
+}
+
+.ds-journal-entry__row-tags {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ds-journal-entry__subtle {
   color: var(--content-subtle);
 }
 
+/* `--content-disabled`, not `--content-placeholder` — this is real,
+   saved memo text, not an empty field's placeholder. `--content-placeholder`
+   is a warm beige, a different hue family entirely from every other gray
+   token in this row; using it here read as a color mistake, not a
+   deliberate, more-muted-than-the-line-above-it choice. */
 .ds-journal-entry__memo-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--content-placeholder);
+  color: var(--content-disabled);
 }
 
 /* Debit always precedes Credit, in both the markup and every column
-   width/gap below — matching standard accounting convention (debits on
-   the left, credits on the right), which is exactly why these need to
-   land in real, consistent columns rather than each sizing to its own
-   content. Same `space-2` gap and `5.5rem` per-figure width as
-   `.ds-journal-entry__amount-input` (the editable Debit/Credit fields),
-   so a value lines up in the same column whether it's editable or not. */
+   below — matching standard accounting convention (debits on the left,
+   credits on the right). Each figure carries its own "DR"/"CR" tag (see
+   `.ds-journal-entry__amount-tag` below) rather than relying on a fixed
+   column position alone to say which side it's on, so alignment only
+   needs a `min-width` floor to read as tidy columns, not an exact shared
+   width the way the editable Debit/Credit inputs need. */
 .ds-journal-entry__row-amounts {
   display: flex;
   flex: 0 0 auto;
@@ -265,10 +292,10 @@
 .ds-journal-entry__amount {
   display: inline-flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: var(--space-1);
-  width: 5.5rem;
-  text-align: right;
+  min-width: 9rem;
+  text-align: left;
   font-variant-numeric: tabular-nums;
 }
 
@@ -279,17 +306,15 @@
   color: var(--content-placeholder);
 }
 
-/* Hidden at this width — the fixed-column layout above already makes
-   clear which side a figure is on. Shown again below, once there's no
-   more column left to align to (see the container query below): a
-   "DR"/"CR" tag is what keeps a stacked, self-labeled figure readable
-   without one, the same problem this solved before column alignment
-   came back for wider views. Read-mode-only sizing/hiding — editing has
-   its own always-visible, neutrally-colored use of this same tag, both
-   as each Debit/Credit field's own `leadingIcon` and on this total row,
-   overridden below. */
+/* Always shown — a self-labeling "DR"/"CR" tag next to the figure itself,
+   not a hidden-until-narrow fallback: reads correctly on its own at any
+   width, and (see the read-mode component in JournalEntry.tsx) is only
+   rendered at all for whichever side actually has a value, so the unused
+   side stays a plain, unlabeled "—". Editing has its own always-visible,
+   neutrally-colored use of this same tag, both as each Debit/Credit
+   field's own `leadingIcon` and on this total row, overridden below. */
 .ds-journal-entry__amount-tag {
-  display: none;
+  display: inline;
   font: var(--type-paragraph-xs-medium);
   letter-spacing: var(--type-paragraph-xs-medium-tracking);
 }
@@ -300,18 +325,6 @@
 
 .ds-journal-entry__amount-tag--credit {
   color: var(--content-positive);
-}
-
-@container (max-width: 26rem) {
-  .ds-journal-entry__amount-tag {
-    display: inline;
-  }
-
-  .ds-journal-entry__amount {
-    width: auto;
-    justify-content: flex-start;
-    text-align: left;
-  }
 }
 
 /* Editing's own DR/CR tags (a Debit/Credit field's `leadingIcon`, and

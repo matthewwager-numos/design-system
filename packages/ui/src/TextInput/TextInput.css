@@ -92,6 +92,18 @@
   cursor: not-allowed;
 }
 
+/* A `type="date"` control renders its own native calendar affordance
+   (WebKit's `::-webkit-calendar-picker-indicator`) flush right, in the
+   browser's own fixed dark icon and position — not this design system's
+   own icon or token colors, and a second, redundant calendar glyph
+   whenever a consumer also supplies a `leadingIcon` (e.g. `JournalEntry`'s
+   own Date field). Left in place (not `display: none`) so its native
+   click target — and the picker it opens — still work; just made
+   invisible so only the real, token-colored icon shows. */
+.ds-text-input__control[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
 .ds-text-input__icon {
   display: inline-flex;
   align-items: center;

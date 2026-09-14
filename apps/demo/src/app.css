@@ -882,6 +882,31 @@ a {
   color: var(--content-subtle);
 }
 
+/* The "Assigned to" column's own two link affordances — "N people" (a
+   group's rollup of its own distinct assignees) and "+ Assign" (an
+   unassigned posting) — same link color convention as
+   `.accruals-region-label--link` above, just a real standalone button
+   rather than one scoped to that row-label column's own ancestor markup. */
+.accruals-assign-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border: none;
+  background: none;
+  padding: 0;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-link-default);
+  cursor: pointer;
+}
+.accruals-assign-link:hover {
+  color: var(--content-link-hover);
+  text-decoration: underline;
+}
+.accruals-assign-link:active {
+  color: var(--content-link-active);
+}
+
 .accruals-figure {
   font: var(--type-paragraph-s-regular);
   letter-spacing: var(--type-paragraph-s-regular-tracking);
@@ -909,6 +934,29 @@ a {
   align-items: flex-start;
   flex-wrap: wrap;
   gap: var(--space-6);
+  width: 100%;
+  /* Figma's own History reference wants a full space-m (12px) gutter
+     around the search/month-picker/feed column on mobile — wider than
+     `.app-body`'s own shared, tighter 4px default. Cancels that inherited
+     4px first (negative margin) rather than just adding on top of it, so
+     the total stays exactly 12px instead of 16px. Reset back to 0 at the
+     desktop breakpoint below, where the feed/sidebar layout never had
+     this gutter and doesn't need it. */
+  margin-inline: calc(-1 * var(--space-1));
+  padding-inline: var(--space-3);
+}
+
+/* Mobile-only stand-in for `.history-timeline__sidebar` below — a vertical
+   month `<Tabs>` list doesn't fit next to a single-column feed at this
+   width, so search + jump-to-month collapse into one row (search field,
+   then a single link-styled "September 2026" button that opens the same
+   month list as a dropdown instead). Hidden again once the real sidebar
+   takes over — see the media query below. */
+.history-timeline__mobile-toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
   width: 100%;
 }
 
@@ -938,8 +986,10 @@ a {
   color: var(--content-subtle);
 }
 
+/* Hidden below the desktop breakpoint — `.history-timeline__mobile-toolbar`
+   above covers search + month-jumping at that width instead. */
 .history-timeline__sidebar {
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: var(--space-6);
   width: 15.75rem;
@@ -964,6 +1014,16 @@ a {
     height: 100%;
     align-items: stretch;
     flex-wrap: nowrap;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .history-timeline__mobile-toolbar {
+    display: none;
+  }
+
+  .history-timeline__sidebar {
+    display: flex;
   }
 
   .history-timeline__feed,
@@ -1362,6 +1422,29 @@ a {
 
 /* ── Accrual detail drawer ─────────────────────────────────────────── */
 
+/* Wider than the default 40rem drawer — the vendor|amount title, the
+   4-item meta row, and the history chart all want more breathing room. */
+.accrual-detail__drawer.ds-modal--drawer-right {
+  width: 45rem;
+}
+
+.accrual-detail__divider {
+  margin: 0 var(--space-2);
+  color: var(--content-placeholder);
+}
+
+/* Meta row items (subsidiary/account/location/department) truncate
+   instead of wrapping now that the title took the amount's place —
+   `.ds-detail-header__meta` itself is just a flex row with no per-item
+   overflow handling, so that's added here rather than in the shared
+   component (other drawers may want their meta to wrap). */
+.accrual-detail__drawer .ds-detail-header__meta > span:not(.ds-detail-header__meta-sep) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
 .accrual-detail__amount {
   font: var(--type-heading-l);
   letter-spacing: var(--type-heading-l-tracking);
@@ -1383,13 +1466,83 @@ a {
 .accrual-detail__body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-7);
+  background: var(--background-secondary);
 }
 
 .accrual-detail__section {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+/* Without this, the scroll-spy nav can't bring the *last* section's own
+   heading flush to the body's top edge — there's nothing below it left
+   to scroll away, so the max scroll position falls short. Giving only
+   the last section a floor of the body's own (flex-computed, definite)
+   height guarantees there's always enough trailing scroll room, no
+   matter how short its actual content is. Earlier sections don't need
+   this — everything after them is already tall enough. */
+.accrual-detail__body > .accrual-detail__section:last-child {
+  min-height: 100%;
+}
+
+/* Elevates the Journal Entry off the drawer body's own background/secondary
+   — the same tokens <Card> itself uses, hand-rolled instead of reusing
+   <Card> because Card's own CSS bakes in a pointer cursor + fixed 400px
+   width meant for a selectable-card-group pattern, not a static wrapper. */
+.accrual-detail__journal-card {
+  background: var(--background-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-l1);
+}
+
+/* Surfaces the "same vendor + same GL account, different subsidiary"
+   case directly on the one posting it applies to — the default Vendor→
+   GL Account table pivot can only show that as a combined rollup cell
+   (a 2-axis pivot can't hold vendor+account both fixed while subsidiary
+   still varies across separate rows), so this is the one place it's
+   fully legible. */
+.accrual-detail__related-accounts-title {
+  margin: 0 0 var(--space-2);
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-subtle);
+}
+.accrual-detail__related-accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.accrual-detail__related-accounts-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+
+/* SegmentedControl's own CSS sets `width: 100%` (a deliberate departure
+   from Figma for form-field consistency) — as a flex child with no
+   override that becomes its flex-basis, so it claims the full row width
+   instead of hugging its Chart/Table content and sitting flush right.
+   Its own segments are also `flex: 1 1 0%`, whose 0% basis makes an
+   auto-width ancestor collapse to near-zero (the browser sizes a
+   shrink-to-fit flex container off each child's flex-basis, not its
+   content, when the basis is a percentage) — truncating "Chart" to
+   "Ch…" — so the segments themselves need `flex: 0 0 auto` too. */
+.accrual-detail__section-header .ds-segmented-control {
+  flex: 0 0 auto;
+  width: auto;
+}
+.accrual-detail__section-header .ds-segmented-control .ds-segment {
+  flex: 0 0 auto;
 }
 
 .accrual-detail__section-title {
@@ -1399,48 +1552,131 @@ a {
   color: var(--content-emphasis);
 }
 
-.accrual-detail__reasoning {
+/* Pairs a section's own heading with a trailing pill (Journal Entry's
+   "Ready" status) or control (History's Chart/Table toggle) on one line,
+   pushed to opposite ends — plain sections (Confidence, Evidence,
+   Collaborate) just use `.accrual-detail__section-title` alone instead. */
+.accrual-detail__section-header {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-2);
-  padding: var(--space-2);
-  border-radius: var(--radius-md);
-  background: var(--background-brand-subdued);
 }
 
-.accrual-detail__reasoning-icon {
-  flex-shrink: 0;
-  color: var(--content-info);
+.accrual-detail__confidence {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-6);
 }
 
-.accrual-detail__reasoning-content {
+.accrual-detail__confidence-factors {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  flex: 1 1 16rem;
   min-width: 0;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.accrual-detail__reasoning-title {
-  margin: 0;
+.accrual-detail__confidence-factor {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+.accrual-detail__confidence-factor svg {
+  flex-shrink: 0;
+}
+.accrual-detail__confidence-factor--passed svg {
+  color: var(--content-positive);
+}
+.accrual-detail__confidence-factor--failed svg {
+  color: var(--content-negative);
+}
+
+.accrual-detail__history-table {
+  overflow-x: auto;
+}
+.accrual-detail__history-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  font-variant-numeric: tabular-nums;
+}
+.accrual-detail__history-table th,
+.accrual-detail__history-table td {
+  padding: var(--space-2) var(--space-3);
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.accrual-detail__history-table th[scope="row"] {
+  text-align: left;
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-emphasis);
+}
+.accrual-detail__history-table thead th {
+  color: var(--content-subtle);
   font: var(--type-paragraph-xs-medium);
   letter-spacing: var(--type-paragraph-xs-medium-tracking);
-  color: var(--content-info);
+  text-transform: uppercase;
 }
 
-.accrual-detail__reasoning-text {
-  margin: 0;
-  font: var(--type-paragraph-xs-regular);
-  letter-spacing: var(--type-paragraph-xs-regular-tracking);
-  color: var(--content-info);
-}
-
-.accrual-detail__documents {
+.accrual-detail__evidence-table {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  align-items: flex-start;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-l1);
 }
-.accrual-detail__documents .ds-file-upload--dropzone {
-  width: 100%;
+
+.accrual-detail__evidence-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--content-link-default);
+  cursor: pointer;
+}
+
+.accrual-detail__evidence-add {
+  color: var(--content-placeholder);
+}
+
+.accrual-detail__assignee {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  border: none;
+  background: none;
+  padding: 0;
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-link-default);
+  cursor: pointer;
+}
+.accrual-detail__assignee:hover {
+  text-decoration: underline;
+}
+
+.accrual-detail__collaborate-to {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.accrual-detail__collaborate-to-label {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
 }
 
 .accrual-detail__comments-empty {

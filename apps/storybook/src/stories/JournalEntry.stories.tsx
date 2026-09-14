@@ -69,12 +69,34 @@ const EMPTY_VALUE: JournalEntryValue = {
   lines: [],
 };
 
-function JournalEntryDemo({ initialValue, initialEditing = false }: { initialValue: JournalEntryValue; initialEditing?: boolean }) {
+/**
+ * `resizable` picks which of two different reviewing needs this demo's own
+ * wrapper serves:
+ *  - `false` (every story below except `ResponsiveEditing`): a fixed 56rem
+ *    that never shrinks, even inside `withThemeSplit`'s own halved,
+ *    sometimes-narrower-than-56rem column — Storybook's own canvas panel
+ *    width (and doubly so, half of it) isn't a reliable stand-in for "a real
+ *    desktop layout," so these stories force it rather than let a
+ *    coincidentally-narrow panel wrap a layout that was never meant to.
+ *  - `true` (`ResponsiveEditing` only): the old shrink-with-its-container
+ *    behavior, since that story's whole point is letting you drag the
+ *    canvas panel narrower to watch the wrap breakpoints happen — see
+ *    "Responsive layout" in JournalEntry.mdx.
+ */
+function JournalEntryDemo({
+  initialValue,
+  initialEditing = false,
+  resizable = false,
+}: {
+  initialValue: JournalEntryValue;
+  initialEditing?: boolean;
+  resizable?: boolean;
+}) {
   const [value, setValue] = useState(initialValue);
   const [editing, setEditing] = useState(initialEditing);
 
   return (
-    <div style={{ width: "56rem", maxWidth: "100%" }}>
+    <div style={resizable ? { width: "56rem", maxWidth: "100%" } : { width: "56rem", flexShrink: 0 }}>
       <JournalEntry
         aria-label="Journal entry"
         value={value}
@@ -110,4 +132,9 @@ export const Unbalanced: Story = {
 export const Empty: Story = {
   name: "New entry (no lines yet)",
   render: () => <JournalEntryDemo initialValue={EMPTY_VALUE} initialEditing />,
+};
+
+/** Used by "Responsive layout" in JournalEntry.mdx only — resize the canvas panel to see the wrap breakpoints, not a story meant to showcase the layout itself. */
+export const ResponsiveEditing: Story = {
+  render: () => <JournalEntryDemo initialValue={BALANCED_VALUE} initialEditing resizable />,
 };
