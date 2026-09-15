@@ -26,10 +26,10 @@ import type { CommunicateAppTab } from "./apps/communicate/CommunicateApp";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { ToastProvider } from "./toast/ToastProvider";
 import { EmployeesProvider } from "./data/useEmployees";
-import type { PageId } from "./pages";
+import { useHashRoute } from "./pages/useHashRoute";
 
 export default function App() {
-  const [page, setPage] = useState<PageId>("home");
+  const [page, setPage] = useHashRoute();
   const mobileNavRef = useMeasuredHeightVar<HTMLDivElement>("--mobile-nav-height");
 
   // Each app's own active tab lives here, not inside that app's own
