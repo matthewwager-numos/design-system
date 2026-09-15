@@ -19,7 +19,9 @@ export function AnalyzeApp({ tab, onTabChange }: AnalyzeAppProps) {
       onTabChange={onTabChange}
       tabs={{
         overview: { description: "A control-tower summary of analysis status will live here." },
-        inputs: { description: "Close's finished output will land here." },
+        inputs: {
+          description: "Close's finished output, plus budget and prior-period actuals to compare it against, will land here.",
+        },
         work: { description: "Line-item variance and trend analysis will happen here." },
         output: { description: "Finalized findings, ready to inform next month's cycle, will appear here." },
         history: { description: "A record of past analysis runs will appear here." },

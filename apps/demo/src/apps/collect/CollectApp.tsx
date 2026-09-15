@@ -19,7 +19,9 @@ export function CollectApp({ tab, onTabChange }: CollectAppProps) {
       onTabChange={onTabChange}
       tabs={{
         overview: { description: "A control-tower summary of collections status will live here." },
-        inputs: { description: "Invoices and payment data will land here." },
+        inputs: {
+          description: "Customer invoices, payment terms, incoming remittances, and aging data will land here.",
+        },
         work: { description: "Line-item collection tracking will happen here." },
         output: { description: "Finalized collections data, ready to feed into Close, will appear here." },
         history: { description: "A record of past collection runs will appear here." },

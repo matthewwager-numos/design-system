@@ -7,7 +7,7 @@ export function InputsTab() {
     <EmptyState
       icon={<Inbox size={24} />}
       title="Not built yet"
-      description="Collect, Pay, Accrue, and Reconcile's own finished Output will land here."
+      description="Finalized AR, AP, accrual, and reconciliation figures from Collect, Pay, Accrue, and Reconcile — everything needed to lock the period — will land here."
     />
   );
 }

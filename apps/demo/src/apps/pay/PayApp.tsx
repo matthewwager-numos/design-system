@@ -19,7 +19,9 @@ export function PayApp({ tab, onTabChange }: PayAppProps) {
       onTabChange={onTabChange}
       tabs={{
         overview: { description: "A control-tower summary of payment status will live here." },
-        inputs: { description: "Payment requests and bank/vendor feeds will land here." },
+        inputs: {
+          description: "Vendor bills, purchase orders, banking details, and payment approval requests will land here.",
+        },
         work: { description: "Line-item payment approval and processing will happen here." },
         output: { description: "Finalized payment data, ready to feed into Close, will appear here." },
         history: { description: "A record of past payment runs will appear here." },

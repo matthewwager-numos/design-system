@@ -25,7 +25,9 @@ export function ReconcileApp({ tab, onTabChange }: ReconcileAppProps) {
       onTabChange={onTabChange}
       tabs={{
         overview: { description: "A control-tower summary of reconciliation status will live here." },
-        inputs: { description: "Ledger and sub-ledger balances to compare will land here." },
+        inputs: {
+          description: "Bank statements, sub-ledger balances, and the GL trial balance to compare against each other will land here.",
+        },
         work: { description: "Line-item account reconciliation will happen here." },
         output: { description: "Finalized, reconciled balances, ready to feed into Close, will appear here." },
         history: { description: "A record of past reconciliation runs will appear here." },

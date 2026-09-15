@@ -27,7 +27,9 @@ export function CommunicateApp({ tab, onTabChange }: CommunicateAppProps) {
       onTabChange={onTabChange}
       tabs={{
         overview: { description: "A control-tower summary of communication status will live here." },
-        inputs: { description: "Close's finished output will land here." },
+        inputs: {
+          description: "Close's finished output, plus Analyze's and Forecast's own findings, will land here — the material this workflow packages for its audience.",
+        },
         work: { description: "Board decks, investor updates, and management reports will be assembled here." },
         output: {
           description:
