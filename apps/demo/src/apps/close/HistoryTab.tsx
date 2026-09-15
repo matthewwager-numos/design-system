@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { Button, ButtonGroup, Header, Modal, ModalBody, ModalFooter } from "@numosai/ui";
 import { HistoryTimeline } from "../../components/HistoryTimeline";
-import { RECONCILIATION_HISTORY } from "../../data/reconciliationHistory";
+import { CLOSE_HISTORY } from "../../data/closeHistory";
 import { useTasks } from "../../data/useTasks";
 import { useEmployees } from "../../data/useEmployees";
 import { useToast } from "../../toast/ToastProvider";
 import type { Employee } from "../../data/employees";
-import { EmployeeDetailDrawer } from "../employees/EmployeeDetailDrawer";
+import { EmployeeDetailDrawer } from "../team/EmployeeDetailDrawer";
 import { TaskDetailDrawer } from "./TaskDetailDrawer";
 
 export function HistoryTab() {
@@ -25,7 +25,7 @@ export function HistoryTab() {
 
   const entries = useMemo(
     () =>
-      RECONCILIATION_HISTORY.map((entry) => ({
+      CLOSE_HISTORY.map((entry) => ({
         ...entry,
         onSubjectClick: entry.subjectId ? () => setSelectedTaskId(entry.subjectId!) : undefined,
         onActorClick: entry.actorEmployeeId ? () => setSelectedEmployeeId(entry.actorEmployeeId!) : undefined,

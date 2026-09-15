@@ -9,19 +9,22 @@ import { HistoryTab } from "./HistoryTab";
 import { SettingsTab } from "./SettingsTab";
 import { AddEmployeeWizard } from "./AddEmployeeWizard";
 
-export type EmployeesAppTab = "overview" | "objectManagement" | "history" | "settings";
+export type TeamAppTab = "overview" | "objectManagement" | "history" | "settings";
 
-export interface EmployeesAppProps {
+export interface TeamAppProps {
   /** Lifted to `App.tsx` (rather than this component's own `useState`) so it survives switching to a different app and back — the last tab you had open here is what you see again next time. */
-  tab: EmployeesAppTab;
-  onTabChange: (tab: EmployeesAppTab) => void;
+  tab: TeamAppTab;
+  onTabChange: (tab: TeamAppTab) => void;
 }
 
 /**
- * The "People" app — the anatomy every left-nav app shares: a header
- * (icon + title + Overview/People/History/Settings tabs) above
- * a scrollable body showing whichever tab is selected. Confirmed from the
- * List & Detail Figma template, which shows this exact anatomy.
+ * The "Team" app — not one of the 8 monthly-rhythm workflow apps (Collect/
+ * Pay/Accrue/Reconcile/Close/Analyze/Forecast/Report), but a global utility
+ * alongside Settings: the roster other workflows reference (e.g. who a
+ * posting is assigned to). Same anatomy every left-nav app shares: a header
+ * (icon + title + Overview/People/History/Settings tabs) above a scrollable
+ * body. Confirmed from the List & Detail Figma template, which shows this
+ * exact anatomy.
  *
  * Renders both the desktop `<Header>` and mobile `<MobileAppHeader>`
  * sharing the same tab state, toggled by the same CSS breakpoint as
@@ -29,7 +32,7 @@ export interface EmployeesAppProps {
  * Detail template shows `MobileNav` + `MobileAppHeader` stacked above the
  * page content, confirmed from Figma's own iPhone frames.
  */
-export function EmployeesApp({ tab, onTabChange }: EmployeesAppProps) {
+export function TeamApp({ tab, onTabChange }: TeamAppProps) {
   const [adding, setAdding] = useState(false);
   const { addEmployee } = useEmployees();
   const showToast = useToast();
@@ -61,9 +64,9 @@ export function EmployeesApp({ tab, onTabChange }: EmployeesAppProps) {
               <Users size={24} />
             </span>
           }
-          title="People"
+          title="Team"
           subNav={
-            <Tabs value={tab} onValueChange={(value) => onTabChange(value as EmployeesAppTab)}>
+            <Tabs value={tab} onValueChange={(value) => onTabChange(value as TeamAppTab)}>
               <TabList>
                 <Tab value="overview">Overview</Tab>
                 <Tab value="objectManagement">People</Tab>
@@ -82,9 +85,9 @@ export function EmployeesApp({ tab, onTabChange }: EmployeesAppProps) {
               <Users size={16} />
             </span>
           }
-          title="People"
+          title="Team"
           value={tab}
-          onValueChange={(value) => onTabChange(value as EmployeesAppTab)}
+          onValueChange={(value) => onTabChange(value as TeamAppTab)}
           onIconClick={() => onTabChange("overview")}
         >
           <Tab value="overview">Overview</Tab>

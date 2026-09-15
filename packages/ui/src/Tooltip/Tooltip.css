@@ -17,7 +17,12 @@
 
 .ds-tooltip {
   position: fixed;
-  z-index: 60;
+  /* Above <Modal>'s own z-index: 100 (and <DropdownMenu>'s 150) — a
+     tooltip is the most transient, contextual overlay of all of them
+     (e.g. a chart's own hover tooltip inside a drawer, or a menu item's
+     tooltip inside an open dropdown) and needs to render above whatever
+     it's shown within, not get stacked underneath it. */
+  z-index: 160;
   display: flex;
   flex-direction: column;
   width: max-content;

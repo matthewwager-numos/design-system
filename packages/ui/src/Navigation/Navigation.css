@@ -95,6 +95,46 @@
   overflow-y: auto;
 }
 
+.ds-nav-section__label {
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  font: var(--type-heading-xs);
+  letter-spacing: var(--type-heading-xs-tracking);
+  text-transform: uppercase;
+  color: var(--content-subtle);
+}
+
+/* Collapsed nav (the icon-only rail) has no room for the label's own
+   words — rather than shrinking/wrapping/truncating them illegibly, the
+   label becomes a plain hairline rule instead. The text itself stays in
+   the DOM (visually hidden, not removed) so a screen reader still
+   announces the group name even though sighted users just see a divider. */
+.ds-navigation--collapsed .ds-nav-section__label {
+  padding: var(--space-2) 0 0;
+  margin: 0 var(--space-2) var(--space-1);
+  border-top: 1px solid var(--border-subtle);
+}
+.ds-navigation--collapsed .ds-nav-section__label-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* A labeled (or otherwise grouped) section nested inside the main
+   scrollable section — e.g. "Make the numbers right" clustering several
+   workflow apps — needs its own separation from whatever's above it, since
+   the outer section's own layout has no `gap` between its direct children
+   to lean on for this. Scoped to nested sections only, so top-level
+   section spacing (unaffected by this) stays exactly as it was. */
+.ds-nav-section .ds-nav-section {
+  margin-top: var(--space-3);
+}
+
 /* ── Nav Item ──────────────────────────────────────────────────────── */
 
 .ds-nav-item-wrapper {

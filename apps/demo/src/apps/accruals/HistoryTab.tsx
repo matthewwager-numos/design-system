@@ -6,7 +6,7 @@ import { ACCRUAL_VENDORS } from "../../data/accruals";
 import { useEmployees } from "../../data/useEmployees";
 import { useToast } from "../../toast/ToastProvider";
 import type { Employee } from "../../data/employees";
-import { EmployeeDetailDrawer } from "../employees/EmployeeDetailDrawer";
+import { EmployeeDetailDrawer } from "../team/EmployeeDetailDrawer";
 import { VendorDetailDrawer } from "./VendorDetailDrawer";
 
 export function HistoryTab() {

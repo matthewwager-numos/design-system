@@ -19,7 +19,7 @@ import type { RawHistoryEntry } from "../components/HistoryTimeline";
 // still-employed actors (Maya Chen e1 / Jordan Lee e2 / Priya Patel e3);
 // "Alex Kim"/"Sam Rivera" are real task assignees but not real employee
 // records, and "System" isn't a person — all three stay non-clickable.
-export const RECONCILIATION_HISTORY: RawHistoryEntry[] = [
+export const CLOSE_HISTORY: RawHistoryEntry[] = [
   {
     id: "rh1",
     subject: "REC-098 “December bank reconciliation”",

@@ -12,7 +12,7 @@ import type { RawHistoryEntry } from "../components/HistoryTimeline";
 // e1 / Jordan Lee e2 / Priya Patel e3). "Sam Rivera" and "Diego Torres" are
 // invented past employees with no real backing record, and "System" isn't
 // a person at all, so those stay non-clickable.
-export const EMPLOYEE_HISTORY: RawHistoryEntry[] = [
+export const TEAM_HISTORY: RawHistoryEntry[] = [
   {
     id: "eh1",
     subject: "Maya Chen’s",

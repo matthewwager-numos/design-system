@@ -2,35 +2,38 @@ import { CheckSquare } from "lucide-react";
 import { Header, MobileAppHeader, Tab, TabList, Tabs, useMeasuredHeightVar } from "@numosai/ui";
 import { TasksProvider } from "../../data/useTasks";
 import { OverviewTab } from "./OverviewTab";
+import { InputsTab } from "./InputsTab";
 import { TasksTab } from "./TasksTab";
 import { HistoryTab } from "./HistoryTab";
 import { SettingsTab } from "./SettingsTab";
 
-export type ReconciliationAppTab = "overview" | "tasks" | "history" | "settings";
+export type CloseAppTab = "overview" | "inputs" | "tasks" | "history" | "settings";
 
-export interface ReconciliationAppProps {
+export interface CloseAppProps {
   /** Lifted to `App.tsx` (rather than this component's own `useState`) so it survives switching to a different app and back — the last tab you had open here is what you see again next time. */
-  tab: ReconciliationAppTab;
-  onTabChange: (tab: ReconciliationAppTab) => void;
+  tab: CloseAppTab;
+  onTabChange: (tab: CloseAppTab) => void;
 }
 
 /**
- * The "Close Checklist" app — same anatomy every left-nav app shares (see
- * `EmployeesApp`): a header (icon + title + Overview/Tasks/History/Settings
- * tabs) above a scrollable body. Its Tasks tab is the one built out in
- * detail — a kanban board of `<Card>`s per stage with a `<SankeyChart>`
- * (one-color mode) visualizing throughput across those same stages above
- * it, matching the reference design directly.
+ * The "Close" app — the hub where Collect/Pay/Accrue/Reconcile's own
+ * Output all feed in, and whose own Output in turn feeds Analyze/Forecast/
+ * Report. Same anatomy every left-nav app shares (see `TeamApp`): a header
+ * (icon + title + Overview/Inputs/Close/History/Settings tabs) above a
+ * scrollable body. Its own eponymous tab is the one built out in detail —
+ * a kanban board of `<Card>`s per stage with a `<SankeyChart>` (one-color mode) visualizing
+ * throughput across those same stages above it, matching the reference
+ * design directly.
  */
-export function ReconciliationApp({ tab, onTabChange }: ReconciliationAppProps) {
+export function CloseApp({ tab, onTabChange }: CloseAppProps) {
   return (
     <TasksProvider>
-      <ReconciliationAppContent tab={tab} onTabChange={onTabChange} />
+      <CloseAppContent tab={tab} onTabChange={onTabChange} />
     </TasksProvider>
   );
 }
 
-function ReconciliationAppContent({ tab, onTabChange }: ReconciliationAppProps) {
+function CloseAppContent({ tab, onTabChange }: CloseAppProps) {
   const mobileHeaderRef = useMeasuredHeightVar<HTMLDivElement>("--mobile-app-header-height");
 
   return (
@@ -43,12 +46,13 @@ function ReconciliationAppContent({ tab, onTabChange }: ReconciliationAppProps) 
               <CheckSquare size={24} />
             </span>
           }
-          title="Close Checklist"
+          title="Close"
           subNav={
-            <Tabs value={tab} onValueChange={(value) => onTabChange(value as ReconciliationAppTab)}>
+            <Tabs value={tab} onValueChange={(value) => onTabChange(value as CloseAppTab)}>
               <TabList>
                 <Tab value="overview">Overview</Tab>
-                <Tab value="tasks">Tasks</Tab>
+                <Tab value="inputs">Inputs</Tab>
+                <Tab value="tasks">Close</Tab>
                 <Tab value="history">History</Tab>
                 <Tab value="settings">Settings</Tab>
               </TabList>
@@ -64,13 +68,14 @@ function ReconciliationAppContent({ tab, onTabChange }: ReconciliationAppProps) 
               <CheckSquare size={16} />
             </span>
           }
-          title="Close Checklist"
+          title="Close"
           value={tab}
-          onValueChange={(value) => onTabChange(value as ReconciliationAppTab)}
+          onValueChange={(value) => onTabChange(value as CloseAppTab)}
           onIconClick={() => onTabChange("overview")}
         >
           <Tab value="overview">Overview</Tab>
-          <Tab value="tasks">Tasks</Tab>
+          <Tab value="inputs">Inputs</Tab>
+          <Tab value="tasks">Close</Tab>
           <Tab value="history">History</Tab>
           <Tab value="settings">Settings</Tab>
         </MobileAppHeader>
@@ -78,6 +83,7 @@ function ReconciliationAppContent({ tab, onTabChange }: ReconciliationAppProps) 
 
       <div className="app-body">
         {tab === "overview" && <OverviewTab />}
+        {tab === "inputs" && <InputsTab />}
         {tab === "tasks" && <TasksTab />}
         {tab === "history" && <HistoryTab />}
         {tab === "settings" && <SettingsTab />}

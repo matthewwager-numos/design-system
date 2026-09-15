@@ -5,12 +5,24 @@ import { NavContent, accountMenu } from "./NavContent";
 import { AssistantPanel, useAssistantConversation } from "./components/AssistantPanel";
 import { HomePage } from "./pages/HomePage";
 import { SettingsPage } from "./pages/SettingsPage";
-import { EmployeesApp } from "./apps/employees/EmployeesApp";
-import type { EmployeesAppTab } from "./apps/employees/EmployeesApp";
-import { ReconciliationApp } from "./apps/reconciliation/ReconciliationApp";
-import type { ReconciliationAppTab } from "./apps/reconciliation/ReconciliationApp";
+import { TeamApp } from "./apps/team/TeamApp";
+import type { TeamAppTab } from "./apps/team/TeamApp";
+import { CloseApp } from "./apps/close/CloseApp";
+import type { CloseAppTab } from "./apps/close/CloseApp";
 import { AccrualsApp } from "./apps/accruals/AccrualsApp";
 import type { AccrualsAppTab } from "./apps/accruals/AccrualsApp";
+import { CollectApp } from "./apps/collect/CollectApp";
+import type { CollectAppTab } from "./apps/collect/CollectApp";
+import { PayApp } from "./apps/pay/PayApp";
+import type { PayAppTab } from "./apps/pay/PayApp";
+import { ReconcileApp } from "./apps/reconcile/ReconcileApp";
+import type { ReconcileAppTab } from "./apps/reconcile/ReconcileApp";
+import { AnalyzeApp } from "./apps/analyze/AnalyzeApp";
+import type { AnalyzeAppTab } from "./apps/analyze/AnalyzeApp";
+import { ForecastApp } from "./apps/forecast/ForecastApp";
+import type { ForecastAppTab } from "./apps/forecast/ForecastApp";
+import { CommunicateApp } from "./apps/communicate/CommunicateApp";
+import type { CommunicateAppTab } from "./apps/communicate/CommunicateApp";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { ToastProvider } from "./toast/ToastProvider";
 import { EmployeesProvider } from "./data/useEmployees";
@@ -24,9 +36,15 @@ export default function App() {
   // component — those unmount (losing local state) the moment you switch
   // to a different app via the left nav, so "remember the last tab you had
   // open" only works if this state survives that unmount, one level up.
-  const [employeesTab, setEmployeesTab] = useState<EmployeesAppTab>("overview");
-  const [reconciliationTab, setReconciliationTab] = useState<ReconciliationAppTab>("tasks");
+  const [teamTab, setTeamTab] = useState<TeamAppTab>("overview");
+  const [closeTab, setCloseTab] = useState<CloseAppTab>("tasks");
   const [accrualsTab, setAccrualsTab] = useState<AccrualsAppTab>("table");
+  const [collectTab, setCollectTab] = useState<CollectAppTab>("overview");
+  const [payTab, setPayTab] = useState<PayAppTab>("overview");
+  const [reconcileTab, setReconcileTab] = useState<ReconcileAppTab>("overview");
+  const [analyzeTab, setAnalyzeTab] = useState<AnalyzeAppTab>("overview");
+  const [forecastTab, setForecastTab] = useState<ForecastAppTab>("overview");
+  const [communicateTab, setCommunicateTab] = useState<CommunicateAppTab>("overview");
 
   // Lifted the same way as the per-app tab state above: this must survive
   // navigating between apps, not reset every time <main>'s own content
@@ -100,9 +118,15 @@ export default function App() {
 
             <main className="app-shell__main">
               {page === "home" && <HomePage />}
-              {page === "employees" && <EmployeesApp tab={employeesTab} onTabChange={setEmployeesTab} />}
-              {page === "reconciliation" && <ReconciliationApp tab={reconciliationTab} onTabChange={setReconciliationTab} />}
+              {page === "collect" && <CollectApp tab={collectTab} onTabChange={setCollectTab} />}
+              {page === "pay" && <PayApp tab={payTab} onTabChange={setPayTab} />}
               {page === "accruals" && <AccrualsApp tab={accrualsTab} onTabChange={setAccrualsTab} />}
+              {page === "reconcile" && <ReconcileApp tab={reconcileTab} onTabChange={setReconcileTab} />}
+              {page === "close" && <CloseApp tab={closeTab} onTabChange={setCloseTab} />}
+              {page === "analyze" && <AnalyzeApp tab={analyzeTab} onTabChange={setAnalyzeTab} />}
+              {page === "forecast" && <ForecastApp tab={forecastTab} onTabChange={setForecastTab} />}
+              {page === "communicate" && <CommunicateApp tab={communicateTab} onTabChange={setCommunicateTab} />}
+              {page === "team" && <TeamApp tab={teamTab} onTabChange={setTeamTab} />}
               {page === "settings" && <SettingsPage />}
             </main>
 

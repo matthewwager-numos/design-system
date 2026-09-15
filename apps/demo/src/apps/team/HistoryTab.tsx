@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Button, ButtonGroup, Header, Modal, ModalBody, ModalFooter } from "@numosai/ui";
 import { HistoryTimeline } from "../../components/HistoryTimeline";
-import { EMPLOYEE_HISTORY } from "../../data/employeeHistory";
+import { TEAM_HISTORY } from "../../data/teamHistory";
 import { useEmployees } from "../../data/useEmployees";
 import { useToast } from "../../toast/ToastProvider";
 import type { Employee } from "../../data/employees";
@@ -19,7 +19,7 @@ export function HistoryTab() {
 
   const entries = useMemo(
     () =>
-      EMPLOYEE_HISTORY.map((entry) => ({
+      TEAM_HISTORY.map((entry) => ({
         ...entry,
         onSubjectClick: entry.subjectId ? () => setSelectedId(entry.subjectId!) : undefined,
         onActorClick: entry.actorEmployeeId ? () => setSelectedId(entry.actorEmployeeId!) : undefined,
