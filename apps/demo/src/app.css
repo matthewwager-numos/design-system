@@ -1873,26 +1873,57 @@ a {
   color: var(--content-base);
 }
 
-/* Hover-only accents on each tile's own icon — a glow around the icon's
-   own stroke (not the tile frame around it, so `filter: drop-shadow`,
-   which follows the icon's actual painted shape, not `box-shadow`, which
-   would just outline the square tile) using the same color
-   `--shadow-glow-positive` does (the Tokens page shows that token but
-   nothing applies it yet — its own value shape, a box-shadow, doesn't
-   translate directly to `drop-shadow`'s shorter offset/blur/color
-   grammar, hence a fresh declaration referencing the same primitive
-   rather than the token itself) — plus `<GrainCorner>` (the same
-   grain+gradient ornament `<DisplayMetric>` uses, reused as-is) fading
-   in, rather than `<DisplayMetric>`'s own mount-triggered fade.
-   `transition`, not `@keyframes`, since this toggles on a persistent
-   hover state instead of playing once on mount — `--motion-toggle` is
-   this codebase's own token for exactly that kind of state change. */
-.home-flow__tile-icon svg {
-  transition: filter var(--motion-toggle);
+/* Hover-only accents on each tile's own icon — a thin gradient ring that
+   rotates continuously around the tile's own perimeter for a "shimmer"
+   effect, plus `<GrainCorner>` (the same grain+gradient ornament
+   `<DisplayMetric>` uses, reused as-is) fading in, rather than
+   `<DisplayMetric>`'s own mount-triggered fade. */
+@property --home-flow-shimmer-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
-.home-flow__tile-icon:hover svg {
-  filter: drop-shadow(0 0 8px var(--green-1100));
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes home-flow-shimmer-spin {
+    to {
+      --home-flow-shimmer-angle: 360deg;
+    }
+  }
 }
+
+/* A rotating ring drawn via the standard "gradient border" trick: a
+   pseudo-element the same size and radius as the tile, `padding` reserves
+   the ring's own thickness, and `mask-composite: exclude` punches out
+   everything except that padding band — so only a thin band right at the
+   tile's edge is ever painted, not a solid fill. `content: ""` plus
+   `pointer-events: none` keep it purely decorative. */
+.home-flow__tile-icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--home-flow-shimmer-angle),
+    transparent 0deg,
+    var(--green-1100) 30deg,
+    transparent 70deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--motion-toggle);
+  pointer-events: none;
+}
+.home-flow__tile-icon:hover::before {
+  opacity: 1;
+  animation: home-flow-shimmer-spin 1.6s linear infinite;
+}
+
 .home-flow__tile-ornament {
   position: absolute;
   right: -8px;
