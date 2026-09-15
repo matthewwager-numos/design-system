@@ -101,6 +101,16 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  color: var(--content-placeholder);
+}
+.ds-multi-select__field:focus-visible .ds-multi-select__icon {
+  color: var(--content-brand-primary);
+}
+.ds-multi-select__field--error .ds-multi-select__icon {
+  color: var(--content-negative);
+}
+.ds-multi-select__field--success .ds-multi-select__icon {
+  color: var(--content-positive);
 }
 
 .ds-multi-select__chevron {

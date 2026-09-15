@@ -37,7 +37,7 @@ function FlowTileButton({ icon: Icon, label }: FlowTile) {
   return (
     <div className="home-flow__tile">
       <span className="app-icon-tile app-icon-tile--lg home-flow__tile-icon" aria-hidden>
-        <Icon size={48} />
+        <Icon size={48} strokeWidth={3} />
         <GrainCorner color="var(--background-positive-base)" className="home-flow__tile-ornament" />
       </span>
       <span className="home-flow__tile-label">{label}</span>
@@ -45,7 +45,7 @@ function FlowTileButton({ icon: Icon, label }: FlowTile) {
   );
 }
 
-/** Measures `ref`'s own rendered pixel width (via ResizeObserver) — the connector SVGs below need real pixel coordinates, not the abstract 0–100 viewBox units a `preserveAspectRatio="none"` stretch would otherwise require, since a stretched viewBox distorts the elbow connectors' rounded corners into ellipses. */
+/** Measures `ref`'s own rendered pixel width (via ResizeObserver) — the connector SVGs below need real pixel coordinates, not the abstract 0–100 viewBox units a `preserveAspectRatio="none"` stretch would otherwise require, since a stretched viewBox distorts the bracket connectors' rounded corners into ellipses. */
 function useElementWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   const [width, setWidth] = useState(0);
@@ -65,41 +65,69 @@ const CONNECTOR_HEIGHT = 64;
 const CONNECTOR_MID_Y = CONNECTOR_HEIGHT / 2;
 const CONNECTOR_CORNER_RADIUS = 12;
 
-/** A rounded 90°-ish elbow from `(x, 0)` down to the shared horizontal trunk at `(centerX, midY)` — straight down, then a rounded corner, then straight across, matching an orthogonal "bus" connector rather than a single smooth curve. */
-function elbowToTrunk(x: number, centerX: number): string {
-  const dir = Math.sign(centerX - x);
-  if (dir === 0) return `M ${x} 0 L ${x} ${CONNECTOR_MID_Y}`;
-  const r = Math.min(CONNECTOR_CORNER_RADIUS, Math.abs(centerX - x));
-  return `M ${x} 0 L ${x} ${CONNECTOR_MID_Y - r} Q ${x} ${CONNECTOR_MID_Y} ${x + dir * r} ${CONNECTOR_MID_Y} L ${centerX} ${CONNECTOR_MID_Y}`;
+interface Bracket {
+  /** The shared horizontal span between the two outer corners — never gets an arrowhead, since it isn't itself a destination. */
+  bar: string;
+  /** One path per point: the two outer corners, plus a plain straight drop for every inner point (a T-junction landing directly on `bar`). */
+  legs: string[];
 }
 
-/** Mirror of `elbowToTrunk` — from the shared trunk out to `(x, height)`. */
-function elbowFromTrunk(x: number, centerX: number): string {
-  const dir = Math.sign(x - centerX);
-  if (dir === 0) return `M ${centerX} ${CONNECTOR_MID_Y} L ${x} ${CONNECTOR_HEIGHT}`;
-  const r = Math.min(CONNECTOR_CORNER_RADIUS, Math.abs(x - centerX));
-  return `M ${centerX} ${CONNECTOR_MID_Y} L ${x - dir * r} ${CONNECTOR_MID_Y} Q ${x} ${CONNECTOR_MID_Y} ${x} ${CONNECTOR_MID_Y + r} L ${x} ${CONNECTOR_HEIGHT}`;
+/**
+ * A single bracket (staple) shape spanning the outermost two of `xs` —
+ * down/out from each end, a rounded corner, then one shared horizontal
+ * bar between them — plus a plain straight drop for every other (inner)
+ * point, landing directly on that same bar as a T-junction. Deliberately
+ * NOT `count` individual elbows converging near the center: with 4 (or
+ * more) points, that reads as clutter right where the "Record"/"Report"
+ * label needs to sit, whereas a bracket keeps the middle clear.
+ */
+function bracketPaths(xs: number[]): Bracket {
+  const left = Math.min(...xs);
+  const right = Math.max(...xs);
+  const r = Math.min(CONNECTOR_CORNER_RADIUS, (right - left) / 2);
+  const legs = [
+    `M ${left} 0 L ${left} ${CONNECTOR_MID_Y - r} Q ${left} ${CONNECTOR_MID_Y} ${left + r} ${CONNECTOR_MID_Y}`,
+    `M ${right} 0 L ${right} ${CONNECTOR_MID_Y - r} Q ${right} ${CONNECTOR_MID_Y} ${right - r} ${CONNECTOR_MID_Y}`,
+  ];
+  for (const x of xs) {
+    if (x !== left && x !== right) legs.push(`M ${x} 0 L ${x} ${CONNECTOR_MID_Y}`);
+  }
+  return { bar: `M ${left + r} ${CONNECTOR_MID_Y} L ${right - r} ${CONNECTOR_MID_Y}`, legs };
+}
+
+/** Mirror of `bracketPaths`, opening downward from the trunk instead of upward into it — each leg (bracket corner or inner straight drop) gets its own arrowhead, since every one is a real destination. */
+function bracketPathsFromTrunk(xs: number[]): Bracket {
+  const left = Math.min(...xs);
+  const right = Math.max(...xs);
+  const r = Math.min(CONNECTOR_CORNER_RADIUS, (right - left) / 2);
+  const legs = [
+    `M ${left + r} ${CONNECTOR_MID_Y} Q ${left} ${CONNECTOR_MID_Y} ${left} ${CONNECTOR_MID_Y + r} L ${left} ${CONNECTOR_HEIGHT}`,
+    `M ${right - r} ${CONNECTOR_MID_Y} Q ${right} ${CONNECTOR_MID_Y} ${right} ${CONNECTOR_MID_Y + r} L ${right} ${CONNECTOR_HEIGHT}`,
+  ];
+  for (const x of xs) {
+    if (x !== left && x !== right) legs.push(`M ${x} ${CONNECTOR_MID_Y} L ${x} ${CONNECTOR_HEIGHT}`);
+  }
+  return { bar: `M ${left + r} ${CONNECTOR_MID_Y} L ${right - r} ${CONNECTOR_MID_Y}`, legs };
 }
 
 /**
  * `count` evenly-spaced source points (one per tile in the row above)
  * converge into the single tile below — Collect/Pay/Accrue/Reconcile's own
- * Output all feeding Close, Record's own capstone step. Each drops straight
- * down, bends through a rounded corner, and merges into one shared
- * horizontal trunk (an orthogonal "bus" connector, not a smooth S-curve) —
- * a single arrow then continues from the trunk down into the tile below.
+ * Output all feeding Close, Record's own capstone step.
  */
 function ConvergeConnector({ label, count }: { label: string; count: number }) {
   const [ref, width] = useElementWidth<HTMLDivElement>();
   const centerX = width / 2;
   const xs = Array.from({ length: count }, (_, i) => ((i + 0.5) / count) * width);
+  const { bar, legs } = bracketPaths(xs);
 
   return (
     <div className="home-flow__connector" ref={ref}>
       {width > 0 && (
         <svg className="home-flow__connector-svg" viewBox={`0 0 ${width} ${CONNECTOR_HEIGHT}`} aria-hidden="true">
-          {xs.map((x, i) => (
-            <path key={i} className="home-flow__connector-line" d={elbowToTrunk(x, centerX)} />
+          <path className="home-flow__connector-line" d={bar} />
+          {legs.map((d, i) => (
+            <path key={i} className="home-flow__connector-line" d={d} />
           ))}
           <path
             className="home-flow__connector-line"
@@ -118,14 +146,16 @@ function DivergeConnector({ label, count }: { label: string; count: number }) {
   const [ref, width] = useElementWidth<HTMLDivElement>();
   const centerX = width / 2;
   const xs = Array.from({ length: count }, (_, i) => ((i + 0.5) / count) * width);
+  const { bar, legs } = bracketPathsFromTrunk(xs);
 
   return (
     <div className="home-flow__connector" ref={ref}>
       {width > 0 && (
         <svg className="home-flow__connector-svg" viewBox={`0 0 ${width} ${CONNECTOR_HEIGHT}`} aria-hidden="true">
           <path className="home-flow__connector-line" d={`M ${centerX} 0 L ${centerX} ${CONNECTOR_MID_Y}`} />
-          {xs.map((x, i) => (
-            <path key={i} className="home-flow__connector-line" d={elbowFromTrunk(x, centerX)} markerEnd="url(#home-flow-arrow)" />
+          <path className="home-flow__connector-line" d={bar} />
+          {legs.map((d, i) => (
+            <path key={i} className="home-flow__connector-line" d={d} markerEnd="url(#home-flow-arrow)" />
           ))}
         </svg>
       )}
@@ -179,6 +209,8 @@ export function HomePage({ conversation, onOpenAssistant }: HomePageProps) {
             disabled={!conversation.draft.trim()}
           />
         </form>
+
+        <p className="home-hero__hint">Or, check on your monthly workflows...</p>
 
         {/* Referenced by both connectors' own `markerEnd` below — one shared definition, not duplicated per <svg>, since marker ids resolve document-wide. */}
         <svg width="0" height="0" aria-hidden="true">

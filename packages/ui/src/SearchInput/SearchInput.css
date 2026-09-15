@@ -95,6 +95,16 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  color: var(--content-placeholder);
+}
+.ds-search-input__field:focus-within .ds-search-input__icon {
+  color: var(--content-brand-primary);
+}
+.ds-search-input__field--error .ds-search-input__icon {
+  color: var(--content-negative);
+}
+.ds-search-input__field--success .ds-search-input__icon {
+  color: var(--content-positive);
 }
 
 /* Shares .ds-search-input__icon's per-size svg sizing below — it's the

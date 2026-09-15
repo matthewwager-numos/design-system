@@ -108,6 +108,16 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  color: var(--content-placeholder);
+}
+.ds-text-input__field:focus-within .ds-text-input__icon {
+  color: var(--content-brand-primary);
+}
+.ds-text-input__field--error .ds-text-input__icon {
+  color: var(--content-negative);
+}
+.ds-text-input__field--success .ds-text-input__icon {
+  color: var(--content-positive);
 }
 
 .ds-text-input__help {

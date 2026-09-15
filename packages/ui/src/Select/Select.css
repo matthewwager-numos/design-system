@@ -106,6 +106,16 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  color: var(--content-placeholder);
+}
+.ds-select__field:focus-visible .ds-select__icon {
+  color: var(--content-brand-primary);
+}
+.ds-select__field--error .ds-select__icon {
+  color: var(--content-negative);
+}
+.ds-select__field--success .ds-select__icon {
+  color: var(--content-positive);
 }
 
 .ds-select__chevron {

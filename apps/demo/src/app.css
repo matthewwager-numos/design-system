@@ -1804,22 +1804,30 @@ a {
 }
 
 /* `<Textarea>`'s own "lg" field only rounds to --radius-lg (12px) — this
-   context wants a fully pill-shaped bar instead, plus a resting shadow
-   `<Textarea>` doesn't apply on its own (it only shadows on focus/
-   validation), since this is the hero of the page, not a form field
-   among others. No manual resize handle either — Enter submits (see
-   HomePage.tsx's own onKeyDown), Shift+Enter still inserts a newline and
-   the field can still grow, just not via a drag handle. */
+   context wants a fully pill-shaped bar instead. No extra resting shadow
+   on top of that — the field is `autoFocus`ed on mount (see HomePage.tsx),
+   so `<Textarea>`'s own real `:focus-within` box-shadow already applies
+   immediately; stacking a second static shadow on top of it just looked
+   like a stray extra shadow, not a deliberate second state. No manual
+   resize handle either — Enter submits (see HomePage.tsx's own
+   onKeyDown), Shift+Enter still inserts a newline and the field can
+   still grow, just not via a drag handle. */
 .home-prompt__input {
   flex: 1;
   min-width: 0;
 }
 .home-prompt__input .ds-textarea__field {
   border-radius: var(--radius-full);
-  box-shadow: var(--shadow-l1);
 }
 .home-prompt__input .ds-textarea__control {
   resize: none;
+}
+
+.home-hero__hint {
+  margin: 0;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-placeholder);
 }
 
 .home-flow {
@@ -1865,16 +1873,25 @@ a {
   color: var(--content-base);
 }
 
-/* Hover-only accents on each tile's own icon — a glow (the same
-   `--shadow-glow-positive` token the Tokens page shows but nothing yet
-   actually applies) plus `<GrainCorner>` (the same grain+gradient
-   ornament `<DisplayMetric>` uses, reused as-is) fading in, rather than
-   `<DisplayMetric>`'s own mount-triggered fade. `transition`, not
-   `@keyframes`, since this toggles on a persistent hover state instead of
-   playing once on mount — `--motion-toggle` is this codebase's own token
-   for exactly that kind of state change. */
-.home-flow__tile-icon:hover {
-  box-shadow: var(--shadow-glow-positive);
+/* Hover-only accents on each tile's own icon — a glow around the icon's
+   own stroke (not the tile frame around it, so `filter: drop-shadow`,
+   which follows the icon's actual painted shape, not `box-shadow`, which
+   would just outline the square tile) using the same color
+   `--shadow-glow-positive` does (the Tokens page shows that token but
+   nothing applies it yet — its own value shape, a box-shadow, doesn't
+   translate directly to `drop-shadow`'s shorter offset/blur/color
+   grammar, hence a fresh declaration referencing the same primitive
+   rather than the token itself) — plus `<GrainCorner>` (the same
+   grain+gradient ornament `<DisplayMetric>` uses, reused as-is) fading
+   in, rather than `<DisplayMetric>`'s own mount-triggered fade.
+   `transition`, not `@keyframes`, since this toggles on a persistent
+   hover state instead of playing once on mount — `--motion-toggle` is
+   this codebase's own token for exactly that kind of state change. */
+.home-flow__tile-icon svg {
+  transition: filter var(--motion-toggle);
+}
+.home-flow__tile-icon:hover svg {
+  filter: drop-shadow(0 0 8px var(--green-1100));
 }
 .home-flow__tile-ornament {
   position: absolute;
@@ -1920,8 +1937,7 @@ a {
   transform: translate(-50%, -50%);
   padding: 0 var(--space-2);
   background: var(--background-default);
-  font: var(--type-heading-xs);
-  letter-spacing: var(--type-heading-xs-tracking);
-  text-transform: uppercase;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
   color: var(--content-placeholder);
 }
