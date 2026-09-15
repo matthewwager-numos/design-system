@@ -117,7 +117,7 @@ export default function App() {
             </div>
 
             <main className="app-shell__main">
-              {page === "home" && <HomePage />}
+              {page === "home" && <HomePage conversation={conversation} onOpenAssistant={() => setAssistantOpen(true)} />}
               {page === "collect" && <CollectApp tab={collectTab} onTabChange={setCollectTab} />}
               {page === "pay" && <PayApp tab={payTab} onTabChange={setPayTab} />}
               {page === "accruals" && <AccrualsApp tab={accrualsTab} onTabChange={setAccrualsTab} />}

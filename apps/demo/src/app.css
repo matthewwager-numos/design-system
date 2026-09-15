@@ -164,6 +164,25 @@ a {
   height: 1rem;
 }
 
+/* HomePage's own flow-diagram tiles — same tile the Home nav uses at 24px/
+   16px, just bigger (2x the base 24px icon scale — a plain size prop on
+   the icon itself, same as every other size in this app; icon sizing was
+   never tokenized here, so this doesn't need to be either), per the Home
+   flow diagram's own larger scale. `position:relative`/`overflow:hidden`
+   crop the hover-only `GrainCorner` ornament (see `.home-flow__tile-icon`)
+   to the tile's own rounded bounds. */
+.app-icon-tile--lg {
+  position: relative;
+  width: 4.5rem;
+  height: 4.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+.app-icon-tile--lg svg {
+  width: 3rem;
+  height: 3rem;
+}
+
 .app-body {
   flex: 1;
   min-height: 0;
@@ -1756,4 +1775,153 @@ a {
 .accrual-detail__comment-input:focus-visible {
   outline: none;
   box-shadow: var(--shadow-focus-brand);
+}
+
+/* ── Home page ──────────────────────────────────────────────────────── */
+
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-7);
+  max-width: 44rem;
+  margin: var(--space-8) auto var(--space-6);
+  text-align: center;
+}
+
+.home-hero__greeting {
+  margin: 0;
+  font: var(--type-heading-5xl);
+  letter-spacing: var(--type-heading-5xl-tracking);
+  color: var(--content-emphasis);
+}
+
+.home-prompt {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+/* `<Textarea>`'s own "lg" field only rounds to --radius-lg (12px) — this
+   context wants a fully pill-shaped bar instead, plus a resting shadow
+   `<Textarea>` doesn't apply on its own (it only shadows on focus/
+   validation), since this is the hero of the page, not a form field
+   among others. No manual resize handle either — Enter submits (see
+   HomePage.tsx's own onKeyDown), Shift+Enter still inserts a newline and
+   the field can still grow, just not via a drag handle. */
+.home-prompt__input {
+  flex: 1;
+  min-width: 0;
+}
+.home-prompt__input .ds-textarea__field {
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-l1);
+}
+.home-prompt__input .ds-textarea__control {
+  resize: none;
+}
+
+.home-flow {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Each row is a CSS grid with as many equal-width columns as it has
+   tiles, one tile centered per column — not a flex row, since the
+   connector SVGs below need to target each tile's exact horizontal
+   center as a plain percentage of the shared container width, and a
+   grid column's center is always at a predictable percentage regardless
+   of the tile's own rendered width (a flex row with `justify-content:
+   space-between` would not give the connectors a reliable position to
+   aim for). */
+.home-flow__row {
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  width: 100%;
+}
+.home-flow__row--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.home-flow__row--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.home-flow__row--1 {
+  grid-template-columns: 1fr;
+}
+
+.home-flow__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.home-flow__tile-label {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-base);
+}
+
+/* Hover-only accents on each tile's own icon — a glow (the same
+   `--shadow-glow-positive` token the Tokens page shows but nothing yet
+   actually applies) plus `<GrainCorner>` (the same grain+gradient
+   ornament `<DisplayMetric>` uses, reused as-is) fading in, rather than
+   `<DisplayMetric>`'s own mount-triggered fade. `transition`, not
+   `@keyframes`, since this toggles on a persistent hover state instead of
+   playing once on mount — `--motion-toggle` is this codebase's own token
+   for exactly that kind of state change. */
+.home-flow__tile-icon:hover {
+  box-shadow: var(--shadow-glow-positive);
+}
+.home-flow__tile-ornament {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+  transform: scale(0.45);
+  transform-origin: bottom right;
+  opacity: 0;
+  transition: opacity var(--motion-toggle);
+}
+.home-flow__tile-icon:hover .home-flow__tile-ornament {
+  opacity: 1;
+}
+
+.home-flow__connector {
+  position: relative;
+  width: 100%;
+  height: 4rem;
+}
+.home-flow__connector-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.home-flow__connector-line {
+  fill: none;
+  stroke: var(--border-base);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+/* The arrowhead marker (referenced via `url(#home-flow-arrow)`) is its
+   own tiny shape, not a stroked line — needs a fill, not the line's own
+   stroke color repeated. */
+#home-flow-arrow path {
+  fill: var(--border-base);
+}
+
+.home-flow__connector-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0 var(--space-2);
+  background: var(--background-default);
+  font: var(--type-heading-xs);
+  letter-spacing: var(--type-heading-xs-tracking);
+  text-transform: uppercase;
+  color: var(--content-placeholder);
 }
