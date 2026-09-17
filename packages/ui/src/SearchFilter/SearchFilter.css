@@ -116,6 +116,9 @@
 .ds-search-filter__field--success .ds-search-filter__icon {
   color: var(--content-positive);
 }
+.ds-search-filter__field--disabled .ds-search-filter__icon {
+  color: var(--content-disabled);
+}
 
 /* A real button, not a fixed icon — toggles the filter panel, swapping
    Filter/X to match (see SearchFilter.tsx). Shares .ds-search-filter__icon's

@@ -111,6 +111,9 @@
 .ds-textarea__field--success .ds-textarea__icon {
   color: var(--content-positive);
 }
+.ds-textarea__field:has(:disabled) .ds-textarea__icon {
+  color: var(--content-disabled);
+}
 
 .ds-textarea__help {
   display: flex;

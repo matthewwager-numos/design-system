@@ -54,6 +54,13 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
           disabled={disabled}
           className="ds-text-input__control"
           aria-invalid={status === "error" || undefined}
+          // Off by default — the browser's own remembered-value dropdown
+          // (and the lingering selection highlight left behind once a
+          // suggestion from it is picked) is built for repeating the same
+          // field across unrelated sites on the open web, not for a field
+          // inside one cohesive app. A consumer can still opt back in by
+          // passing its own `autoComplete` in the spread below.
+          autoComplete="off"
           {...rest}
         />
         {trailingIcon ? <span className="ds-text-input__icon" aria-hidden>{trailingIcon}</span> : null}

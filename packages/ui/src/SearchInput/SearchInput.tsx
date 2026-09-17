@@ -233,6 +233,8 @@ export function SearchInput({
             onFocus={handleFocus}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
+            // Off by default — see <TextInput>'s own doc comment for why.
+            autoComplete="off"
             {...rest}
           />
           {showClear ? (

@@ -52,6 +52,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
           disabled={disabled}
           className="ds-textarea__control"
           aria-invalid={status === "error" || undefined}
+          // Off by default — see <TextInput>'s own doc comment for why.
+          autoComplete="off"
           {...rest}
         />
         {trailingIcon ? <span className="ds-textarea__icon" aria-hidden>{trailingIcon}</span> : null}

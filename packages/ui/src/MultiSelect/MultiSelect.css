@@ -112,6 +112,9 @@
 .ds-multi-select__field--success .ds-multi-select__icon {
   color: var(--content-positive);
 }
+.ds-multi-select__field--disabled .ds-multi-select__icon {
+  color: var(--content-disabled);
+}
 
 .ds-multi-select__chevron {
   color: var(--content-subtle);

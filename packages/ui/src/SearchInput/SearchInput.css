@@ -106,6 +106,9 @@
 .ds-search-input__field--success .ds-search-input__icon {
   color: var(--content-positive);
 }
+.ds-search-input__field:has(:disabled) .ds-search-input__icon {
+  color: var(--content-disabled);
+}
 
 /* Shares .ds-search-input__icon's per-size svg sizing below — it's the
    trailing-icon slot Figma's own field anatomy already reserves, just put

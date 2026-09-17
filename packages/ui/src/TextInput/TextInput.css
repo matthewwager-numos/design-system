@@ -119,6 +119,9 @@
 .ds-text-input__field--success .ds-text-input__icon {
   color: var(--content-positive);
 }
+.ds-text-input__field:has(:disabled) .ds-text-input__icon {
+  color: var(--content-disabled);
+}
 
 .ds-text-input__help {
   display: flex;

@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FocusEvent, KeyboardEvent, ReactNode } from "react";
-import { Check, Filter, Search, TriangleAlert, X } from "lucide-react";
+import { Check, ChevronUp, Filter, Search, TriangleAlert } from "lucide-react";
 import { clsx } from "clsx";
 import { Badge } from "../Badge";
 import { Button } from "../Button";
@@ -303,6 +303,11 @@ export function SearchFilter({
               onFocus={handleFocus}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
+              // Off by default — see <TextInput>'s own doc comment for why.
+              // Doubly so here: this field already has its own typeahead
+              // (`properties`), so the browser's remembered-value dropdown
+              // would just be a second, redundant suggestions popup.
+              autoComplete="off"
             />
             {filters ? (
               <DropdownMenuTrigger>
@@ -319,14 +324,14 @@ export function SearchFilter({
                   disabled={disabled}
                   aria-label={open ? "Close filters" : "Open filters"}
                 >
-                  {open ? <X size={iconSize} /> : <Filter size={iconSize} />}
+                  {open ? <ChevronUp size={iconSize} /> : <Filter size={iconSize} />}
                 </button>
               </DropdownMenuTrigger>
             ) : null}
             {filterCount ? (
               <Badge
                 status="info"
-                size="md"
+                size={size === "lg" ? "lg" : "md"}
                 className="ds-search-filter__filter-badge"
                 aria-label={`${filterCount} filter${filterCount === 1 ? "" : "s"} applied`}
               >

@@ -121,7 +121,7 @@ This is independent of, and coordinates with, the filter panel below: the two ar
 
 ## The trailing icon is the filter toggle, not a clear button
 
-Confirmed from Figma: the funnel icon swaps to an X only while the panel is open — regardless of whether `value` is empty or filled with a filter summary. It's not `<SearchInput>`'s "clear the typed text" button; clicking it toggles the panel, and clicking it again (or Escape, or an outside click) closes it. Clearing the query by hand is ordinary text editing, the same as any other field — the panel's own Clear button (below) is a separate affordance for resetting whatever's driving `filters`.
+The funnel icon swaps to a chevron-up only while the panel is open — regardless of whether `value` is empty or filled with a filter summary — same as any other dropdown trigger, open vs. closed. It's not `<SearchInput>`'s "clear the typed text" button; clicking it toggles the panel, and clicking it again (or Escape, or an outside click) closes it. An X here would read as "clear," which is now the panel's own Clear button's job (below) — resetting whatever's driving `filters`, not toggling the panel. Clearing the query by hand is ordinary text editing, the same as any other field.
 
 ## Applied-filter count
 
