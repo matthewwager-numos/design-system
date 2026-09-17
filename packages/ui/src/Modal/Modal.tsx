@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { clsx } from "clsx";
 import "./Modal.css";
 
-export type ModalVariant = "default" | "drawer";
+export type ModalVariant = "default" | "drawer" | "fullscreen";
 export type ModalSide = "top" | "right" | "bottom" | "left";
 
 const FOCUSABLE_SELECTOR =
@@ -13,7 +13,7 @@ const FOCUSABLE_SELECTOR =
 export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, "className" | "children" | "onClick"> {
   /** `<Header variant="modal">`, then whatever body/footer content — see `<ModalBody>`/`<ModalFooter>`. */
   children: ReactNode;
-  /** "default" (centered, fades in while scaling from center) or "drawer" (slides in from `side`). Matches Figma's two Modal types. */
+  /** "default" (centered, fades in while scaling from center), "drawer" (slides in from `side`), or "fullscreen" (centered like "default", but scaled to fill the viewport minus a small inset — for a modal whose own content is itself a full page, e.g. a List & Detail review flow). */
   variant?: ModalVariant;
   /** Which edge a "drawer" slides in from. Ignored for "default". */
   side?: ModalSide;
@@ -137,8 +137,10 @@ export function Modal({
     }
   }
 
-  const overlayVariantClass = variant === "default" ? "ds-modal-overlay--default" : `ds-modal-overlay--drawer-${side}`;
-  const panelVariantClass = variant === "default" ? "ds-modal--default" : clsx("ds-modal--drawer", `ds-modal--drawer-${side}`);
+  const overlayVariantClass =
+    variant === "default" ? "ds-modal-overlay--default" : variant === "fullscreen" ? "ds-modal-overlay--fullscreen" : `ds-modal-overlay--drawer-${side}`;
+  const panelVariantClass =
+    variant === "default" ? "ds-modal--default" : variant === "fullscreen" ? "ds-modal--fullscreen" : clsx("ds-modal--drawer", `ds-modal--drawer-${side}`);
 
   return (
     <>

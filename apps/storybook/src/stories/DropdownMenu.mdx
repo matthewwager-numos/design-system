@@ -77,7 +77,9 @@ Size is set once on the root — `<DropdownMenu size="sm" | "md" | "lg">` — an
 
 ## Width
 
-`<DropdownMenuContent matchTriggerWidth>` (default `false`) matches the panel's width to the trigger's own measured width — what `<Select>`/`<MultiSelect>` use for their options list, so it lines up with the field that opened it rather than shrinking to its content. `<DropdownMenuPanel>` defaults this to `true` instead, since a panel is almost always anchored to a full-width field (`<SearchFilter>`'s own filters panel, for instance).
+`<DropdownMenuContent matchTriggerWidth>` (default `false`) matches the panel's width exactly to the trigger's own measured width — what `<Select>`/`<MultiSelect>` use for their options list, so it lines up with the field that opened it edge-to-edge instead of shrinking to its content or growing wider than it. `<DropdownMenuPanel>` defaults this to `true` instead, since a panel is almost always anchored to a full-width field (`<SearchFilter>`'s own filters panel, for instance).
+
+If the element that should actually open the panel is only *part* of the field it should visually line up with (`<SearchFilter>`'s small filter button, say, rather than the whole field), pass `anchorRef` — a ref to the element to measure/position from instead of `<DropdownMenuTrigger>`'s own.
 
 ## Placement
 

@@ -347,6 +347,12 @@ export function TableTab() {
               placeholder="Search or filter"
               value={query}
               onChange={setQuery}
+              filterCount={primaryFilterOptions.length - primaryFilter.length}
+              onClearFilters={
+                primaryFilter.length < primaryFilterOptions.length
+                  ? () => setPrimaryFilter(primaryFilterOptions.map((option) => option.value))
+                  : undefined
+              }
               filters={
                 <CheckboxGroup>
                   {primaryFilterOptions.map((option) => (

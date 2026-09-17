@@ -5,7 +5,7 @@ import * as ModalStories from "./Modal.stories";
 
 # Modal
 
-A centered dialog or edge-anchored drawer, portaled to `document.body` over a backdrop — matches Figma's Modal (Default/Drawer types) exactly, filled with `<Header variant="modal">`, `<ModalBody>`, and `<ModalFooter>`.
+A centered dialog, edge-anchored drawer, or fullscreen panel, portaled to `document.body` over a backdrop — matches Figma's Modal (Default/Drawer types) exactly, filled with `<Header variant="modal">`, `<ModalBody>`, and `<ModalFooter>`.
 
 <Primary />
 
@@ -68,6 +68,13 @@ Click the button below — it's a real, live component, not a screenshot.
 <Canvas of={ModalStories.DrawerBottom} />
 
 Figma gives "drawer" square corners and lets it run edge-to-edge (no radius, matching its own frame exactly) — "default" keeps the `radius-xl` rounded corners of a normal dialog.
+
+A third variant, `variant="fullscreen"`, is for a modal whose own content is itself a full page — e.g. a List & Detail review flow (a checkbox-selectable list beside a detail pane, with a footer spanning both). It centers like `"default"` but scales to fill the viewport minus a small inset, rather than sitting at a fixed reading width.
+
+<Canvas of={ModalStories.Fullscreen} />
+<Canvas of={ModalStories.FullscreenListDetail} />
+
+For this shape, the header's own **×** (`<Header variant="modal" onClose={...}>`) is the only close affordance — there's no separate close button inside the detail pane, since dismissing "the thing you're reviewing" and dismissing "the whole review" are the same action here. The detail pane also always shows something (defaults to the first row) rather than an empty "nothing selected" state, and a select-all/count row is pinned to the top of the list pane while its rows scroll beneath it — see `FullscreenListDetail`'s own source for the full layout.
 
 ## Closing
 

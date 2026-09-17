@@ -149,6 +149,18 @@
   flex-shrink: 0;
 }
 
+/* Truncates rather than wrapping/overflowing — matters most once
+   `matchTriggerWidth` forces this menu to a real, exact width (see
+   useDropdownMenuPlacement.ts) instead of shrink-to-fit, e.g. a long
+   `<Select>` option label next to a narrow field. */
+.ds-dropdown-menu-item__label {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ── Sizes ─────────────────────────────────────────────────────────── */
 /* The panel's own corner radius scales with size too, matching Figma's
    Dropdown container (not just the items it cascades onto below). */

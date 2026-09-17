@@ -272,7 +272,10 @@
    `size` prop — same reasoning as `<TextInput>`'s own mobile override:
    `<SearchInput>`'s `__control` is a real `<input>`, so this also keeps iOS
    from auto-zooming on focus (it zooms below 16px), on top of the bigger
-   tap target. Matches the same breakpoint `apps/demo` uses (`48rem`/768px). */
+   tap target. Matches the same breakpoint `apps/demo` uses (`48rem`/768px).
+   The lead icon and trailing clear button are deliberately NOT part of this
+   bump — only "lg" ever uses a 24px icon; "md"/"sm" stay at 16px regardless
+   of viewport. */
 @media (max-width: 767px) {
   .ds-search-input--md .ds-search-input__field,
   .ds-search-input--sm .ds-search-input__field {
@@ -288,13 +291,6 @@
   .ds-search-input--sm .ds-search-input__help {
     font: var(--type-paragraph-s-regular);
     letter-spacing: var(--type-paragraph-s-regular-tracking);
-  }
-  .ds-search-input--md .ds-search-input__icon svg,
-  .ds-search-input--sm .ds-search-input__icon svg,
-  .ds-search-input--md .ds-search-input__clear svg,
-  .ds-search-input--sm .ds-search-input__clear svg {
-    width: 1.5rem;
-    height: 1.5rem;
   }
   .ds-search-input--md .ds-search-input__option,
   .ds-search-input--sm .ds-search-input__option {

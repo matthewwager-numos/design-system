@@ -201,6 +201,8 @@ export function TasksTab() {
             value={query}
             onChange={setQuery}
             className="tasks-tab__search"
+            filterCount={assigneeFilter.length}
+            onClearFilters={assigneeFilter.length > 0 ? () => setAssigneeFilter([]) : undefined}
             filters={
               <CheckboxGroup label="Assignee">
                 <Checkbox

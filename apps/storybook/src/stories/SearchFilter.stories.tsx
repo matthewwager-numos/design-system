@@ -127,6 +127,26 @@ export const FiltersOpenByDefault: Story = {
   ),
 };
 
+// `filterCount` and the panel heading (`filtersLabel` + `onClearFilters`) are
+// independent of each other — shown together here since a real consumer
+// almost always wires them from the same "how many filters are applied"
+// state, but either can be used alone.
+export const WithBadgeAndClear: Story = {
+  name: "Applied count + Clear",
+  render: (args) => (
+    <div style={PREVIEW_STYLE}>
+      <SearchFilter
+        {...args}
+        defaultValue="status:overdue amount:>40"
+        filters={<SampleFilters />}
+        filterCount={2}
+        defaultFiltersOpen
+        onClearFilters={() => alert("Clear filters")}
+      />
+    </div>
+  ),
+};
+
 export const Filled: Story = {
   name: "With filter notation applied",
   render: (args) => (
@@ -190,12 +210,23 @@ function WorkedExampleDemo() {
     setQuery(parts.join(" "));
   }
 
+  function clearFilters() {
+    setOverdue(false);
+    setPaid(false);
+    setMinAmount(0);
+    setQuery("");
+  }
+
+  const filterCount = [overdue, paid, minAmount > 0].filter(Boolean).length;
+
   return (
     <div style={PREVIEW_STYLE}>
       <SearchFilter
         label="Invoices"
         value={query}
         onChange={setQuery}
+        filterCount={filterCount}
+        onClearFilters={filterCount > 0 ? clearFilters : undefined}
         filters={
           <>
             <Checkbox

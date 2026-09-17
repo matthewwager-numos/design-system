@@ -54,6 +54,27 @@
   left: 0;
   width: 2px;
 }
+/* `align="end"` only ever combines with `orientation="vertical"` in
+   practice — a horizontal strip has no equivalent "which edge" concept —
+   so this is written as the combined selector rather than a standalone
+   `.ds-tab-list--align-end` rule. Matches Figma's alternate Stacked layout:
+   right-aligned text and a right-edge indicator, mirroring the default
+   left-aligned one, for a list meant to sit to the *left* of the content it
+   describes and point inward at it. */
+.ds-tab-list--vertical.ds-tab-list--align-end {
+  align-items: flex-end;
+  /* See `TabListProps.align`'s own doc comment for why this is required,
+     not just a nice-to-have, for "end" specifically. */
+  width: 100%;
+}
+.ds-tab-list--vertical.ds-tab-list--align-end .ds-tab-list__indicator {
+  left: auto;
+  right: 0;
+}
+.ds-tab-list--vertical.ds-tab-list--align-end .ds-tab {
+  justify-content: flex-end;
+  text-align: right;
+}
 
 .ds-tab-list--horizontal {
   flex-direction: row;

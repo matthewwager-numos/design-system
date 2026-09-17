@@ -2,46 +2,67 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 import type { LucideIcon } from "lucide-react";
 import { ArrowUp, Banknote, Calculator, CheckSquare, FlaskConical, Inbox, RadioTower, Scale, Sparkles, Telescope } from "lucide-react";
-import { GrainCorner, IconButton, Textarea } from "@numosai/ui";
+import { Button, GrainCorner, IconButton, Textarea } from "@numosai/ui";
 import type { AssistantConversation } from "../components/AssistantPanel";
+import type { PageId } from "./index";
 
 export interface HomePageProps {
   /** The same conversation instance App.tsx lifts for both AssistantPanel renders — typing/submitting here feeds the exact same thread, not a separate one. */
   conversation: AssistantConversation;
   /** Opens the desktop squeeze panel so the reply is actually visible after submitting. */
   onOpenAssistant: () => void;
+  /** Same `setPage` App.tsx already hands `NavContent` — a flow-diagram tile is just another way to reach an app's Overview tab, not a separate navigation concept. */
+  onNavigate: (page: PageId) => void;
 }
+
+/** Placeholder "quick action" prompts — once a real model is wired up (see
+ * `useAssistantConversation`'s `submitDraft`), picking one of these should
+ * ideally route the user straight to the relevant app rather than just
+ * dropping a canned reply in chat. That routing depends on the model
+ * actually understanding intent, so for now this only does the half of the
+ * job that's already real: submit the prompt into the same conversation
+ * typing it and hitting Enter would. */
+const SUGGESTED_PROMPTS = ["I want to add a teammate", "I want to connect a bank account"];
 
 interface FlowTile {
   icon: LucideIcon;
   label: string;
+  page: PageId;
 }
 
 /** Same icon per app as `NavContent.tsx` — one visual identity for each workflow, reused everywhere it appears. */
 const RECORD_TILES: FlowTile[] = [
-  { icon: Inbox, label: "Collect" },
-  { icon: Banknote, label: "Pay" },
-  { icon: Calculator, label: "Accrue" },
-  { icon: Scale, label: "Reconcile" },
+  { icon: Inbox, label: "Collect", page: "collect" },
+  { icon: Banknote, label: "Pay", page: "pay" },
+  { icon: Calculator, label: "Accrue", page: "accruals" },
+  { icon: Scale, label: "Reconcile", page: "reconcile" },
 ];
 
-const CLOSE_TILE: FlowTile = { icon: CheckSquare, label: "Close" };
+const CLOSE_TILE: FlowTile = { icon: CheckSquare, label: "Close", page: "close" };
 
 const REPORT_TILES: FlowTile[] = [
-  { icon: FlaskConical, label: "Analyze" },
-  { icon: Telescope, label: "Forecast" },
-  { icon: RadioTower, label: "Communicate" },
+  { icon: FlaskConical, label: "Analyze", page: "analyze" },
+  { icon: Telescope, label: "Forecast", page: "forecast" },
+  { icon: RadioTower, label: "Communicate", page: "communicate" },
 ];
 
-function FlowTileButton({ icon: Icon, label }: FlowTile) {
+function FlowTileButton({ icon: Icon, label, page, onNavigate }: FlowTile & { onNavigate: (page: PageId) => void }) {
   return (
-    <div className="home-flow__tile">
+    <button type="button" className="home-flow__tile" onClick={() => onNavigate(page)}>
       <span className="app-icon-tile app-icon-tile--lg home-flow__tile-icon" aria-hidden>
-        <Icon size={48} strokeWidth={3} />
+        {/* strokeWidth is in the icon's own 24x24 viewBox space, not screen
+            pixels — rendering at size=48 (2x) doubles every viewBox unit to
+            2 screen px, so a "normal" strokeWidth of 2 (matching every other
+            24px icon in this app) comes out at 4 screen px here, noticeably
+            heavier than the rest of the app's icons rather than just bigger.
+            1.25 lands the on-screen stroke at 2.5px — close to the app's
+            standard 2px weight, with a touch more heft to suit the larger
+            size, instead of scaling the weight up 1:1 with the size. */}
+        <Icon size={48} strokeWidth={1.25} />
         <GrainCorner color="var(--background-positive-base)" className="home-flow__tile-ornament" />
       </span>
       <span className="home-flow__tile-label">{label}</span>
-    </div>
+    </button>
   );
 }
 
@@ -61,7 +82,7 @@ function useElementWidth<T extends HTMLElement>() {
   return [ref, width] as const;
 }
 
-const CONNECTOR_HEIGHT = 64;
+const CONNECTOR_HEIGHT = 44;
 const CONNECTOR_MID_Y = CONNECTOR_HEIGHT / 2;
 const CONNECTOR_CORNER_RADIUS = 12;
 
@@ -131,8 +152,7 @@ function ConvergeConnector({ label, count }: { label: string; count: number }) {
           ))}
           <path
             className="home-flow__connector-line"
-            d={`M ${centerX} ${CONNECTOR_MID_Y} L ${centerX} ${CONNECTOR_HEIGHT - 2}`}
-            markerEnd="url(#home-flow-arrow)"
+            d={`M ${centerX} ${CONNECTOR_MID_Y} L ${centerX} ${CONNECTOR_HEIGHT}`}
           />
         </svg>
       )}
@@ -155,7 +175,7 @@ function DivergeConnector({ label, count }: { label: string; count: number }) {
           <path className="home-flow__connector-line" d={`M ${centerX} 0 L ${centerX} ${CONNECTOR_MID_Y}`} />
           <path className="home-flow__connector-line" d={bar} />
           {legs.map((d, i) => (
-            <path key={i} className="home-flow__connector-line" d={d} markerEnd="url(#home-flow-arrow)" />
+            <path key={i} className="home-flow__connector-line" d={d} />
           ))}
         </svg>
       )}
@@ -164,7 +184,7 @@ function DivergeConnector({ label, count }: { label: string; count: number }) {
   );
 }
 
-export function HomePage({ conversation, onOpenAssistant }: HomePageProps) {
+export function HomePage({ conversation, onOpenAssistant, onNavigate }: HomePageProps) {
   function submit() {
     if (!conversation.draft.trim()) return;
     onOpenAssistant();
@@ -181,6 +201,11 @@ export function HomePage({ conversation, onOpenAssistant }: HomePageProps) {
       event.preventDefault();
       submit();
     }
+  }
+
+  function selectSuggestion(text: string) {
+    onOpenAssistant();
+    conversation.submitDraft(text);
   }
 
   return (
@@ -210,35 +235,40 @@ export function HomePage({ conversation, onOpenAssistant }: HomePageProps) {
           />
         </form>
 
-        <p className="home-hero__hint">Or, check on your monthly workflows...</p>
+        <div className="home-prompt__suggestions">
+          {SUGGESTED_PROMPTS.map((text) => (
+            <Button
+              key={text}
+              variant="secondary"
+              size="sm"
+              className="home-prompt__suggestion"
+              onClick={() => selectSuggestion(text)}
+            >
+              {text}
+            </Button>
+          ))}
+        </div>
 
-        {/* Referenced by both connectors' own `markerEnd` below — one shared definition, not duplicated per <svg>, since marker ids resolve document-wide. */}
-        <svg width="0" height="0" aria-hidden="true">
-          <defs>
-            <marker id="home-flow-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" />
-            </marker>
-          </defs>
-        </svg>
+        <p className="home-hero__hint">Or, check on your monthly workflows...</p>
 
         <div className="home-flow">
           <div className="home-flow__row home-flow__row--4">
             {RECORD_TILES.map((tile) => (
-              <FlowTileButton key={tile.label} {...tile} />
+              <FlowTileButton key={tile.label} {...tile} onNavigate={onNavigate} />
             ))}
           </div>
 
           <ConvergeConnector label="Record" count={RECORD_TILES.length} />
 
           <div className="home-flow__row home-flow__row--1">
-            <FlowTileButton {...CLOSE_TILE} />
+            <FlowTileButton {...CLOSE_TILE} onNavigate={onNavigate} />
           </div>
 
           <DivergeConnector label="Report" count={REPORT_TILES.length} />
 
           <div className="home-flow__row home-flow__row--3">
             {REPORT_TILES.map((tile) => (
-              <FlowTileButton key={tile.label} {...tile} />
+              <FlowTileButton key={tile.label} {...tile} onNavigate={onNavigate} />
             ))}
           </div>
         </div>

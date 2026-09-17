@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { ArrowLeft } from "lucide-react";
-import { Button, Setting, SettingsCard, Tab, TabList, Tabs } from "@numosai/ui";
+import { Setting, SettingsCard } from "@numosai/ui";
+import { SettingsCategoryNav } from "../../components/SettingsCategoryNav";
 import { useToast } from "../../toast/ToastProvider";
 
 type CategoryId = "general" | "notifications" | "workflow" | "templates";
@@ -176,34 +176,14 @@ function TemplatesCard() {
 
 export function SettingsTab() {
   const [category, setCategory] = useState<CategoryId>("general");
-  // Only meaningful below the desktop breakpoint, where list and detail are
-  // separate full-width "screens" rather than side-by-side panes — see
-  // .settings-layout in app.css.
-  const [mobileView, setMobileView] = useState<"list" | "detail">("list");
-
-  function handleCategoryChange(value: string) {
-    setCategory(value as CategoryId);
-    setMobileView("detail");
-  }
 
   return (
-    <div className="settings-layout" data-mobile-view={mobileView}>
+    <div className="settings-layout">
       <div className="settings-list-pane">
-        <Tabs orientation="vertical" value={category} onValueChange={handleCategoryChange}>
-          <TabList>
-            {CATEGORIES.map((c) => (
-              <Tab key={c.id} value={c.id}>
-                {c.label}
-              </Tab>
-            ))}
-          </TabList>
-        </Tabs>
+        <SettingsCategoryNav categories={CATEGORIES} value={category} onChange={setCategory} />
       </div>
 
       <div className="settings-detail-pane">
-        <Button variant="link" size="sm" leadingIcon={<ArrowLeft size={16} />} className="settings-back" onClick={() => setMobileView("list")}>
-          Categories
-        </Button>
         {category === "general" && <GeneralCard />}
         {category === "notifications" && <NotificationsCard />}
         {category === "workflow" && <WorkflowCard />}

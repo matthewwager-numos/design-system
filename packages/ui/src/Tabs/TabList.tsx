@@ -3,7 +3,25 @@ import type { CSSProperties, HTMLAttributes, KeyboardEvent } from "react";
 import { clsx } from "clsx";
 import { useTabsContext } from "./TabsContext";
 
-export interface TabListProps extends HTMLAttributes<HTMLDivElement> {}
+export type TabListAlign = "start" | "end";
+
+export interface TabListProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * Only meaningful for `orientation="vertical"` — "start" (default)
+   * matches Figma's plain Stacked variant (left-aligned text, left-edge
+   * indicator). "end" right-aligns the text and moves the indicator to the
+   * right edge instead, for a vertical list that sits to the *left* of the
+   * content it describes and points inward at it (e.g. a Settings page's
+   * own category list beside its detail pane) rather than stacked above
+   * content below/beside it. Also stretches the list to fill its own
+   * container's width, which "end" needs to have a real edge to align
+   * against — without it, `<Tabs>`'s own root lays this out as one flex
+   * item in a row with no width of its own, so it just shrinks to fit its
+   * longest label, leaving "right-aligned" text flush against that
+   * undersized box instead of the container's true right edge.
+   */
+  align?: TabListAlign;
+}
 
 /**
  * Wraps a row (horizontal) or column (vertical) of <Tab>s. Implements the
@@ -17,7 +35,7 @@ export interface TabListProps extends HTMLAttributes<HTMLDivElement> {}
  * selected tab to the newly selected one, and fades in on first selection,
  * instead of the indicator instantly teleporting.
  */
-export function TabList({ className, children, onKeyDown, ...rest }: TabListProps) {
+export function TabList({ align = "start", className, children, onKeyDown, ...rest }: TabListProps) {
   const { orientation, value, setValue } = useTabsContext("TabList");
   const listRef = useRef<HTMLDivElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState<CSSProperties | null>(null);
@@ -87,7 +105,7 @@ export function TabList({ className, children, onKeyDown, ...rest }: TabListProp
       ref={listRef}
       role="tablist"
       aria-orientation={orientation}
-      className={clsx("ds-tab-list", `ds-tab-list--${orientation}`, className)}
+      className={clsx("ds-tab-list", `ds-tab-list--${orientation}`, align === "end" && "ds-tab-list--align-end", className)}
       onKeyDown={handleKeyDown}
       {...rest}
     >

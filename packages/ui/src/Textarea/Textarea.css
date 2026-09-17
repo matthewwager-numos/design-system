@@ -183,7 +183,9 @@
 /* Below this width, "md"/"sm" render at "lg" metrics regardless of the
    `size` prop — same reasoning as `<TextInput>`'s own mobile override
    (avoids iOS's auto-zoom-on-focus below 16px, and gives a bigger tap
-   target). Matches the same breakpoint `apps/demo` uses (`48rem`/768px). */
+   target). Matches the same breakpoint `apps/demo` uses (`48rem`/768px).
+   The icon itself is deliberately NOT part of this bump — only "lg" ever
+   uses a 24px icon; "md"/"sm" stay at 16px regardless of viewport. */
 @media (max-width: 767px) {
   .ds-textarea--md .ds-textarea__field,
   .ds-textarea--sm .ds-textarea__field {
@@ -199,10 +201,5 @@
   .ds-textarea--sm .ds-textarea__help {
     font: var(--type-paragraph-s-regular);
     letter-spacing: var(--type-paragraph-s-regular-tracking);
-  }
-  .ds-textarea--md .ds-textarea__icon svg,
-  .ds-textarea--sm .ds-textarea__icon svg {
-    width: 1.5rem;
-    height: 1.5rem;
   }
 }

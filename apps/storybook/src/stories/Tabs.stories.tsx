@@ -59,6 +59,37 @@ export const Vertical: Story = {
   ),
 };
 
+export const VerticalAlignEnd: Story = {
+  name: 'Vertical, align="end"',
+  render: () => (
+    <div style={{ display: "flex", width: 32 * 16 }}>
+      <Tabs orientation="vertical" defaultValue="general">
+        <TabList align="end" style={{ width: 9 * 16, flexShrink: 0 }}>
+          <Tab value="general">General</Tab>
+          <Tab value="notifications">Notifications</Tab>
+          <Tab value="access">Access</Tab>
+        </TabList>
+      </Tabs>
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+          marginLeft: 1.5 * 16,
+          padding: 1 * 16,
+          borderRadius: "var(--radius-md)",
+          background: "var(--background-default)",
+          boxShadow: "var(--shadow-l1)",
+          font: "var(--type-paragraph-s-regular)",
+          color: "var(--content-base)",
+        }}
+      >
+        A category list sitting to the left of the panel it describes, pointing inward at it — the same shape a Settings page's own
+        category list uses beside its detail pane.
+      </div>
+    </div>
+  ),
+};
+
 export const WithBadge: Story = {
   render: () => (
     <div style={{ width: 28 * 16 }}>

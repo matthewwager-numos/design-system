@@ -3,7 +3,7 @@ export type { TabsProps } from "./Tabs";
 export type { TabsOrientation } from "./TabsContext";
 
 export { TabList } from "./TabList";
-export type { TabListProps } from "./TabList";
+export type { TabListProps, TabListAlign } from "./TabList";
 
 export { Tab } from "./Tab";
 export type { TabProps } from "./Tab";

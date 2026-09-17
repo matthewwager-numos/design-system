@@ -205,10 +205,14 @@ a {
 
 @media (min-width: 48rem) {
   .app-body {
-    padding: var(--space-6);
+    /* Matches <Header>'s own horizontal inset (--space-5, confirmed in
+       Header.css) so a page's content lines up with that header's icon and
+       tabs above it, rather than sitting inset further with its own
+       larger value. */
+    padding: var(--space-5);
   }
   .mobile-app-header + .app-body {
-    padding-top: var(--space-6);
+    padding-top: var(--space-5);
   }
 }
 
@@ -224,6 +228,14 @@ a {
    use the full width of the content area instead. */
 .page--full-width {
   max-width: none;
+}
+
+/* Collect's own "Work" tab — a single, narrower checklist reads better
+   centered in the available width than pinned to the left edge of a wider
+   64rem page, so this narrows *and* centers rather than just narrowing. */
+.collect-work-tab {
+  max-width: 28rem;
+  margin-inline: auto;
 }
 
 .page__header {
@@ -248,23 +260,21 @@ a {
 }
 
 /* ── Settings List & Detail ────────────────────────────────────────── */
-/* Figma's own mobile frames never show the category list and its detail
-   at once — below the desktop breakpoint this shows one full-width
-   "screen" at a time (list, or the selected category's detail with a
-   Back affordance), toggled by `data-mobile-view` on the wrapper. At/above
-   the breakpoint both panes show side by side and `data-mobile-view` is
-   ignored, matching the desktop List & Detail template. */
+/* The one shared template every Settings surface in this app uses — the
+   global Settings page (no tertiary nav) and each app's own internal
+   Settings tab (Team/Accrue/Close/Notifications, tertiary nav present)
+   alike — so the card lands in exactly the same place regardless of
+   whether a nav sits beside it.
+   Below the desktop breakpoint the category switcher itself changes shape
+   rather than the layout hiding either pane: <SettingsCategoryNav> renders
+   a single Select (.settings-category-select) pinned above the card
+   instead of the vertical tab list (.settings-category-tabs), so mobile
+   stays one continuous screen — no separate list/detail screens or a
+   Back affordance to get between them. */
 .settings-layout {
   display: flex;
   flex-direction: column;
   width: 100%;
-}
-
-.settings-layout[data-mobile-view="list"] .settings-detail-pane {
-  display: none;
-}
-.settings-layout[data-mobile-view="detail"] .settings-list-pane {
-  display: none;
 }
 
 .settings-list-pane {
@@ -275,54 +285,65 @@ a {
   width: 100%;
 }
 
-/* Mobile-only "back to categories" affordance — meaningless once both
-   panes are visible together on desktop. */
-.settings-back {
+/* Mobile-only category switcher — see <SettingsCategoryNav>. Hidden once
+   the desktop vertical nav (.settings-category-tabs) takes over below. */
+.settings-category-select {
   margin-bottom: var(--space-4);
 }
 
+.settings-category-tabs {
+  display: none;
+}
+
 @media (min-width: 48rem) {
+  /* 7 columns: [spacer][nav][gap][card][phantom gap][phantom nav][spacer].
+     The two outer spacers are equal `1fr` tracks, and columns 2/3 (nav+gap)
+     are mirrored by *empty* columns 5/6 of the identical width on the
+     other side — nothing is ever placed there, they exist purely so the
+     card (column 4) always sits at this grid's true center, whether or
+     not a nav actually occupies column 2. A first attempt at this used
+     `transform` to pull the nav out of a shared column with the card
+     instead of giving it its own real track — visually correct at wide
+     viewports, but since a `transform` doesn't reserve any actual layout
+     space, the two outer spacers had no reason to leave room for it: at
+     moderate desktop widths they'd shrink toward 0 with nothing accounting
+     for the nav's own footprint, and the nav would silently overflow past
+     the page's own left edge. Real tracks fix that — there's always
+     genuine space reserved for the nav, so it can't overflow regardless of
+     viewport width (down to this 48rem breakpoint itself, where the fixed
+     columns' own combined minimum still comfortably fits). */
   .settings-layout {
-    flex-direction: row;
-    justify-content: center;
-    gap: var(--space-4);
-  }
-  .settings-layout[data-mobile-view] .settings-list-pane,
-  .settings-layout[data-mobile-view] .settings-detail-pane {
-    display: block;
+    display: grid;
+    grid-template-columns: 1fr 9rem 1.5rem minmax(0, 45rem) 1.5rem 9rem 1fr;
   }
 
-  /* Mirrors <Tabs orientation="vertical"> (right-aligned text, right-edge
-     selected indicator) rather than its left-aligned default — confirmed
-     from Figma as a deliberate mirroring for a list sitting to the *left*
-     of the detail it describes, pointing inward at it. Desktop-only: on
-     mobile the list is its own full-width screen, with no adjacent detail
-     pane to point into, so it stays the plain left-aligned default there.
-     Scoped here rather than changed in the shared component, since every
-     other consumer of vertical <Tabs> still wants the normal left-aligned
-     behavior. */
+  /* The right-aligned look itself (text, selected indicator, and the width
+     stretch that makes "right-aligned" mean something) now lives on
+     `<TabList align="end">` in packages/ui — see its own doc comment —
+     rather than being reconstructed here via descendant selectors. Every
+     consumer of this template passes that prop directly; this file only
+     positions the pane as a whole. */
   .settings-list-pane {
-    width: 9rem;
-    flex-shrink: 0;
-  }
-  .settings-list-pane .ds-tab-list--vertical {
-    align-items: flex-end;
-  }
-  .settings-list-pane .ds-tab-list--vertical .ds-tab {
-    justify-content: flex-end;
-    text-align: right;
-  }
-  .settings-list-pane .ds-tab-list--vertical .ds-tab-list__indicator {
-    left: auto;
-    right: 0;
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    /* ~16px lower — roughly lines up the first tab's own baseline with the
+       card's own title, sitting in the adjacent column at the grid's own
+       row start. */
+    margin-top: 1rem;
   }
 
   .settings-detail-pane {
-    max-width: 45rem;
+    grid-column: 4;
+    grid-row: 1;
   }
 
-  .settings-back {
+  .settings-category-select {
     display: none;
+  }
+
+  .settings-category-tabs {
+    display: block;
   }
 }
 
@@ -1783,10 +1804,20 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-7);
+  gap: var(--space-5);
+  width: 100%;
   max-width: 44rem;
-  margin: var(--space-8) auto var(--space-6);
+  margin: var(--space-5) auto var(--space-4);
+  padding-inline: var(--space-4);
   text-align: center;
+}
+
+@media (min-width: 48rem) {
+  .home-hero {
+    gap: var(--space-6);
+    margin: var(--space-7) auto var(--space-5);
+    padding-inline: 0;
+  }
 }
 
 .home-hero__greeting {
@@ -1798,26 +1829,19 @@ a {
 
 .home-prompt {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: var(--space-2);
   width: 100%;
 }
 
-/* `<Textarea>`'s own "lg" field only rounds to --radius-lg (12px) — this
-   context wants a fully pill-shaped bar instead. No extra resting shadow
-   on top of that — the field is `autoFocus`ed on mount (see HomePage.tsx),
-   so `<Textarea>`'s own real `:focus-within` box-shadow already applies
-   immediately; stacking a second static shadow on top of it just looked
-   like a stray extra shadow, not a deliberate second state. No manual
-   resize handle either — Enter submits (see HomePage.tsx's own
-   onKeyDown), Shift+Enter still inserts a newline and the field can
-   still grow, just not via a drag handle. */
+/* Otherwise plain `<Textarea>` — standard radius/shadow/focus states,
+   matching Storybook, rather than a bespoke pill treatment. No manual
+   resize handle: Enter submits (see HomePage.tsx's own onKeyDown),
+   Shift+Enter still inserts a newline and the field can still grow, just
+   not via a drag handle. */
 .home-prompt__input {
   flex: 1;
   min-width: 0;
-}
-.home-prompt__input .ds-textarea__field {
-  border-radius: var(--radius-full);
 }
 .home-prompt__input .ds-textarea__control {
   resize: none;
@@ -1828,6 +1852,13 @@ a {
   font: var(--type-paragraph-s-regular);
   letter-spacing: var(--type-paragraph-s-regular-tracking);
   color: var(--content-placeholder);
+}
+
+.home-prompt__suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
 }
 
 .home-flow {
@@ -1860,11 +1891,25 @@ a {
   grid-template-columns: 1fr;
 }
 
+/* A real <button> (see HomePage.tsx) — each tile now navigates to that
+   app's Overview tab, so it needs a full reset off the browser's default
+   button chrome rather than a plain layout div. */
 .home-flow__tile {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+}
+.home-flow__tile:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 4px;
 }
 
 .home-flow__tile-label {
@@ -1940,7 +1985,10 @@ a {
 .home-flow__connector {
   position: relative;
   width: 100%;
-  height: 4rem;
+  /* Matches HomePage.tsx's own CONNECTOR_HEIGHT constant (44px) — the SVG's
+     viewBox scales to fit this wrapper, so the two must stay in lockstep or
+     the bracket paths stretch out of proportion. */
+  height: 2.75rem;
 }
 .home-flow__connector-svg {
   position: absolute;
@@ -1954,12 +2002,6 @@ a {
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
-/* The arrowhead marker (referenced via `url(#home-flow-arrow)`) is its
-   own tiny shape, not a stroked line — needs a fill, not the line's own
-   stroke color repeated. */
-#home-flow-arrow path {
-  fill: var(--border-base);
-}
 
 .home-flow__connector-label {
   position: absolute;
@@ -1971,4 +2013,542 @@ a {
   font: var(--type-paragraph-s-regular);
   letter-spacing: var(--type-paragraph-s-regular-tracking);
   color: var(--content-placeholder);
+}
+
+/* ── Notifications app ─────────────────────────────────────────────── */
+/* Uses the shared `.page--fill-height`/`.page--full-width` modifiers (see
+   the History timeline section above) directly as its own root, rather than
+   a bespoke wrapper — same "fill the tab body, panels scroll internally"
+   shape, just with a toolbar + a two-pane panel instead of a feed + sidebar. */
+
+/* `.page`'s own gap (--space-5, 24px) is more than the toolbar-to-panel
+   spacing wants here — overridden specifically for this page rather than
+   changed on the shared class, which every other `.page` consumer (History,
+   Settings) still wants at its own default. */
+.page.notifications-page {
+  gap: var(--space-4);
+}
+
+/* Select-all/count + pager — sits *above* the panel below, the same whether
+   or not a row is currently open, so neither it nor the footer are ever
+   tied to "is a message expanded right now." Its own horizontal padding
+   matches `.list-detail-row`'s so the two checkboxes land in the same
+   column. Never scrolls away with the panel's own internal content. */
+.notifications-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  flex-shrink: 0;
+}
+.notifications-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.notifications-toolbar__count {
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+
+/* The shadow lives on this outer wrapper, not on `.notifications-panel`
+   itself — a box's own `overflow: hidden` (needed below to clip the list/
+   detail panes' rounded corners) clips that same element's own box-shadow
+   too, so an L1 depth declared there would render invisible. */
+.notifications-panel-shadow {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-l1);
+}
+
+/* The ONE shared card: the row list and the detail pane are both inside
+   this single rounded/shadowed container — not two separate cards side by
+   side — and the footer is this container's own last child, spanning both,
+   rather than living inside the detail pane. Fills whatever height
+   `.page--fill-height` leaves below the toolbar, so it (not the page) is
+   what the two panes and the footer size themselves against. */
+.notifications-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  border-radius: var(--radius-md);
+  background: var(--background-default);
+  overflow: hidden;
+}
+
+.notifications-panel__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.notifications-panel__body[data-mobile-view="list"] .notifications-detail-pane {
+  display: none;
+}
+.notifications-panel__body[data-mobile-view="detail"] .notifications-list-pane {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .notifications-panel__body {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  /* Both panes always flex-displayed at this width regardless of
+     `data-mobile-view` (that attribute only matters for the mobile
+     one-screen-at-a-time swap above) — the detail pane's own *width*
+     animating is what opens/closes it here, not display. */
+  .notifications-panel__body[data-mobile-view] .notifications-list-pane,
+  .notifications-panel__body[data-mobile-view] .notifications-detail-pane {
+    display: flex;
+  }
+}
+
+.notifications-list-pane {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 0 0 auto;
+  /* Independent scroll — the toolbar above and the footer below are the
+     only things that should ever stay fixed; a long message list scrolls
+     on its own rather than growing the whole page. */
+  overflow-y: auto;
+  transition: width var(--motion-toggle);
+}
+@media (min-width: 48rem) {
+  .notifications-list-pane--split {
+    width: 20rem;
+    border-right: 1px solid var(--border-subtle);
+  }
+}
+
+/* Always mounted at its full flex share — with the list pane still at its
+   full 100% width (nothing active), there's simply no room left in the row
+   for this to occupy, so it renders at 0 width for free; once the list
+   pane's own width transitions down to 20rem, this smoothly grows to fill
+   what's left. Mirrors `.app-shell__assistant`'s own squeeze panel. */
+.notifications-detail-pane {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 0%;
+  /* Clips, doesn't scroll — the header inside stays fixed; only
+     `.notification-detail__body` (flex:1;overflow-y:auto) scrolls. */
+  overflow: hidden;
+}
+/* Out of the tab order while its width is 0 — it never unmounts (so the
+   width transition has something to animate), unlike a conditionally
+   rendered element would. */
+.notifications-detail-pane:not(.notifications-detail-pane--open) {
+  visibility: hidden;
+}
+
+.notifications-back {
+  flex-shrink: 0;
+  margin: var(--space-4) var(--space-4) 0;
+}
+@media (min-width: 48rem) {
+  .notifications-back {
+    display: none;
+  }
+}
+
+/* The footer — always mounted, sliding open the moment anything is checked
+   and shut again once nothing is, independent of whether a detail happens
+   to be open. Same grid `fr`-unit height animation `<Accordion>`'s own
+   panel uses (see Accordion.css) rather than a hardcoded height, so it
+   still fits the footer's real content at any viewport width. */
+.notifications-footer-track {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--motion-toggle);
+}
+.notifications-footer-track--open {
+  grid-template-rows: 1fr;
+}
+.notifications-footer-track__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* A real <button> (whole row opens/previews the notification) with a
+   Checkbox nested inside it whose own click is stopped from bubbling (see
+   InboxTab.tsx) so checking a box never also opens the row. Type size and
+   padding stay exactly the same whether or not a detail is open beside it —
+   only the column's own width changes, which truncation already handles;
+   swapping to a smaller variant the instant a row is clicked was what made
+   the list visibly jump right as the eye was tracking the click. */
+/* Shared by every consumer of `<ListDetailRow>` (Notifications' own Inbox,
+   Collect's bulk-action review modal) — one row look, so a checkbox-
+   selectable-list-with-a-focused-detail behaves and reads identically
+   wherever it appears, per `components/ListDetailRow.tsx`'s own doc
+   comment. */
+.list-detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  width: 100%;
+  flex-shrink: 0;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  /* Explicit, not `none` — a row is its own opaque surface (matching
+     Figma: a white card sitting on the list pane's own background), so
+     hover/focus reliably override it regardless of what the surrounding
+     pane's own background happens to be (e.g. `.bulk-action-list-pane`'s
+     `--background-secondary`, which `none` would just show through as). */
+  background: var(--background-default);
+  padding: var(--space-3) var(--space-4);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.list-detail-row:last-child {
+  border-bottom: none;
+}
+/* Subtle on purpose — background is already --background-default, so
+   --background-hover (meant for a field sitting on --background-element)
+   read as too dark here. */
+.list-detail-row:hover {
+  background: var(--background-secondary);
+}
+/* This is the row's own focus indicator — not a separate ring on top of it.
+   The default browser focus outline is suppressed below specifically
+   because this background is *always* in sync with real DOM focus (see
+   `ListDetailRow`'s own `onFocus`/arrow-key handling), so a second,
+   different-looking indicator would be redundant rather than additive. */
+.list-detail-row--focused {
+  background: var(--background-selected);
+}
+/* `:hover` (0,2,0,0) otherwise beats the plain `--focused` class (0,1,0,0)
+   regardless of source order — without this, clicking a row while the
+   mouse is still over it would show the *hover* background instead of the
+   focus one, only correcting itself once the pointer moved away. Hovering
+   an already-focused row should stay focused-blue, not fall back to the
+   plain hover tint. */
+.list-detail-row--focused:hover {
+  background: var(--background-selected);
+}
+.list-detail-row:focus-visible {
+  outline: none;
+}
+.list-detail-row__check {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: var(--space-0);
+}
+.list-detail-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0);
+  flex: 1;
+  min-width: 0;
+}
+.list-detail-row__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-m-medium);
+  letter-spacing: var(--type-paragraph-m-medium-tracking);
+  color: var(--content-emphasis);
+}
+.list-detail-row__title--read {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+  color: var(--content-base);
+}
+.list-detail-row__description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}
+/* A row, not a column — the timestamp and (if present) the attachment icon
+   sit inline, side by side, not stacked. */
+.list-detail-row__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+.list-detail-row__timestamp {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+.list-detail-row__attachment-icon {
+  flex-shrink: 0;
+  color: var(--content-subtle);
+}
+
+/* ── Notification detail (AI summary + thread + reply) ────────────────── */
+
+.notification-detail__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-disabled);
+  flex-shrink: 0;
+}
+.notification-detail__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.notification-detail__close {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-2);
+  color: var(--content-subtle);
+  cursor: pointer;
+}
+.notification-detail__close:hover {
+  background: var(--background-hover);
+  color: var(--content-base);
+}
+.notification-detail__titles {
+  min-width: 0;
+}
+.notification-detail__title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-heading-m);
+  letter-spacing: var(--type-heading-m-tracking);
+  color: var(--content-emphasis);
+}
+.notification-detail__subtitle {
+  margin: 0;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.notification-detail__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: var(--space-4);
+  /* No bottom inset — content scrolls flush to the pane's own bottom edge,
+     same as `.notifications-list-pane`'s rows do, rather than stopping
+     short with a dead gap before the footer. */
+  padding: var(--space-4) var(--space-4) 0;
+  overflow-y: auto;
+}
+
+/* ── Conversation thread — previous messages collapsed into an <Accordion>,
+   the in-progress reply as its own always-relevant final row ───────────── */
+
+/* `.ds-accordion-item__title` is a plain inline `<span>` by default (only as
+   wide as its own content) — these two custom head layouts need it to fill
+   the head's remaining width instead, so their own timestamp/meta content
+   can sit flush right. Scoped to these two item classes rather than changed
+   on the shared component, since most `<Accordion>` consumers just want a
+   plain text title with no inner flex layout of their own. */
+.notification-thread-item .ds-accordion-item__title,
+.notification-reply-item .ds-accordion-item__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-thread-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-width: 0;
+}
+.notification-thread-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0);
+  flex: 1;
+  min-width: 0;
+}
+.notification-thread-row__author {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-s-medium);
+  letter-spacing: var(--type-paragraph-s-medium-tracking);
+  color: var(--content-emphasis);
+}
+/* Smaller than the author line — a preview, not a second line of body copy. */
+.notification-thread-row__snippet {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+.notification-thread-row__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+.notification-thread-row__timestamp {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+.notification-thread-row__attachment-icon {
+  flex-shrink: 0;
+  color: var(--content-subtle);
+}
+
+.notification-thread-item__full-text {
+  margin: 0;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-base);
+}
+
+/* The reply row's own head — the sender's own (i.e. Numos, not the
+   recipient's) avatar in front of "To:"/"Re:" lines, mirroring every other
+   (collapsed, historical) row's own avatar + text-stack layout. */
+.notification-reply-item__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+.notification-reply-item__lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0);
+  min-width: 0;
+}
+.notification-reply-item__line {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.notification-reply {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  /* Without this, the column's default `stretch` cross-alignment forces
+     `<FileUpload>` (an `inline-flex` element that otherwise hugs its own
+     content) to the column's full width — and since `<FileUpload>`'s own
+     root centers its children, that reads as "the attachment info is
+     centered" rather than "the box is just wider than it looks." */
+  align-items: flex-start;
+}
+.notification-reply__textarea .ds-textarea__control {
+  min-height: 10rem;
+}
+
+.notification-attachment {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+/* Same blue `<FileUpload>`'s own built-in file icon uses — swapping in a
+   plain paperclip (this app's attachment indicator everywhere else, e.g.
+   `.list-detail-row__attachment-icon`/`.notification-thread-row__attachment-icon`)
+   rather than a generic document glyph. */
+.notification-attachment__icon {
+  flex-shrink: 0;
+  color: var(--content-link-default);
+}
+.notification-attachment__upload .ds-file-upload__icon--file {
+  display: none;
+}
+
+/* ── Collect — bulk action review modal ───────────────────────────────
+   Reuses `<ListDetailRow>`'s own `.list-detail-row` classes plus
+   Notifications' own `.notification-thread-row`/`.notification-reply-item`/
+   etc. classes as-is (see above) — same visual language, just inside a
+   `variant="fullscreen"` <Modal> instead of a page. Only what's genuinely
+   different here gets its own classes: the modal's
+   own header/subtitle, the two-pane body, and the list pane's pinned
+   select-all (Notifications' toolbar sits above its whole panel; here it's
+   pinned to the top of just the list column instead, per this flow's own
+   design). */
+
+.bulk-action-modal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* `<Header>`'s own border-bottom would otherwise land between the title and
+   the subtitle line below it — suppressed here so the border sits after
+   both instead, on `.bulk-action-modal__subtitle`. */
+.bulk-action-modal__header.ds-header {
+  border-bottom: none;
+}
+.bulk-action-modal__subtitle {
+  margin: 0;
+  flex-shrink: 0;
+  padding: 0 var(--space-4) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.bulk-action-modal__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.bulk-action-list-pane {
+  display: flex;
+  flex-direction: column;
+  width: 20rem;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--background-secondary);
+}
+/* Pinned — doesn't scroll away with the rows below it. */
+.bulk-action-list-pane__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.bulk-action-list-pane__rows {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.bulk-action-detail-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }

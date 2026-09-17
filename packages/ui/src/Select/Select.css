@@ -200,7 +200,10 @@
    mobile override, not because of iOS's zoom-on-focus bug: `<Select>` is a
    custom dropdown with only a hidden native input for form submission, so
    there's no real focusable text field here for iOS to zoom on in the
-   first place. Matches the same breakpoint `apps/demo` uses (`48rem`/768px). */
+   first place. Matches the same breakpoint `apps/demo` uses (`48rem`/768px).
+   The leading icon and chevron are deliberately NOT part of this bump —
+   only "lg" ever uses a 24px icon; "md"/"sm" stay at 16px regardless of
+   viewport. */
 @media (max-width: 767px) {
   .ds-select--md .ds-select__field,
   .ds-select--sm .ds-select__field {
@@ -216,10 +219,5 @@
   .ds-select--sm .ds-select__help {
     font: var(--type-paragraph-s-regular);
     letter-spacing: var(--type-paragraph-s-regular-tracking);
-  }
-  .ds-select--md .ds-select__icon svg,
-  .ds-select--sm .ds-select__icon svg {
-    width: 1.5rem;
-    height: 1.5rem;
   }
 }

@@ -2,6 +2,8 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FocusEvent, KeyboardEvent, ReactNode } from "react";
 import { Check, Filter, Search, TriangleAlert, X } from "lucide-react";
 import { clsx } from "clsx";
+import { Badge } from "../Badge";
+import { Button } from "../Button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuPanel } from "../DropdownMenu";
 import { FieldLabel } from "../FieldLabel";
 import "./SearchFilter.css";
@@ -73,6 +75,12 @@ export interface SearchFilterProps {
   filtersOpen?: boolean;
   defaultFiltersOpen?: boolean;
   onFiltersOpenChange?: (open: boolean) => void;
+  /** Number of currently-applied filters. Above 0, shows a count badge next to the filter button on the field itself — SearchFilter has no idea what's "applied" inside your own `filters` content, so this is on you to compute. Omit (or 0) to show no badge. */
+  filterCount?: number;
+  /** Heading text above `filters` in the panel, paired with the Clear button. Defaults to "Filters". */
+  filtersLabel?: ReactNode;
+  /** Shows a "Clear" link button beside the panel heading when provided — call your own logic to reset whatever's driving `filters`/`filterCount`. Omitted entirely (no dead button) if you don't pass this. */
+  onClearFilters?: () => void;
   /**
    * Turns on the typing suggestions dropdown, and gives it something to
    * suggest: property names (rendered as `"key:"`) while the word being
@@ -125,6 +133,9 @@ export function SearchFilter({
   filtersOpen: controlledFiltersOpen,
   defaultFiltersOpen = false,
   onFiltersOpenChange,
+  filterCount,
+  filtersLabel = "Filters",
+  onClearFilters,
   properties,
   placeholder = "Search or filter",
   label,
@@ -147,6 +158,7 @@ export function SearchFilter({
   const suggestListId = `${inputId}-suggestions`;
   const iconSize = size === "lg" ? 24 : 16;
   const rootRef = useRef<HTMLDivElement>(null);
+  const fieldRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const hasProperties = Boolean(properties && properties.length > 0);
 
@@ -263,6 +275,7 @@ export function SearchFilter({
       <DropdownMenu open={filters ? open : false} onOpenChange={filters ? setOpen : undefined} size={size}>
         <div className="ds-search-filter__anchor">
           <div
+            ref={fieldRef}
             className={clsx(
               "ds-search-filter__field",
               `ds-search-filter__field--${status}`,
@@ -310,6 +323,16 @@ export function SearchFilter({
                 </button>
               </DropdownMenuTrigger>
             ) : null}
+            {filterCount ? (
+              <Badge
+                status="info"
+                size="md"
+                className="ds-search-filter__filter-badge"
+                aria-label={`${filterCount} filter${filterCount === 1 ? "" : "s"} applied`}
+              >
+                {filterCount}
+              </Badge>
+            ) : null}
           </div>
 
           {showSuggestions && (
@@ -348,7 +371,21 @@ export function SearchFilter({
           )}
         </div>
 
-        {filters ? <DropdownMenuPanel className="ds-search-filter__panel">{filters}</DropdownMenuPanel> : null}
+        {filters ? (
+          <DropdownMenuPanel className="ds-search-filter__panel" anchorRef={fieldRef}>
+            <div className="ds-search-filter__panel-heading">
+              <FieldLabel as="span" size={size} className="ds-search-filter__panel-label">
+                {filtersLabel}
+              </FieldLabel>
+              {onClearFilters ? (
+                <Button type="button" variant="link" size="sm" onClick={onClearFilters}>
+                  Clear
+                </Button>
+              ) : null}
+            </div>
+            {filters}
+          </DropdownMenuPanel>
+        ) : null}
       </DropdownMenu>
 
       {helpText ? (

@@ -92,7 +92,7 @@ export function useDropdownMenuPlacement(
       ...verticalStyle(placement, anchor.rect),
       ...horizontalStyle(align, anchor.rect),
       transformOrigin: `${placement === "bottom" ? "top" : "bottom"} ${align}`,
-      ...(matchTriggerWidth ? { minWidth: `${anchor.rect.width}px` } : {}),
+      ...(matchTriggerWidth ? { width: `${anchor.rect.width}px` } : {}),
     },
   };
 }

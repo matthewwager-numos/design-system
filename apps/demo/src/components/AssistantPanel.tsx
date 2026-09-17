@@ -61,8 +61,12 @@ export function useAssistantConversation() {
     saveAssistantSettings(next);
   }
 
-  async function submitDraft() {
-    const text = draft.trim();
+  /** `overrideText` lets a caller (e.g. HomePage's suggestion chips) submit
+   * text that never passed through `setDraft` — reading `draft` itself right
+   * after calling `setDraft` in the same handler would still see the stale
+   * pre-update value, since the state write hasn't committed yet. */
+  async function submitDraft(overrideText?: string) {
+    const text = (overrideText ?? draft).trim();
     if (!text || pending) return;
 
     const userMessage: AssistantMessage = { id: String(nextMessageId++), role: "user", text, timestamp: timestamp() };

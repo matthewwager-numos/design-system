@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { HTMLAttributes, KeyboardEvent, TransitionEvent } from "react";
+import type { HTMLAttributes, KeyboardEvent, RefObject, TransitionEvent } from "react";
 import { createPortal } from "react-dom";
 import { clsx } from "clsx";
 import { useDropdownMenuContext } from "./DropdownMenuContext";
@@ -10,8 +10,17 @@ import { useDropdownMenuPlacement } from "./useDropdownMenuPlacement";
 export interface DropdownMenuPanelProps extends HTMLAttributes<HTMLDivElement> {
   /** Defaults to the size set on the enclosing `<DropdownMenu>` — only needed here to override that for this one panel. */
   size?: DropdownMenuSize;
-  /** Gives the panel a *minimum* width matching the trigger's own measured width (it can still grow wider for its own content) — on by default, since a panel is almost always anchored to a full-width field (e.g. `<SearchFilter>`'s filters). */
+  /** Matches the panel's width exactly to the trigger's own measured width — on by default, since a panel is almost always anchored to a full-width field (e.g. `<SearchFilter>`'s filters). */
   matchTriggerWidth?: boolean;
+  /**
+   * Measure/position from this element instead of `<DropdownMenuTrigger>`'s
+   * own ref — for when the clickable trigger is only *part* of the field
+   * it should visually anchor to (e.g. `<SearchFilter>`'s small filter
+   * button opens the panel, but the panel itself needs to line up with the
+   * whole field, edge to edge, the same as that field's own typeahead
+   * listbox does).
+   */
+  anchorRef?: RefObject<HTMLElement>;
 }
 
 /**
@@ -36,13 +45,13 @@ export interface DropdownMenuPanelProps extends HTMLAttributes<HTMLDivElement> {
  * would otherwise get cropped by any clipping/scrolling ancestor (e.g. a
  * `<Modal>`'s own `overflow: hidden` panel).
  */
-export function DropdownMenuPanel({ size: sizeProp, matchTriggerWidth = true, className, style, children, onKeyDown, ...rest }: DropdownMenuPanelProps) {
+export function DropdownMenuPanel({ size: sizeProp, matchTriggerWidth = true, anchorRef, className, style, children, onKeyDown, ...rest }: DropdownMenuPanelProps) {
   const { open, setOpen, triggerRef, contentId, size: contextSize } = useDropdownMenuContext("DropdownMenuPanel");
   const size = sizeProp ?? contextSize;
   const panelRef = useRef<HTMLDivElement>(null);
   const [rendered, setRendered] = useState(open);
   const [visible, setVisible] = useState(open);
-  const anchor = useAnchorRect(triggerRef, rendered);
+  const anchor = useAnchorRect(anchorRef ?? triggerRef, rendered);
   const resolved = useDropdownMenuPlacement(panelRef, anchor, "bottom", matchTriggerWidth);
 
   useEffect(() => {

@@ -230,7 +230,9 @@
 
 /* Below this width, "md"/"sm" render at "lg" metrics regardless of the
    `size` prop — same reasoning (and breakpoint) as <Select>'s own mobile
-   override; see Select.css. */
+   override; see Select.css. The leading icon and chevron are deliberately
+   NOT part of this bump — only "lg" ever uses a 24px icon; "md"/"sm" stay
+   at 16px regardless of viewport. */
 @media (max-width: 767px) {
   .ds-multi-select--md .ds-multi-select__field,
   .ds-multi-select--sm .ds-multi-select__field {
@@ -246,10 +248,5 @@
   .ds-multi-select--sm .ds-multi-select__help {
     font: var(--type-paragraph-s-regular);
     letter-spacing: var(--type-paragraph-s-regular-tracking);
-  }
-  .ds-multi-select--md .ds-multi-select__icon svg,
-  .ds-multi-select--sm .ds-multi-select__icon svg {
-    width: 1.5rem;
-    height: 1.5rem;
   }
 }

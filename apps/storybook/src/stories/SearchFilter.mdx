@@ -121,7 +121,23 @@ This is independent of, and coordinates with, the filter panel below: the two ar
 
 ## The trailing icon is the filter toggle, not a clear button
 
-Confirmed from Figma: the funnel icon swaps to an X only while the panel is open — regardless of whether `value` is empty or filled with a filter summary. It's not `<SearchInput>`'s "clear the typed text" button; clicking it toggles the panel, and clicking it again (or Escape, or an outside click) closes it. There's no separate clear-all — clearing the query is ordinary text editing, the same as any other field.
+Confirmed from Figma: the funnel icon swaps to an X only while the panel is open — regardless of whether `value` is empty or filled with a filter summary. It's not `<SearchInput>`'s "clear the typed text" button; clicking it toggles the panel, and clicking it again (or Escape, or an outside click) closes it. Clearing the query by hand is ordinary text editing, the same as any other field — the panel's own Clear button (below) is a separate affordance for resetting whatever's driving `filters`.
+
+## Applied-filter count
+
+Pass `filterCount` to show a count badge beside the filter button — SearchFilter doesn't parse `filters` or `value`, so it has no idea how many filters are actually "applied"; that's on you to compute (see the worked example below, which counts its own checkbox/slider state).
+
+```tsx
+<SearchFilter filters={<Checkbox label="Only overdue" />} filterCount={1} />
+```
+
+## The panel heading
+
+Confirmed from Figma: the panel now opens with its own heading — a `<FieldLabel>` (default text "Filters", override with `filtersLabel`) and, when `onClearFilters` is passed, a "Clear" link button beside it. Omit `onClearFilters` and only the label renders — no dead button with nothing to do.
+
+<Canvas of={SearchFilterStories.WithBadgeAndClear} />
+
+The worked example above wires both `filterCount` and `onClearFilters` from the same state that drives its checkboxes and slider.
 
 ## Controlling the panel
 
@@ -149,9 +165,9 @@ const [filtersOpen, setFiltersOpen] = useState(false);
 - The suggestions dropdown never moves real focus either — the input keeps it the whole time. The highlighted option is tracked as plain state and exposed via `aria-activedescendant`, with the usual Arrow/Home/End/Enter/Escape keys wired to the input itself.
 - Sets `aria-invalid="true"` automatically when `status="error"`.
 
-## The filter panel's width
+## The filter panel's width and position
 
-The panel is at least as wide as the field it's anchored to (never narrower, so it can't clip its own content) but can grow wider when `filters` genuinely needs the room — it's a minimum, not an exact match.
+The panel matches the field's width exactly — and opens from the field's own left edge, not the small filter button that happens to trigger it — the same width and position as the typing suggestions listbox above. `filters` content that needs more room wraps or scrolls within that width rather than growing the panel wider.
 
 ## Props
 

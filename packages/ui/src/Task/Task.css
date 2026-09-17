@@ -1,0 +1,90 @@
+/*
+ * Task styles — pure token-driven CSS, matching Figma's Task component
+ * across its states (plus "inProgress", added after the original Figma
+ * pull). Figma's own "Radius/S" primitive is 8px, which is this codebase's
+ * `--radius-md`, not `--radius-sm` (4px) — the same naming-offset already
+ * confirmed elsewhere (see Accordion.css).
+ */
+
+.ds-task {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--background-default);
+  box-shadow: var(--shadow-l1);
+}
+
+.ds-task__badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-full);
+  background: var(--background-element);
+  color: var(--content-disabled);
+}
+.ds-task__badge--disabled {
+  background: var(--background-disabled);
+}
+/* inProgress deliberately gets no color override — same plain
+   `--background-element` circle as notStarted/overdue. The state exists to
+   change the button/meta copy ("Continue", a progress count), not to add a
+   third badge color. */
+
+.ds-task__text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.ds-task__title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-heading-s);
+  letter-spacing: var(--type-heading-s-tracking);
+  color: var(--content-emphasis);
+}
+.ds-task__description {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.ds-task__meta {
+  flex-shrink: 0;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+
+.ds-task__action {
+  flex-shrink: 0;
+}
+
+/* ── States ────────────────────────────────────────────────────────── */
+
+/* Disabled dims the title/description/meta together (locked = nothing
+   here is actionable yet), unlike notStarted/overdue/complete/error, which
+   keep the title at full emphasis regardless of urgency. */
+.ds-task--disabled .ds-task__title,
+.ds-task--disabled .ds-task__description,
+.ds-task--disabled .ds-task__meta {
+  color: var(--content-disabled);
+}
+
+.ds-task--overdue .ds-task__meta {
+  color: var(--content-negative);
+}

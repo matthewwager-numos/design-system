@@ -1,5 +1,6 @@
 export type PageId =
   | "home"
+  | "notifications"
   | "team"
   | "close"
   | "accruals"

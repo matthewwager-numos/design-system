@@ -1,0 +1,36 @@
+/* TaskList styles — pure token-driven CSS, matching Figma's TaskList exactly. */
+
+.ds-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.ds-task-list__heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+.ds-task-list__title {
+  margin: 0;
+  font: var(--type-heading-xl);
+  letter-spacing: var(--type-heading-xl-tracking);
+  color: var(--content-emphasis);
+}
+.ds-task-list__description {
+  margin: 0;
+  max-width: 25rem;
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+  color: var(--content-subtle);
+}
+
+.ds-task-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}

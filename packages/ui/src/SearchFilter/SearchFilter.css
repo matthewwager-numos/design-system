@@ -139,6 +139,31 @@
   cursor: not-allowed;
 }
 
+/* Count of currently-applied filters — see `filterCount` in SearchFilter.tsx.
+   flex-shrink:0 for the same reason as the icon/filter-button beside it: a
+   long typed value in the field shouldn't be able to squeeze this down. */
+.ds-search-filter__filter-badge {
+  flex-shrink: 0;
+}
+
+/* ── Panel heading ─────────────────────────────────────────────────── */
+/* "Filters" label + Clear link button, above `filters` itself — a sibling
+   of it inside <DropdownMenuPanel>, so the panel's own flex column `gap`
+   (see DropdownMenu.css) spaces it from the first filter control the same
+   way it spaces every filter control from the next. */
+.ds-search-filter__panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.ds-search-filter__panel-label {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
 /* ── Suggestions listbox ───────────────────────────────────────────── */
 
 .ds-search-filter__listbox {
@@ -283,7 +308,9 @@
    `size` prop — same reasoning (and breakpoint) as <SearchInput>'s own
    mobile override: this control is a real <input>, so this also keeps iOS
    from auto-zooming on focus (it zooms below 16px), on top of the bigger
-   tap target. */
+   tap target. The lead icon and trailing filter button are deliberately
+   NOT part of this bump — only "lg" ever uses a 24px icon; "md"/"sm" stay
+   at 16px regardless of viewport. */
 @media (max-width: 767px) {
   .ds-search-filter--md .ds-search-filter__field,
   .ds-search-filter--sm .ds-search-filter__field {
@@ -299,13 +326,6 @@
   .ds-search-filter--sm .ds-search-filter__help {
     font: var(--type-paragraph-s-regular);
     letter-spacing: var(--type-paragraph-s-regular-tracking);
-  }
-  .ds-search-filter--md .ds-search-filter__icon svg,
-  .ds-search-filter--sm .ds-search-filter__icon svg,
-  .ds-search-filter--md .ds-search-filter__filter-button svg,
-  .ds-search-filter--sm .ds-search-filter__filter-button svg {
-    width: 1.5rem;
-    height: 1.5rem;
   }
   .ds-search-filter--md .ds-search-filter__option,
   .ds-search-filter--sm .ds-search-filter__option {

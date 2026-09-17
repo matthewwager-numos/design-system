@@ -66,7 +66,7 @@ export { Popover } from "./Popover";
 export type { PopoverProps, PopoverPlacement, PopoverTriggerMode } from "./Popover";
 
 export { Tabs, TabList, Tab, TabPanel } from "./Tabs";
-export type { TabsProps, TabsOrientation, TabListProps, TabProps, TabPanelProps } from "./Tabs";
+export type { TabsProps, TabsOrientation, TabListProps, TabListAlign, TabProps, TabPanelProps } from "./Tabs";
 
 export { Navigation, NavSection, NavItem, NavUser } from "./Navigation";
 export type { NavigationProps, NavSectionProps, NavItemProps, NavSubItem, NavUserProps } from "./Navigation";
@@ -142,6 +142,9 @@ export type { AccordionProps, AccordionItemProps } from "./Accordion";
 
 export { Card, CardHeader, CardGroup } from "./Card";
 export type { CardProps, CardExpand, CardHeaderProps, CardHeaderAction, CardGroupProps, CardGroupType } from "./Card";
+
+export { Task, TaskList } from "./Task";
+export type { TaskProps, TaskState, TaskListProps } from "./Task";
 
 export { SettingsCard } from "./SettingsCard";
 export type { SettingsCardProps } from "./SettingsCard";

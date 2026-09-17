@@ -1,0 +1,57 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as TaskStories from "./Task.stories";
+
+<Meta of={TaskStories} />
+
+# Task
+
+A single step in a sequential checklist — a status badge, title/description, a right-aligned label (a due date, "Locked", "3d ago"), and an optional action button. `<TaskList>` stacks them under a heading.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- A sequential list of steps a user works through (onboarding, a monthly close checklist, a setup wizard) where each step has its own status.
+- Anywhere a step can be locked until a prior one finishes — `state="disabled"` renders no action button and dims the row.
+
+## When NOT to use
+
+- A bulk-actionable list where many rows get selected together and reviewed as a batch — that's a List & Detail pattern (checkbox + detail pane + footer), not a sequential checklist.
+- As a generic card — `<Card>` is the plain, unopinionated shell; `Task` is specifically the multi-state step pattern from Figma.
+
+## Implementation
+
+```tsx
+import { Task, TaskList } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<TaskList title="Get set up" description="Finish these steps to start closing your books with Numos.">
+  <Task state="complete" title="Connect your bank account" description="Linked 2 accounts" meta="Done" actionLabel="Review" />
+  <Task state="notStarted" title="Invite your team" description="Add teammates to assign work" meta="Due in 5d" actionLabel="Start" onAction={invite} />
+  <Task state="disabled" title="Set your close calendar" meta="Locked" />
+</TaskList>
+```
+
+## States
+
+<Canvas of={TaskStories.Disabled} />
+<Canvas of={TaskStories.NotStarted} />
+<Canvas of={TaskStories.InProgress} />
+<Canvas of={TaskStories.Overdue} />
+<Canvas of={TaskStories.Complete} />
+<Canvas of={TaskStories.Error} />
+
+## TaskList
+
+<Canvas of={TaskStories.List} />
+
+## Accessibility
+
+- `Task` renders a plain `<div>`, not a button — Figma's own frame wraps the whole row in one, but it also nests a real action button inside it, and a button can't legally contain another button. The action button (`actionLabel`/`onAction`) is the only real interactive element.
+- `state="disabled"` is a visual/copy convention (dimmed color, no action button, "Locked" label) — it doesn't set a native `disabled` attribute anywhere, since there's nothing on the row itself to disable.
+
+## Props
+
+See the **Controls** table above for `Task`'s full list, types, and defaults — generated automatically from the TypeScript types. `TaskList` takes `title`, `description`, and `children` (`<Task>` elements).

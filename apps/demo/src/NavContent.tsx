@@ -1,5 +1,6 @@
 import {
   Banknote,
+  Bell,
   Calculator,
   CheckSquare,
   FlaskConical,
@@ -81,6 +82,9 @@ export function NavContent({ active, onNavigate, onSignOut }: NavContentProps) {
           <DropdownMenuItem>Preferences</DropdownMenuItem>
           <DropdownMenuItem onClick={onSignOut}>Sign out</DropdownMenuItem>
         </NavUser>
+        <NavItem icon={<Bell size={24} />} selected={active === "notifications"} onClick={() => onNavigate("notifications")}>
+          Notifications
+        </NavItem>
         <NavItem icon={<Users size={24} />} selected={active === "team"} onClick={() => onNavigate("team")}>
           Team
         </NavItem>

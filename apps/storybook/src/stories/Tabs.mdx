@@ -60,6 +60,21 @@ const [tab, setTab] = useState("overview");
 
 <Canvas of={TabsStories.Vertical} />
 
+### Right-aligned (`align="end"`)
+
+`<TabList align="end">` — only meaningful alongside `orientation="vertical"` — right-aligns the labels and moves the selected indicator to the right edge, for a category list that sits to the *left* of the panel it describes and points inward at it (a Settings page's own category list beside its detail pane is exactly this shape). It also stretches the list to fill its own container's width, which "end" needs to have a real edge to align against.
+
+```tsx
+<Tabs orientation="vertical" value={category} onValueChange={setCategory}>
+  <TabList align="end">
+    <Tab value="general">General</Tab>
+    <Tab value="notifications">Notifications</Tab>
+  </TabList>
+</Tabs>
+```
+
+<Canvas of={TabsStories.VerticalAlignEnd} />
+
 ## Icons and badges
 
 `<Tab>` takes the same `leadingIcon`/`trailingIcon` props as `<DropdownMenuItem>`, plus `badge` for a count pill (Figma's optional "Badge" — e.g. an unread count):
@@ -92,6 +107,6 @@ Not part of Figma's Tab component set — no "Disabled" state is defined there �
 ## Props
 
 `<Tabs>`: `orientation`, `value`, `defaultValue`, `onValueChange`, `className`.
-`<TabList>`: any `<div>` prop (it's a thin wrapper — `role`/`aria-orientation`/keyboard handling are automatic).
+`<TabList>`: `align` ("start", the default, or "end" — only meaningful for `orientation="vertical"`), plus any `<div>` prop (it's a thin wrapper — `role`/`aria-orientation`/keyboard handling are automatic).
 `<Tab>`: `value` (required), `leadingIcon`, `trailingIcon`, `badge`, `disabled`, plus any native `<button>` prop.
 `<TabPanel>`: `value` (required), plus any native `<div>` prop.

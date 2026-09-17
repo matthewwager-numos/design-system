@@ -195,7 +195,10 @@
    touch viewport. Matches the same breakpoint `apps/demo` uses for its own
    mobile/desktop layout switch (`48rem`/768px). Repeats "lg"'s selectors
    (rather than a lower-specificity generic one) so it actually overrides
-   the "md"/"sm" rules above at equal specificity. */
+   the "md"/"sm" rules above at equal specificity.
+   The icon itself is deliberately NOT part of this bump — only "lg" ever
+   uses a 24px icon; "md"/"sm" stay at 16px regardless of viewport, so the
+   icon's size is purely a function of the `size` prop, not the viewport. */
 @media (max-width: 767px) {
   .ds-text-input--md .ds-text-input__field,
   .ds-text-input--sm .ds-text-input__field {
@@ -211,10 +214,5 @@
   .ds-text-input--sm .ds-text-input__help {
     font: var(--type-paragraph-s-regular);
     letter-spacing: var(--type-paragraph-s-regular-tracking);
-  }
-  .ds-text-input--md .ds-text-input__icon svg,
-  .ds-text-input--sm .ds-text-input__icon svg {
-    width: 1.5rem;
-    height: 1.5rem;
   }
 }
