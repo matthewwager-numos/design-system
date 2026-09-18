@@ -76,10 +76,30 @@
   text-align: right;
 }
 
+/* A horizontal list scrolls once its tabs no longer fit, rather than
+   shrinking them into ellipsis/wrapped text (confirmed as the wrong call
+   on a narrow viewport: several short labels shrinking down that far reads
+   as broken, not "responsive") — every tab keeps its own natural,
+   fully-readable width via `flex-shrink: 0` below, and the *list* is what
+   gives, not the labels inside it. `overflow-x: auto` is a no-op whenever
+   the tabs already fit (the common case at any reasonable width), so this
+   costs nothing there. Scrollbar hidden but still fully functional via
+   wheel/trackpad/drag/keyboard — chrome a tab strip doesn't need, same
+   reasoning `.history-timeline__feed` in the demo app already uses. */
 .ds-tab-list--horizontal {
   flex-direction: row;
   align-items: center;
   gap: var(--space-4);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ds-tab-list--horizontal::-webkit-scrollbar {
+  display: none;
+}
+.ds-tab-list--horizontal .ds-tab {
+  flex-shrink: 0;
 }
 
 .ds-tab-list--vertical {

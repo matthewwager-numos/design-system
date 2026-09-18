@@ -129,3 +129,26 @@ export const DisabledTab: Story = {
     </div>
   ),
 };
+
+// A narrow container (mobile width) with more tabs than it can fit —
+// confirms the list scrolls horizontally, full labels intact, rather than
+// shrinking/wrapping them. Try it at a real mobile viewport in the toolbar
+// above, or just resize this panel.
+export const NarrowOverflow: Story = {
+  name: "Overflow (scrolls, doesn't wrap)",
+  render: () => (
+    <div style={{ width: 20 * 16, border: "1px dashed var(--border-subtle)", padding: "0.5rem" }}>
+      <Tabs defaultValue="confidence">
+        <TabList>
+          <Tab value="confidence">Confidence</Tab>
+          <Tab value="journal">Journal Entry</Tab>
+          <Tab value="history">History</Tab>
+          <Tab value="evidence">Evidence</Tab>
+          <Tab value="collaborate" badge={2}>
+            Collaborate
+          </Tab>
+        </TabList>
+      </Tabs>
+    </div>
+  ),
+};

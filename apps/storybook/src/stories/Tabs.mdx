@@ -98,6 +98,9 @@ Not part of Figma's Tab component set — no "Disabled" state is defined there �
 - **Panels**: a `<TabPanel>` unmounts (not just visually hides) while its tab isn't selected.
 - **Selected indicator**: a single bar owned by `<TabList>`, measured off the selected `<Tab>`'s own box and repositioned via CSS transition — it slides from the previously selected tab to the newly selected one, and fades in on first selection, rather than teleporting. Also re-measures on window resize, so it doesn't end up pointing at stale coordinates if the list reflows.
 - **Layout stability**: horizontal tabs reserve their hover indicator's 2px border space (transparent, or `background-brand-subdued` on hover) even when unselected — Figma's separate per-state frames don't need to worry about this, but a live component does: without it, hovering a tab would shift every tab after it by 2px. The *selected* indicator doesn't need this — it's the overlay described above, not a per-tab border, so it never affects tab layout.
+- **Overflow**: a horizontal `<TabList>` scrolls once its tabs stop fitting, rather than shrinking labels down to a wrapped or ellipsized mess — every `<Tab>` keeps its own natural, fully-readable width (`flex-shrink: 0`), and the list itself is what gives, scrolling via wheel/trackpad/drag/keyboard with the scrollbar itself hidden. Confirmed the wrong call to let it wrap: a handful of short labels squeezed onto two lines on a narrow viewport reads as broken, not "responsive."
+
+<Canvas of={TabsStories.NarrowOverflow} />
 
 ## Accessibility
 

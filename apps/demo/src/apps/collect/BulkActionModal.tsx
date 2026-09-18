@@ -1,10 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
-import { Paperclip } from "lucide-react";
-import { Accordion, AccordionItem, Avatar, Banner, Button, ButtonGroup, Checkbox, FileUpload, Header, Modal, ModalFooter, Textarea, Toggle } from "@numosai/ui";
+import { ChevronDown, ChevronLeft, ChevronUp, Paperclip } from "lucide-react";
+import {
+  Accordion,
+  AccordionItem,
+  Avatar,
+  Banner,
+  Button,
+  ButtonGroup,
+  Checkbox,
+  FileUpload,
+  Header,
+  IconButton,
+  Modal,
+  ModalFooter,
+  Pagination,
+  Textarea,
+  Toggle,
+} from "@numosai/ui";
 import type { CollectActionItem, CollectActionThreadMessage, CollectBulkAction } from "../../data/collectActions";
 import { useToast } from "../../toast/ToastProvider";
 import { ListDetailRow } from "../../components/ListDetailRow";
+import { Timestamp } from "../../components/Timestamp";
 
 export interface BulkActionModalProps {
   /** `null` closes the modal. */
@@ -26,7 +43,7 @@ function ThreadMessageHead({ message }: { message: CollectActionThreadMessage })
         <span className="notification-thread-row__snippet">{message.text}</span>
       </span>
       <span className="notification-thread-row__meta">
-        <span className="notification-thread-row__timestamp">{message.timestamp}</span>
+        <Timestamp date={message.timestamp} className="notification-thread-row__timestamp" />
         {message.attachment ? <Paperclip size={14} className="notification-thread-row__attachment-icon" aria-hidden /> : null}
       </span>
     </span>
@@ -40,10 +57,13 @@ function ThreadMessageHead({ message }: { message: CollectActionThreadMessage })
  * app.css), with deliberate differences for this "review a prescribed bulk
  * action" context rather than "browse an inbox":
  *
- * 1. The header's own × (`<Header variant="modal" onClose>`) is the only
- *    close affordance — there's no separate close button inside the detail
- *    pane, since dismissing "the item you're previewing" and dismissing
- *    "the whole review" are the same action here.
+ * 1. The header's own × (`<Header variant="modal" onClose>`) is the only way
+ *    to close the whole review — desktop shows list and detail together, so
+ *    there's nothing else to "go back" to. Mobile shows one full-width pane
+ *    at a time instead (see `mobileView`/`data-mobile-view`, the same
+ *    toggle Notifications' own Inbox uses), so its detail pane gets a
+ *    second, separate affordance of its own: a back chevron that only
+ *    leaves the detail, not the whole modal.
  * 2. The detail pane always shows something (defaults to the first item) —
  *    there's no "nothing focused" state to design for, so no width-
  *    transition/slide animation is needed either.
@@ -91,6 +111,14 @@ function BulkActionModalContent({ action, onClose, onItemRead, onSent }: BulkAct
   // mount below, same as any other row becoming focused.
   const [readIds, setReadIds] = useState<Set<string>>(new Set([action.items[0]!.id]));
   const [dismissedSummaries, setDismissedSummaries] = useState<Set<string>>(new Set());
+  // Mobile only (see .bulk-action-modal__body in app.css) — the two panes
+  // are full-width, one-screen-at-a-time there instead of side by side, same
+  // toggle Notifications' own Inbox uses. Starts on the list, same reasoning
+  // as that Inbox: landing straight in a detail with no context of what
+  // else is in this bulk action would be disorienting, even though (unlike
+  // that Inbox) an item is already "focused" underneath from the moment
+  // this opens.
+  const [mobileView, setMobileView] = useState<"list" | "detail">("list");
   const showToast = useToast();
   const rowRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
@@ -102,6 +130,7 @@ function BulkActionModalContent({ action, onClose, onItemRead, onSent }: BulkAct
   const allSelected = items.length > 0 && selectedIds.size === items.length;
   const someSelected = selectedIds.size > 0 && !allSelected;
   const focusedItem = items.find((item) => item.id === focusedId)!;
+  const focusedIndex = items.findIndex((item) => item.id === focusedId);
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -119,10 +148,23 @@ function BulkActionModalContent({ action, onClose, onItemRead, onSent }: BulkAct
   /** The first time a customer is focused (click or arrow-key nav), it's marked read locally (for the row's own title weight/color) and reported up so the referring Task can show review progress. */
   function focusItem(id: string) {
     setFocusedId(id);
+    setMobileView("detail");
     if (!readIds.has(id)) {
       setReadIds((prev) => new Set(prev).add(id));
       onItemRead(action.id, id);
     }
+  }
+
+  /** Mobile-only footer affordance (see .bulk-action-footer-review) — on
+      desktop the list is already visible beside the detail, so Up/Down on a
+      row does the same job; on mobile the list is hidden while a detail is
+      open, so this is the only way to move between items without going
+      back to it first. */
+  function goToPrevious() {
+    if (focusedIndex > 0) focusItem(items[focusedIndex - 1]!.id);
+  }
+  function goToNext() {
+    if (focusedIndex !== -1 && focusedIndex < items.length - 1) focusItem(items[focusedIndex + 1]!.id);
   }
 
   function updateReplyDraft(id: string, text: string) {
@@ -170,17 +212,20 @@ function BulkActionModalContent({ action, onClose, onItemRead, onSent }: BulkAct
   }
 
   return (
-    <div className="bulk-action-modal">
+    <div className="bulk-action-modal" data-mobile-view={mobileView}>
       <Header variant="modal" className="bulk-action-modal__header" title={`Send ${selectedIds.size} ${action.noun}`} onClose={onClose} />
       <p className="bulk-action-modal__subtitle">Review each customer and choose who to include, then send.</p>
 
-      <div className="bulk-action-modal__body">
+      <div className="bulk-action-modal__body" data-mobile-view={mobileView}>
         <div className="bulk-action-list-pane">
           <div className="bulk-action-list-pane__toolbar">
-            <Checkbox checked={allSelected} indeterminate={someSelected} onChange={selectAll} aria-label="Select all" />
-            <span className="notifications-toolbar__count">
-              {selectedIds.size} of {items.length} selected
-            </span>
+            <div className="bulk-action-list-pane__toolbar-left">
+              <Checkbox checked={allSelected} indeterminate={someSelected} onChange={selectAll} aria-label="Select all" />
+              <span className="notifications-toolbar__count">
+                {selectedIds.size} of {items.length} selected
+              </span>
+            </div>
+            <Pagination totalPages={1} />
           </div>
           <div className="bulk-action-list-pane__rows">
             {items.map((item, index) => (
@@ -198,6 +243,12 @@ function BulkActionModalContent({ action, onClose, onItemRead, onSent }: BulkAct
                 onCheckChange={() => toggleSelected(item.id)}
                 onFocusRow={() => focusItem(item.id)}
                 onKeyDown={(event) => handleRowKeyDown(event, index, item.id)}
+                meta={
+                  <>
+                    <Timestamp date={item.timestamp} className="list-detail-row__timestamp" />
+                    {item.attachment ? <Paperclip size={14} className="list-detail-row__attachment-icon" aria-hidden /> : null}
+                  </>
+                }
               />
             ))}
           </div>
@@ -205,14 +256,28 @@ function BulkActionModalContent({ action, onClose, onItemRead, onSent }: BulkAct
 
         <div className="bulk-action-detail-pane">
           <div className="notification-detail__header">
-            <div className="notification-detail__titles">
-              <p className="notification-detail__title">{focusedItem.customer}</p>
-              <p className="notification-detail__subtitle">{focusedItem.reference}</p>
+            <div className="notification-detail__heading">
+              {/* Mobile only — the modal's own header X (above) always closes
+                  the whole review; this instead steps back to the list
+                  without leaving the modal, the same job Notifications'
+                  own back link does for its Inbox. Desktop never shows
+                  this — the list is already visible beside this pane. */}
+              <button type="button" className="bulk-action-detail__back" onClick={() => setMobileView("list")} aria-label="Back to list">
+                <ChevronLeft size={16} />
+              </button>
+              <div className="notification-detail__titles">
+                <p className="notification-detail__title">{focusedItem.customer}</p>
+                <p className="notification-detail__subtitle">{focusedItem.reference}</p>
+              </div>
             </div>
+            {/* Desktop only — see .notification-detail__include's own doc
+                comment (app.css). On mobile it moves to the footer instead
+                (see .bulk-action-footer-review), paired with prev/next. */}
             <Toggle
               label="Include in bulk action"
               labelPlacement="left"
               size="md"
+              className="notification-detail__include"
               checked={selectedIds.has(focusedItem.id)}
               onChange={() => toggleSelected(focusedItem.id)}
             />
@@ -275,7 +340,13 @@ function BulkActionModalContent({ action, onClose, onItemRead, onSent }: BulkAct
         </div>
       </div>
 
-      <ModalFooter>
+      {/* Two rows, not one that swaps content by condition — see
+          .bulk-action-footer-bulk/-review in app.css for why both are
+          always rendered and CSS (keyed off .bulk-action-modal's own
+          `data-mobile-view`) picks which shows: desktop always wants the
+          bulk row (Cancel/Send), mobile wants it back in list view and the
+          review row (Include + prev/next) instead while a detail is open. */}
+      <ModalFooter className="bulk-action-footer-bulk">
         <ButtonGroup>
           <Button variant="secondary" onClick={onClose}>
             Cancel
@@ -285,6 +356,35 @@ function BulkActionModalContent({ action, onClose, onItemRead, onSent }: BulkAct
           </Button>
         </ButtonGroup>
       </ModalFooter>
+      <div className="bulk-action-footer-review">
+        <div className="bulk-action-footer-review__include">
+          <Toggle checked={selectedIds.has(focusedItem.id)} onChange={() => toggleSelected(focusedItem.id)} label="Include" />
+          <span className="bulk-action-footer-review__count">({selectedIds.size} selected)</span>
+        </div>
+        <div className="bulk-action-footer-review__nav">
+          <span className="bulk-action-footer-review__position">
+            {focusedIndex + 1} of {items.length}
+          </span>
+          <div className="bulk-action-footer-review__chevrons">
+            <IconButton
+              icon={<ChevronUp size={20} />}
+              aria-label="Previous customer"
+              variant="ghost"
+              size="md"
+              disabled={focusedIndex <= 0}
+              onClick={goToPrevious}
+            />
+            <IconButton
+              icon={<ChevronDown size={20} />}
+              aria-label="Next customer"
+              variant="ghost"
+              size="md"
+              disabled={focusedIndex === -1 || focusedIndex >= items.length - 1}
+              onClick={goToNext}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

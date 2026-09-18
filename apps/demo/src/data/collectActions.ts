@@ -2,7 +2,7 @@ export interface CollectActionThreadMessage {
   id: string;
   author: string;
   text: string;
-  timestamp: string;
+  timestamp: Date;
   attachment?: string;
 }
 
@@ -13,7 +13,7 @@ export interface CollectActionItem {
   /** Short reference shown as the detail's subtitle — an invoice/account number and amount. */
   reference: string;
   description: string;
-  timestamp: string;
+  timestamp: Date;
   attachment?: string;
   thread: CollectActionThreadMessage[];
   replyDraft: string;
@@ -29,7 +29,7 @@ export interface CollectBulkAction {
   items: CollectActionItem[];
 }
 
-const TIMESTAMP = "Sep 11, 2026, 9:15 AM (4 days ago)";
+const TIMESTAMP = new Date(2026, 8, 11, 9, 15);
 
 function overdueItem(id: string, customer: string, invoice: string, amount: string, daysOverdue: number): CollectActionItem {
   return {

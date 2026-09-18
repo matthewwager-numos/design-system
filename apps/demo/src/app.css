@@ -2015,6 +2015,28 @@ a {
   color: var(--content-placeholder);
 }
 
+/* ── Timestamp (shared — see components/Timestamp.tsx) ────────────────── */
+/* Date over time below the desktop breakpoint (each has room to read on its
+   own line), date beside time above it (a row has the width to spare).
+   Typography/color are deliberately not set here — they come from whatever
+   context class a consumer passes in alongside this one, cascading down to
+   both lines, so this stays a pure layout wrapper. Currently only
+   Notifications uses it; written generically since the app-wide date
+   convention it wraps (`formatDate`/`formatTime`) belongs everywhere a date
+   and time show together, not just there. */
+.timestamp {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+@media (min-width: 48rem) {
+  .timestamp {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-1);
+  }
+}
+
 /* ── Notifications app ─────────────────────────────────────────────── */
 /* Uses the shared `.page--fill-height`/`.page--full-width` modifiers (see
    the History timeline section above) directly as its own root, rather than
@@ -2042,6 +2064,36 @@ a {
   padding: 0 var(--space-4);
   flex-shrink: 0;
 }
+/* Mobile only — fixed directly below the app header (same stacking as the
+   header is itself fixed below the nav bar; see .mobile-app-header), not
+   `position: sticky`. Sticky's "stuck" offset is still relative to the
+   nearest *scrolling* ancestor, and which element that actually is here
+   turned out not to be the safe assumption `top: 0` needs — it left a real
+   gap that scrolled content could show through. `position: fixed` has no
+   such ambiguity: it's always the viewport, full stop. Rounded on top only,
+   matching `.notifications-panel-shadow`'s own radius, so it still reads as
+   this card's own top rather than a bar floating separately above it — kept
+   on `--background-secondary` (the page's own background, matching this
+   row's look everywhere else) rather than switching to the panel's
+   `--background-default` just because it's adjacent now.
+   `.notifications-panel-shadow`'s own `padding-top` (below) makes room for
+   this now being out of flow. */
+@media (max-width: 767px) {
+  .notifications-toolbar {
+    position: fixed;
+    /* Matches `.mobile-app-header + .app-body`'s own combined top padding
+       (nav + that same `--space-1` + the app header) exactly — not just nav
+       + header — so this lands flush with where `.notifications-panel-shadow`
+       already naturally starts, with nothing left over as a stray gap. */
+    top: calc(var(--mobile-nav-height) + var(--space-1) + var(--mobile-app-header-height));
+    left: var(--space-1);
+    right: var(--space-1);
+    z-index: 20;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    background: var(--background-secondary);
+  }
+}
 .notifications-toolbar__left {
   display: flex;
   align-items: center;
@@ -2065,6 +2117,25 @@ a {
   min-height: 0;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-l1);
+}
+/* Mobile only — makes room for the now-fixed toolbar above (see
+   .notifications-toolbar) so the list starts exactly where that toolbar
+   ends, not underneath it. `--notifications-toolbar-height` is this
+   toolbar's own real measured height (see InboxTab.tsx) — its padding
+   changes if the count text wraps at a narrow width, and a guessed
+   constant would drift out of sync with that.
+   The `- 2px` is deliberate overlap, not a mistake: the toolbar's own
+   `top` and this padding are computed via two independent `calc()`
+   chains that are algebraically equal but get rounded to actual pixels
+   separately, and browsers don't always round both the same way — a 1px
+   remainder either way was showing up as scrolled content peeking through
+   a hairline seam. Overlapping on purpose means whichever way it rounds,
+   there's still real (matching-background) content covering the seam,
+   not a gap. */
+@media (max-width: 767px) {
+  .notifications-panel-shadow {
+    padding-top: calc(var(--notifications-toolbar-height, 0px) - 2px);
+  }
 }
 
 /* The ONE shared card: the row list and the detail pane are both inside
@@ -2096,6 +2167,23 @@ a {
   display: none;
 }
 
+/* Mobile only — the bulk-action row (Archive/Mark as read/Flag, see
+   .notifications-footer-bulk) is replaced by the review row
+   (.notifications-footer-review) while a detail is open, however many
+   items are checked. Desktop shows both panes at once, so the bulk row's
+   own "N selected" always has visible context; mobile shows only the one
+   item you're looking at, and a bulk action from there risks acting on
+   other, unseen items you've since forgotten are still included.
+   Deliberately a sibling selector reaching from `.notifications-panel`
+   (which also carries this same attribute) rather than nested inside
+   `.notifications-panel__body` — the footer track lives outside that body,
+   spanning both panes. */
+@media (max-width: 767px) {
+  .notifications-panel[data-mobile-view="detail"] .notifications-footer-bulk {
+    display: none;
+  }
+}
+
 @media (min-width: 48rem) {
   .notifications-panel__body {
     flex-direction: row;
@@ -2121,6 +2209,14 @@ a {
      on its own rather than growing the whole page. */
   overflow-y: auto;
   transition: width var(--motion-toggle);
+}
+/* Mobile only — the footer is `position: fixed` there (see
+   .notifications-footer-track), out of flow, so the last row would
+   otherwise end up scrolled underneath it. */
+@media (max-width: 767px) {
+  .notifications-list-pane {
+    padding-bottom: var(--notifications-footer-height, 0px);
+  }
 }
 @media (min-width: 48rem) {
   .notifications-list-pane--split {
@@ -2151,12 +2247,12 @@ a {
   visibility: hidden;
 }
 
-.notifications-back {
-  flex-shrink: 0;
-  margin: var(--space-4) var(--space-4) 0;
-}
-@media (min-width: 48rem) {
-  .notifications-back {
+/* Mobile only — the select-all checkbox/count and pager describe the list,
+   which is off-screen the moment a detail is open there; the header's own
+   chevron-left (see .notification-detail__close-icon--mobile) is this
+   view's own way back to it instead. */
+@media (max-width: 767px) {
+  .notifications-page[data-mobile-view="detail"] .notifications-toolbar {
     display: none;
   }
 }
@@ -2165,19 +2261,115 @@ a {
    and shut again once nothing is, independent of whether a detail happens
    to be open. Same grid `fr`-unit height animation `<Accordion>`'s own
    panel uses (see Accordion.css) rather than a hardcoded height, so it
-   still fits the footer's real content at any viewport width. */
+   still fits the footer's real content at any viewport width — this still
+   applies once the rule below takes it out of flow on mobile, since
+   `display: grid` there governs this element's own height, independent of
+   how the element itself is positioned in the page. */
 .notifications-footer-track {
   flex-shrink: 0;
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows var(--motion-toggle);
 }
+/* Mobile only — fixed to the bottom of the viewport rather than scrolling
+   away with the panel's own content, the same reasoning as the mobile nav
+   bar/app header being fixed to the top (see .app-shell__mobile-nav/
+   .mobile-app-header). Inset by the same `--space-1` `.app-body` already
+   pads the whole page by, so it still reads as this card's own bottom edge
+   rather than breaking out to a wider, edge-to-edge bar the rest of the
+   card doesn't share. The scrollable panes behind it (`.notifications-list-pane`/
+   `.notification-detail__body`) get real bottom padding to match — see
+   `--notifications-footer-height` in InboxTab.tsx. */
+@media (max-width: 767px) {
+  .notifications-footer-track {
+    position: fixed;
+    left: var(--space-1);
+    right: var(--space-1);
+    bottom: var(--space-1);
+    z-index: 20;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--background-default);
+    box-shadow: var(--shadow-l1);
+  }
+}
 .notifications-footer-track--open {
   grid-template-rows: 1fr;
+}
+/* Mobile only (see InboxTab.tsx) — opens the track just from focusing an
+   item, so the review row (.notifications-footer-review) it reveals there
+   stays reachable without also selecting something first. Left out of the
+   unconditional `--open` rule above so desktop, which shows nothing new on
+   focus (Select lives in the header there), never pops this open as a
+   side effect of merely looking at an item. */
+@media (max-width: 767px) {
+  .notifications-footer-track--preview-open {
+    grid-template-rows: 1fr;
+  }
 }
 .notifications-footer-track__inner {
   min-height: 0;
   overflow: hidden;
+}
+
+/* Archive/Mark as read/Flag — icon-only (each wrapped in its own <Tooltip>
+   for the visible label), matching a real email client's own bulk toolbar
+   rather than text buttons the way the old single "Send N replies" action
+   read. */
+.notifications-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Two rows share the track: the bulk row (Archive/Mark as read/Flag)
+   desktop always shows and mobile shows back in list view, and the review
+   row (Select + prev/next) mobile only shows instead while a detail is
+   open — see the media queries on each below and the one hiding
+   .notifications-footer-bulk above. */
+.notifications-footer-review {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+@media (min-width: 48rem) {
+  .notifications-footer-review {
+    display: none;
+  }
+}
+.notifications-footer-review__include {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.notifications-footer-review__count {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+.notifications-footer-review__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+.notifications-footer-review__position {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+/* Side by side, not stacked — a fixed mobile footer (see
+   .notifications-footer-track below) is real screen real estate on every
+   scroll position, so keeping this row as short as possible matters more
+   here than it would in a one-off panel. */
+.notifications-footer-review__chevrons {
+  display: flex;
+  gap: var(--space-1);
 }
 
 /* A real <button> (whole row opens/previews the notification) with a
@@ -2293,6 +2485,12 @@ a {
   flex-shrink: 0;
   color: var(--content-subtle);
 }
+/* Deliberately not --content-subtle like its meta siblings — a flag is
+   meant to stand out at a glance, not read as more incidental metadata. */
+.list-detail-row__flag-icon {
+  flex-shrink: 0;
+  color: var(--content-notice);
+}
 
 /* ── Notification detail (AI summary + thread + reply) ────────────────── */
 
@@ -2327,6 +2525,33 @@ a {
   background: var(--background-hover);
   color: var(--content-base);
 }
+/* Chevron-left (mobile, "back to the list") / X (desktop, "close the
+   detail") — same button, same handler (`clearFocus`), just the icon
+   convention each platform expects for leaving this view. */
+.notification-detail__close-icon--desktop {
+  display: none;
+}
+@media (min-width: 48rem) {
+  .notification-detail__close-icon--mobile {
+    display: none;
+  }
+  .notification-detail__close-icon--desktop {
+    display: block;
+  }
+}
+
+/* Desktop only — see .notification-detail__include's own doc comment in
+   InboxTab.tsx for why. Mobile's equivalent is
+   .notifications-footer-review__include, in the footer instead. */
+.notification-detail__include {
+  display: none;
+}
+@media (min-width: 48rem) {
+  .notification-detail__include {
+    display: inline-flex;
+  }
+}
+
 .notification-detail__titles {
   min-width: 0;
 }
@@ -2352,11 +2577,19 @@ a {
   flex: 1;
   min-height: 0;
   gap: var(--space-4);
-  /* No bottom inset — content scrolls flush to the pane's own bottom edge,
-     same as `.notifications-list-pane`'s rows do, rather than stopping
-     short with a dead gap before the footer. */
+  /* No bottom inset at desktop — content scrolls flush to the pane's own
+     bottom edge, same as `.notifications-list-pane`'s rows do, rather than
+     stopping short with a dead gap before the (in-flow, there) footer.
+     Mobile does need one: the footer is `position: fixed` below this
+     breakpoint (see .notifications-footer-track), out of flow, so without
+     it the last line of a reply would end up scrolled underneath it. */
   padding: var(--space-4) var(--space-4) 0;
   overflow-y: auto;
+}
+@media (max-width: 767px) {
+  .notification-detail__body {
+    padding-bottom: var(--notifications-footer-height, 0px);
+  }
 }
 
 /* ── Conversation thread — previous messages collapsed into an <Accordion>,
@@ -2464,6 +2697,15 @@ a {
 .notification-reply__textarea .ds-textarea__control {
   min-height: 10rem;
 }
+/* Overrides `.notification-reply`'s own `align-items: flex-start` (there
+   for `<FileUpload>`'s sake, see that rule's doc comment) — this one
+   genuinely does want the column's full width, to right-align Send the way
+   a real compose box's own send button sits. */
+.notification-reply__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-self: stretch;
+}
 
 .notification-attachment {
   display: flex;
@@ -2516,28 +2758,65 @@ a {
   color: var(--content-subtle);
 }
 
+/* Mobile-first: one full-width pane at a time (see `data-mobile-view`,
+   set from `mobileView` state in BulkActionModal.tsx — same toggle
+   Notifications' own Inbox uses for the same reason). Side by side at the
+   desktop breakpoint instead, where `data-mobile-view` stops mattering. */
 .bulk-action-modal__body {
   display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
+}
+.bulk-action-modal__body[data-mobile-view="list"] .bulk-action-detail-pane {
+  display: none;
+}
+.bulk-action-modal__body[data-mobile-view="detail"] .bulk-action-list-pane {
+  display: none;
+}
+@media (min-width: 48rem) {
+  .bulk-action-modal__body {
+    flex-direction: row;
+  }
+  .bulk-action-modal__body[data-mobile-view] .bulk-action-list-pane,
+  .bulk-action-modal__body[data-mobile-view] .bulk-action-detail-pane {
+    display: flex;
+  }
 }
 
 .bulk-action-list-pane {
   display: flex;
   flex-direction: column;
-  width: 20rem;
-  flex-shrink: 0;
-  border-right: 1px solid var(--border-subtle);
+  width: 100%;
+  /* Fills the body's own height on mobile (only one pane shows at a time,
+     so it needs real height to scroll its own rows within, not just its
+     natural content height) — a fixed side column at desktop instead,
+     sized to content height beside the detail pane. */
+  flex: 1;
+  min-height: 0;
   background: var(--background-secondary);
+}
+@media (min-width: 48rem) {
+  .bulk-action-list-pane {
+    width: 20rem;
+    flex: 0 0 auto;
+    border-right: 1px solid var(--border-subtle);
+  }
 }
 /* Pinned — doesn't scroll away with the rows below it. */
 .bulk-action-list-pane__toolbar {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  justify-content: space-between;
+  gap: var(--space-3);
   flex-shrink: 0;
   padding: var(--space-4);
   border-bottom: 1px solid var(--border-subtle);
+}
+.bulk-action-list-pane__toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 .bulk-action-list-pane__rows {
   flex: 1;
@@ -2550,5 +2829,82 @@ a {
   flex-direction: column;
   flex: 1;
   min-width: 0;
+  min-height: 0;
   overflow: hidden;
+}
+/* Mobile only — the modal's own header X always closes the whole review
+   (see BulkActionModal.tsx); this is a second, separate way out that only
+   leaves the detail, back to the list, still inside the modal. Desktop
+   never shows it — the list is already visible beside this pane there. */
+.bulk-action-detail__back {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-2);
+  color: var(--content-subtle);
+  cursor: pointer;
+}
+.bulk-action-detail__back:hover {
+  background: var(--background-hover);
+  color: var(--content-base);
+}
+@media (min-width: 48rem) {
+  .bulk-action-detail__back {
+    display: none;
+  }
+}
+
+/* Two rows, not a single one that swaps content — see the doc comment in
+   BulkActionModal.tsx for why both are always rendered. Desktop always
+   wants the bulk row (Cancel/Send); mobile wants it back in list view and
+   the review row (Include + prev/next) instead while a detail is open —
+   same split Notifications' own footer uses, just without that one's
+   open/close height animation, since this modal's footer is always
+   visible regardless of selection. */
+.bulk-action-footer-review {
+  display: none;
+}
+@media (max-width: 767px) {
+  .bulk-action-modal[data-mobile-view="detail"] .bulk-action-footer-bulk {
+    display: none;
+  }
+  .bulk-action-modal[data-mobile-view="detail"] .bulk-action-footer-review {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+  }
+}
+.bulk-action-footer-review__include {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.bulk-action-footer-review__count {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+.bulk-action-footer-review__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+.bulk-action-footer-review__position {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+.bulk-action-footer-review__chevrons {
+  display: flex;
+  gap: var(--space-1);
 }
