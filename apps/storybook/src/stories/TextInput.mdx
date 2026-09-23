@@ -50,6 +50,16 @@ import { Mail } from "lucide-react";
 <TextInput label="Email" leadingIcon={<Mail size={16} />} />
 ```
 
+### With a prefix and/or suffix
+
+```tsx
+<TextInput label="Amount" prefix="$" suffix="USD" defaultValue="15.00" />
+```
+
+Fixed text inside the field, immediately before/after the value — e.g. a currency symbol or unit. Not shown by default. Unlike `leadingIcon`/`trailingIcon`, a `prefix`/`suffix` is real content, not `aria-hidden` decoration, so a screen reader reads it as part of the field. It always renders in `content-subtle`, at the same font size as the value itself — including through focus, since (confirmed against Figma) it doesn't pick up the brand tint the way an icon does.
+
+Available on every component in this family that mirrors `<TextInput>`'s Field anatomy: `<Textarea>`, `<SearchInput>`, `<RichTextEditor>`.
+
 ## A note on state
 
 Figma's Hover/Focus/Filled/Disabled variants aren't separate props on this component — they're real `:hover`, `:focus-within`, `::placeholder` (vs. the input's own typed value), and native `disabled` behavior. A browser already knows when a field is hovered, focused, or has a value; encoding that as extra props would just be a second, driftable source of truth. Only `status` (default/error/success) is a real prop, since that's actual application state — validity — that nothing in the DOM can infer on its own.
@@ -59,6 +69,7 @@ Figma's Hover/Focus/Filled/Disabled variants aren't separate props on this compo
 <Canvas of={TextInputStories.Default} />
 <Canvas of={TextInputStories.WithHelpText} />
 <Canvas of={TextInputStories.WithIcon} />
+<Canvas of={TextInputStories.WithPrefixAndSuffix} />
 <Canvas of={TextInputStories.Error} />
 <Canvas of={TextInputStories.Success} />
 <Canvas of={TextInputStories.Disabled} />

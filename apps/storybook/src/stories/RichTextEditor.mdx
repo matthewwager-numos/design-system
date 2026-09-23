@@ -1,0 +1,98 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as RichTextEditorStories from "./RichTextEditor.stories";
+
+<Meta of={RichTextEditorStories} />
+
+# RichTextEditor
+
+A labeled field for formatted, multi-line text — `<TextInput>`/`<Textarea>`'s structure and token scale, unchanged, with a real `contentEditable` area and an embedded formatting toolbar in place of a plain `<textarea>`. Matches Figma's "Input / RichTextEditor" component (S/M/L) directly.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Content that benefits from real inline formatting — bold/italic emphasis, lists, a quoted line — not just plain multi-line text (use `<Textarea>` for that).
+- A composer-style field where formatting controls live inside the input itself, rather than in a separate toolbar above or below it.
+
+## When NOT to use
+
+- Plain multi-line text with no formatting need — use `<Textarea>`, it's lighter weight.
+- A single line of text — use `<TextInput>`.
+
+## Implementation
+
+```tsx
+import { RichTextEditor } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<RichTextEditor label="Description" placeholder="What's this update about?" />
+```
+
+Figma's Hover/Focus/Filled/Disabled "states" aren't separate props — they're real `:hover`, `:focus-within`, and a `disabled` prop, same as `<TextInput>`/`<Textarea>`. Only validation state (`status`) is a prop.
+
+<Canvas of={RichTextEditorStories.Default} />
+
+Content is real HTML — `defaultValue` for uncontrolled use, or `value`/`onChange` (both carrying the editor's `innerHTML`) for controlled use. `value` only syncs back into the DOM while the editor isn't focused, so a controlled consumer re-rendering mid-keystroke can't fight the caret.
+
+<Canvas of={RichTextEditorStories.WithContent} />
+
+## Sizes
+
+`size`: `"sm" | "md" | "lg"` (defaults to `"lg"`) — the same three steps as `<TextInput>`/`<Textarea>`, same padding/radius/type tokens at each step. The toolbar's own icons stay 16px at every size — only the field around them scales.
+
+<Canvas of={RichTextEditorStories.Sizes} />
+
+## Icons
+
+`leadingIcon`/`trailingIcon`, same as `<TextInput>`/`<Textarea>` — an optional icon alongside the text content, above the toolbar.
+
+<Canvas of={RichTextEditorStories.WithIcons} />
+
+## Prefix and suffix
+
+Fixed text inside the field, immediately before/after the value — e.g. a currency symbol or unit — via `prefix`/`suffix`. Not shown by default; unlike `leadingIcon`/`trailingIcon`, it's real content (not `aria-hidden`), always rendered in `content-subtle` at the value's own font size. Same prop, same reasoning, as `<TextInput>` — see its own docs for the full write-up.
+
+<Canvas of={RichTextEditorStories.WithPrefixAndSuffix} />
+
+## Validation
+
+`status`: `"default" | "error" | "success"`, same as `<TextInput>`/`<Textarea>` — also styles `helpText` and adds its icon.
+
+<Canvas of={RichTextEditorStories.ErrorState} />
+<Canvas of={RichTextEditorStories.SuccessState} />
+
+## Disabled
+
+<Canvas of={RichTextEditorStories.Disabled} />
+
+## The toolbar
+
+Built on `document.execCommand` — deprecated, but still universally supported for exactly this kind of inline formatting, and consistent with this library's own practice of hand-building interactive behavior (`<Modal>`, `<DropdownMenu>`, `<Tabs>`) rather than reaching for a rich-text dependency.
+
+- **Undo / Redo** — the browser's own `contentEditable` history.
+- **Font family / Font size** — dropdowns (Sans Serif/Serif/Monospace; 12–32px). Selecting an option applies it to the current selection, or to whatever's typed next if nothing's selected.
+- **Bold / Italic / Underline** — toggle, and reflect the formatting under the cursor as you move through the text (pressed state via `document.queryCommandState`).
+- **Emoji** — inserts at the cursor.
+- **Bulleted list / Numbered list / Quote** — the same toggle behavior as Bold/Italic/Underline.
+- **More** — Strikethrough and Clear formatting.
+
+Every toolbar action first restores the selection that was active when its dropdown opened (or never gives up focus at all, for direct buttons — see below) — opening a portaled menu would otherwise steal focus and lose the user's selection before they even pick an option.
+
+The icon-to-action mapping above is inferred from Figma's screenshot and layer names, not confirmed icon-by-icon against the source file — flag anything that reads wrong against the actual design intent.
+
+## A future basis for prompt input
+
+This component was built with an eye toward also becoming the basis for a "prompt input" — a chat composer with its own send/attach controls living inside the same bordered field, the way this toolbar already does. The shape (`Field` wraps `content + embedded control row`) is already exactly that pattern; a prompt input would mean swapping what's inside the control row, not restructuring the field itself.
+
+## Accessibility
+
+- `label` renders as a `<span>` (not a real `<label>`) associated via `aria-labelledby` — a `contentEditable` `<div>` isn't a labelable element the way an `<input>`/`<textarea>` is, so `htmlFor` wouldn't reliably reach it. Pass `aria-label` instead when there's no visible `label`.
+- The editable area is `role="textbox"` with `aria-multiline="true"`.
+- `status="error"` sets `aria-invalid`.
+- Every toolbar button is a real `<button>` with its own `aria-label` and, where relevant, `aria-pressed`.
+
+## Props
+
+`label`, `aria-label`, `helpText`, `status`, `size`, `leadingIcon`, `trailingIcon`, `prefix`, `suffix`, `placeholder`, `value`, `defaultValue`, `onChange`, `disabled`, `id`, `className`.

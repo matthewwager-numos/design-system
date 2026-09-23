@@ -2,17 +2,18 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { AppIcon } from "@numosai/ui";
 
 const APPS = [
-  "tasks",
+  "collect",
+  "pay",
   "accruals",
-  "chat",
-  "reconciliations",
-  "variance",
-  "assistant",
-  "help-desk",
-  "transactions",
-  "reports",
-  "workflows",
+  "reconcile",
+  "close",
+  "analyze",
+  "forecast",
+  "communicate",
+  "team",
+  "notifications",
   "settings",
+  "assistant",
 ] as const;
 
 const meta: Meta<typeof AppIcon> = {
@@ -25,9 +26,14 @@ const meta: Meta<typeof AppIcon> = {
       control: "select",
       options: APPS,
     },
+    size: {
+      control: "select",
+      options: ["sm", "md", "lg"],
+    },
   },
   args: {
-    app: "tasks",
+    app: "collect",
+    size: "md",
   },
 };
 
@@ -37,12 +43,25 @@ type Story = StoryObj<typeof AppIcon>;
 export const Default: Story = {};
 
 export const AllApps: Story = {
-  render: () => (
+  render: (args) => (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "var(--space-3)" }}>
       {APPS.map((app) => (
         <div key={app} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--space-1)" }}>
-          <AppIcon app={app} />
+          <AppIcon app={app} size={args.size} />
           <span style={{ fontSize: "var(--text-xs)", color: "var(--content-subtle)" }}>{app}</span>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const Sizes: Story = {
+  render: (args) => (
+    <div style={{ display: "flex", alignItems: "flex-end", gap: "var(--space-5)" }}>
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <div key={size} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--space-1)" }}>
+          <AppIcon app={args.app} size={size} />
+          <span style={{ fontSize: "var(--text-xs)", color: "var(--content-subtle)" }}>{size}</span>
         </div>
       ))}
     </div>

@@ -5,7 +5,7 @@ import * as AppIconStories from "./AppIcon.stories";
 
 # AppIcon
 
-A branded 40×40 tile representing one of the product's apps. Use it in an app switcher, nav rail, or anywhere you need a recognizable glyph for a specific app rather than a generic icon.
+A branded tile representing one of this product's own apps. Use it in an app switcher, nav rail, or anywhere you need a recognizable glyph for a specific app rather than a generic icon.
 
 <Primary />
 
@@ -14,7 +14,7 @@ A branded 40×40 tile representing one of the product's apps. Use it in an app s
 ## When to use
 
 - App switchers, launchers, and nav rails where each app needs a distinct, recognizable glyph.
-- Anywhere the design explicitly calls for one of the 11 named apps (`tasks`, `accruals`, `chat`, `reconciliations`, `variance`, `assistant`, `help-desk`, `transactions`, `reports`, `workflows`, `settings`).
+- Anywhere the design explicitly calls for one of the 12 named apps (`collect`, `pay`, `accruals`, `reconcile`, `close`, `analyze`, `forecast`, `communicate`, `team`, `notifications`, `settings`, `assistant`) — matches this demo's own `PageId` 1:1 (minus `"home"`, which has no tile of its own), plus `assistant` for the cross-cutting AI entry point.
 
 ## When NOT to use
 
@@ -26,16 +26,30 @@ A branded 40×40 tile representing one of the product's apps. Use it in an app s
 import { AppIcon } from "@numosai/ui";
 import "@numosai/ui/styles.css"; // once, at your app entry
 
-<AppIcon app="tasks" />
+<AppIcon app="collect" />
 ```
+
+Each glyph is a real `lucide-react` icon, not a traced Figma path — `collect` is `<Inbox>`, `pay` is `<BanknoteArrowUp>`, and so on, one per app. Background and glyph color are both tokens (`--app-icon-fill`/`--app-icon-stroke`), which swap places between light and dark mode rather than each independently picking a per-theme value — see their own comment in `tokens.css` for why.
 
 ## All apps
 
 <Canvas of={AppIconStories.AllApps} />
 
+## Sizes
+
+`size`: `"sm" | "md" | "lg"` (defaults to `"md"`) — matches Figma's own S/M/L exactly:
+
+- `sm` — 24px tile, 16px icon, 4px radius. Used by `<MobileAppHeader>`'s own icon.
+- `md` — 40px tile, 24px icon, 8px radius. The default, general-purpose size.
+- `lg` — 64px tile, 48px icon, 16px radius.
+
+<Canvas of={AppIconStories.Sizes} />
+
+`lg`'s icon renders at a slightly lighter stroke weight (1.25 instead of Lucide's default 2) — at 2x a normal 24px icon, the default weight would come out twice as heavy on screen as every other icon in this app.
+
 ## Accessibility
 
-- Renders a `<span>` wrapping a decorative `<svg aria-hidden>` — it carries no accessible name on its own. If the app name needs to be announced (e.g. in a switcher button), provide it via `aria-label` on the interactive element that wraps the icon.
+- Renders a `<span>` wrapping a decorative, `aria-hidden` icon — it carries no accessible name on its own. If the app name needs to be announced (e.g. in a switcher button), provide it via `aria-label` on the interactive element that wraps the icon.
 
 ## Props
 

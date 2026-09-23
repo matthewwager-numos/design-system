@@ -148,8 +148,8 @@ a {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: var(--radius-md);
-  background: var(--button-primary-default);
-  color: var(--green-700);
+  background: var(--app-icon-fill);
+  color: var(--app-icon-stroke);
 }
 
 /* MobileAppHeader's confirmed icon scale (24px, radius-sm) — same tile,
@@ -162,25 +162,6 @@ a {
 .app-icon-tile--sm svg {
   width: 1rem;
   height: 1rem;
-}
-
-/* HomePage's own flow-diagram tiles — same tile the Home nav uses at 24px/
-   16px, just bigger (2x the base 24px icon scale — a plain size prop on
-   the icon itself, same as every other size in this app; icon sizing was
-   never tokenized here, so this doesn't need to be either), per the Home
-   flow diagram's own larger scale. `position:relative`/`overflow:hidden`
-   crop the hover-only `GrainCorner` ornament (see `.home-flow__tile-icon`)
-   to the tile's own rounded bounds. */
-.app-icon-tile--lg {
-  position: relative;
-  width: 4.5rem;
-  height: 4.5rem;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-}
-.app-icon-tile--lg svg {
-  width: 3rem;
-  height: 3rem;
 }
 
 .app-body {
@@ -1918,57 +1899,30 @@ a {
   color: var(--content-base);
 }
 
-/* Hover-only accents on each tile's own icon — a thin gradient ring that
-   rotates continuously around the tile's own perimeter for a "shimmer"
-   effect, plus `<GrainCorner>` (the same grain+gradient ornament
-   `<DisplayMetric>` uses, reused as-is) fading in, rather than
-   `<DisplayMetric>`'s own mount-triggered fade. */
-@property --home-flow-shimmer-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
+/* Wraps the real `<AppIcon size="lg">` (see HomePage.tsx) plus Close's own
+   trial corner badge — sized to match AppIcon's own 4rem exactly.
+   `position:relative` anchors both the badge (`.home-flow__tile-badge`)
+   and the crop wrapper below; it deliberately doesn't crop itself, so the
+   badge can sit outside that crop instead of being clipped by it. */
+.home-flow__tile-icon {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  @keyframes home-flow-shimmer-spin {
-    to {
-      --home-flow-shimmer-angle: 360deg;
-    }
-  }
-}
-
-/* A rotating ring drawn via the standard "gradient border" trick: a
-   pseudo-element the same size and radius as the tile, `padding` reserves
-   the ring's own thickness, and `mask-composite: exclude` punches out
-   everything except that padding band — so only a thin band right at the
-   tile's edge is ever painted, not a solid fill. `content: ""` plus
-   `pointer-events: none` keep it purely decorative. */
-.home-flow__tile-icon::before {
-  content: "";
+/* The actual rounded, clipped tile — separate from `.home-flow__tile-icon`
+   itself so `<GrainCorner>`'s hover-in accent crops to the tile's rounded
+   bounds without also clipping the corner badge sitting outside it. */
+.home-flow__tile-icon-crop {
   position: absolute;
   inset: 0;
-  padding: 2px;
-  border-radius: inherit;
-  background: conic-gradient(
-    from var(--home-flow-shimmer-angle),
-    transparent 0deg,
-    var(--green-1100) 30deg,
-    transparent 70deg,
-    transparent 360deg
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity var(--motion-toggle);
-  pointer-events: none;
-}
-.home-flow__tile-icon:hover::before {
-  opacity: 1;
-  animation: home-flow-shimmer-spin 1.6s linear infinite;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
 }
 
+/* `<GrainCorner>` (the same grain+gradient ornament `<DisplayMetric>`
+   uses, reused as-is) fading in on hover, rather than `<DisplayMetric>`'s
+   own mount-triggered fade. */
 .home-flow__tile-ornament {
   position: absolute;
   right: -8px;
@@ -1980,6 +1934,15 @@ a {
 }
 .home-flow__tile-icon:hover .home-flow__tile-ornament {
   opacity: 1;
+}
+
+/* Close's own trial badge (see HomePage.tsx) — sits right at the tile's
+   corner, outside `.home-flow__tile-icon-crop` so it isn't clipped by the
+   tile's own rounded overflow. */
+.home-flow__tile-badge {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
 }
 
 .home-flow__connector {
@@ -2310,16 +2273,6 @@ a {
 .notifications-footer-track__inner {
   min-height: 0;
   overflow: hidden;
-}
-
-/* Archive/Mark as read/Flag — icon-only (each wrapped in its own <Tooltip>
-   for the visible label), matching a real email client's own bulk toolbar
-   rather than text buttons the way the old single "Send N replies" action
-   read. */
-.notifications-footer-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
 }
 
 /* Two rows share the track: the bulk row (Archive/Mark as read/Flag)

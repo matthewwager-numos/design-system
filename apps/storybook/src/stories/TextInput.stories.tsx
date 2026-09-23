@@ -55,6 +55,11 @@ export const WithIcon: Story = {
   args: { label: "Email", placeholder: "you@example.com", leadingIcon: "mail" },
 };
 
+export const WithPrefixAndSuffix: Story = {
+  name: "With prefix and suffix",
+  args: { label: "Amount", prefix: "$", suffix: "USD", defaultValue: "15.00" },
+};
+
 export const Error: Story = {
   args: { status: "error", helpText: "This field is required." },
 };

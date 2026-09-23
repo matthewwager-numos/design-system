@@ -47,6 +47,12 @@ Omit `options` (or pass `[]`) for a plain search box with no dropdown at all:
 
 <Canvas of={SearchInputStories.NoDropdown} />
 
+## Prefix and suffix
+
+Fixed text inside the field, immediately before/after the value — e.g. a currency symbol or unit — via `prefix`/`suffix`. Not shown by default; unlike the field's icons, it's real content (not `aria-hidden`), always rendered in `content-subtle` at the value's own font size. Shared across every component that mirrors `<TextInput>`'s Field anatomy — see its own docs for the full reasoning.
+
+<Canvas of={SearchInputStories.WithPrefixAndSuffix} />
+
 ## Clearing
 
 A trailing "×" button appears — filling Figma's own (otherwise-unused) trailing-icon slot — whenever the field is filled or focused, clearing the text (and refocusing the input) on click. Not shown while empty and unfocused, so an idle search box stays visually simple.
@@ -84,4 +90,4 @@ Deliberately not built on `<DropdownMenu>` (which `<Select>` uses) — `<Dropdow
 
 ## Props
 
-`options`, `value`/`defaultValue`/`onChange`, `onSelect`, `filter`, `label`, `placeholder`, `helpText`, `status`, `size` (`"sm" | "md" | "lg"`, default `"lg"`), `disabled`, `name`, `className`, plus any other native `<input>` attribute.
+`options`, `value`/`defaultValue`/`onChange`, `onSelect`, `filter`, `label`, `placeholder`, `helpText`, `status`, `size` (`"sm" | "md" | "lg"`, default `"lg"`), `disabled`, `prefix`, `suffix`, `name`, `className`, plus any other native `<input>` attribute.

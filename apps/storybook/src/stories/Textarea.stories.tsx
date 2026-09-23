@@ -37,6 +37,11 @@ export const Sizes: Story = {
   ),
 };
 
+export const WithPrefixAndSuffix: Story = {
+  name: "With prefix and suffix",
+  args: { label: "Ticket", prefix: "#", defaultValue: "4471", placeholder: undefined },
+};
+
 export const ErrorState: Story = {
   name: "Error",
   args: { status: "error", helpText: "Description is required", defaultValue: "" },

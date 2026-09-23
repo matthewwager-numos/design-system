@@ -16,8 +16,11 @@ export interface SearchInputOption {
   leadingIcon?: ReactNode;
 }
 
+// "prefix" is omitted because `HTMLAttributes` already declares it as the
+// (obscure, unrelated) RDFa `prefix` attribute typed `string` — this
+// component's own `prefix` is a `ReactNode` render slot, not that.
 export interface SearchInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "value" | "defaultValue" | "onChange" | "onSelect"> {
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "value" | "defaultValue" | "onChange" | "onSelect" | "prefix"> {
   /** The full list of suggestions. Omit (or pass `[]`) for a plain search box with no dropdown at all. */
   options?: SearchInputOption[];
   /** Controlled text value. Omit to let SearchInput manage its own. */
@@ -37,6 +40,15 @@ export interface SearchInputProps
   helpText?: ReactNode;
   status?: SearchInputStatus;
   size?: SearchInputSize;
+  /**
+   * Fixed text rendered immediately before the value, after the permanent
+   * search icon — e.g. a currency symbol. Unlike the search icon, this is
+   * real content (not `aria-hidden`), so a screen reader reads it as part
+   * of the field. Not shown by default.
+   */
+  prefix?: ReactNode;
+  /** Fixed text rendered immediately after the value, before the clear button. Same real-content reasoning as `prefix`. */
+  suffix?: ReactNode;
 }
 
 const defaultFilter = (option: SearchInputOption, query: string) => option.label.toLowerCase().includes(query.trim().toLowerCase());
@@ -82,6 +94,8 @@ export function SearchInput({
   status = "default",
   size = "lg",
   disabled = false,
+  prefix,
+  suffix,
   id,
   className,
   onFocus,
@@ -213,6 +227,7 @@ export function SearchInput({
           <span className="ds-search-input__icon" aria-hidden>
             <Search />
           </span>
+          {prefix ? <span className="ds-search-input__affix">{prefix}</span> : null}
           <input
             ref={inputRef}
             id={inputId}
@@ -237,6 +252,7 @@ export function SearchInput({
             autoComplete="off"
             {...rest}
           />
+          {suffix ? <span className="ds-search-input__affix">{suffix}</span> : null}
           {showClear ? (
             <button
               type="button"

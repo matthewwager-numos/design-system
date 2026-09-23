@@ -3,6 +3,8 @@ import type { MouseEvent, ReactNode } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { clsx } from "clsx";
 import { Tooltip } from "../Tooltip";
+import { Badge } from "../Badge";
+import type { BadgeStatus } from "../Badge";
 import { useNavigationContext } from "./NavigationContext";
 
 export interface NavSubItem {
@@ -29,6 +31,22 @@ export interface NavItemProps {
    */
   items?: NavSubItem[];
   defaultOpen?: boolean;
+  /**
+   * A count/status indicator — matches Figma's own Badge-on-Nav-Item
+   * update: a full `<Badge size="lg">` (with `badge` as its content) after
+   * the label while expanded, or a plain `size="sm"` dot in the icon's own
+   * corner while collapsed, rather than disappearing entirely. Omit for no
+   * badge at all.
+   */
+  badge?: ReactNode;
+  /**
+   * Badge color. Defaults to `"negative"`, matching Figma's own example —
+   * override per item, since what a badge means varies by item (e.g. a
+   * days-until-due badge might step from `"info"` to `"notice"` to
+   * `"negative"` as the deadline actually gets closer, not stay one fixed
+   * color).
+   */
+  badgeStatus?: BadgeStatus;
   className?: string;
 }
 
@@ -38,10 +56,23 @@ export interface NavItemProps {
  * is given, otherwise a `<button>`. While `<Navigation>` is collapsed, the
  * label moves into a `<Tooltip placement="right">` instead of disappearing.
  */
-export function NavItem({ icon, children, href, selected = false, disabled = false, onClick, items, defaultOpen = false, className }: NavItemProps) {
+export function NavItem({
+  icon,
+  children,
+  href,
+  selected = false,
+  disabled = false,
+  onClick,
+  items,
+  defaultOpen = false,
+  badge,
+  badgeStatus = "negative",
+  className,
+}: NavItemProps) {
   const { expanded } = useNavigationContext("NavItem");
   const [open, setOpen] = useState(defaultOpen);
   const subItems = expanded ? items : undefined;
+  const hasBadge = badge !== undefined;
 
   function handleClick(event: MouseEvent) {
     if (disabled) {
@@ -55,8 +86,18 @@ export function NavItem({ icon, children, href, selected = false, disabled = fal
     <>
       <span className="ds-nav-item__icon" aria-hidden>
         {icon}
+        {hasBadge && !expanded ? <Badge status={badgeStatus} size="sm" className="ds-nav-item__badge-dot" /> : null}
       </span>
-      {expanded && <span className="ds-nav-item__label">{children}</span>}
+      {expanded && (
+        <>
+          <span className="ds-nav-item__label">{children}</span>
+          {hasBadge ? (
+            <Badge status={badgeStatus} size="lg">
+              {badge}
+            </Badge>
+          ) : null}
+        </>
+      )}
     </>
   );
 

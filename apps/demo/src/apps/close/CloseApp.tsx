@@ -1,4 +1,4 @@
-import { CheckSquare } from "lucide-react";
+import { CalendarCheck } from "lucide-react";
 import { Header, MobileAppHeader, Tab, TabList, Tabs, useMeasuredHeightVar } from "@numosai/ui";
 import { TasksProvider } from "../../data/useTasks";
 import { OverviewTab } from "./OverviewTab";
@@ -43,7 +43,7 @@ function CloseAppContent({ tab, onTabChange }: CloseAppProps) {
           variant="app"
           icon={
             <span className="app-icon-tile">
-              <CheckSquare size={24} />
+              <CalendarCheck size={24} />
             </span>
           }
           title="Close"
@@ -65,7 +65,7 @@ function CloseAppContent({ tab, onTabChange }: CloseAppProps) {
         <MobileAppHeader
           icon={
             <span className="app-icon-tile app-icon-tile--sm">
-              <CheckSquare size={16} />
+              <CalendarCheck size={16} />
             </span>
           }
           title="Close"

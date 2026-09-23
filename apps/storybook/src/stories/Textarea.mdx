@@ -38,6 +38,12 @@ Figma's Hover/Focus/Filled/Disabled "states" aren't separate props — they're r
 
 <Canvas of={TextareaStories.Sizes} />
 
+## Prefix and suffix
+
+Fixed text rendered immediately before/after the value — e.g. `#` before a ticket number — via `prefix`/`suffix`. Not shown by default; unlike `leadingIcon`/`trailingIcon`, it's real content (not `aria-hidden`), always rendered in `content-subtle` at the value's own font size. Same prop, same reasoning, as `<TextInput>` — see its own docs for the full write-up.
+
+<Canvas of={TextareaStories.WithPrefixAndSuffix} />
+
 ## Validation
 
 `status`: `"default" | "error" | "success"`, same as `<TextInput>` — also styles `helpText` and adds its icon.

@@ -89,7 +89,7 @@ export const Collapsed: Story = {
           <NavItem icon={<CreditCard size={24} />} href="#reconciliations">
             Reconciliations
           </NavItem>
-          <NavItem icon={<Receipt size={24} />} href="#accruals" selected>
+          <NavItem icon={<Receipt size={24} />} href="#accruals" selected badge="1d">
             Accruals
           </NavItem>
         </NavSection>
@@ -99,8 +99,44 @@ export const Collapsed: Story = {
             <DropdownMenuItem>Preferences</DropdownMenuItem>
             <DropdownMenuItem>Sign out</DropdownMenuItem>
           </NavUser>
+          <NavItem icon={<Bell size={24} />} badge={2} badgeStatus="info">
+            Notifications
+          </NavItem>
           <NavItem icon={<Settings size={24} />}>Settings</NavItem>
           <NavItem icon={<LogOut size={24} />}>Sign Out</NavItem>
+        </NavSection>
+      </Navigation>
+    </div>
+  ),
+};
+
+export const WithBadges: Story = {
+  name: "With badges",
+  render: () => (
+    <div style={PREVIEW_STYLE}>
+      <Navigation>
+        <NavSection grow>
+          <NavItem icon={<SquareCheckBig size={24} />} href="#tasks">
+            Tasks
+          </NavItem>
+          <NavItem icon={<Receipt size={24} />} href="#accruals" selected badge="5d" badgeStatus="info">
+            Accruals
+          </NavItem>
+          <NavItem icon={<CreditCard size={24} />} href="#reconciliations" badge="3d" badgeStatus="notice">
+            Reconciliations
+          </NavItem>
+          <NavItem icon={<Activity size={24} />} href="#variance" badge="1d">
+            Variance
+          </NavItem>
+        </NavSection>
+        <NavSection>
+          <NavUser name="Matthew Wager">
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Sign out</DropdownMenuItem>
+          </NavUser>
+          <NavItem icon={<Bell size={24} />} badge={2}>
+            Notifications
+          </NavItem>
         </NavSection>
       </Navigation>
     </div>

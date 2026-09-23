@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
-import type { LucideIcon } from "lucide-react";
-import { ArrowUp, Banknote, Calculator, CheckSquare, FlaskConical, Inbox, RadioTower, Scale, Sparkles, Telescope } from "lucide-react";
-import { Button, GrainCorner, IconButton, Textarea } from "@numosai/ui";
+import { ArrowUp, Sparkles } from "lucide-react";
+import { AppIcon, Badge, Button, GrainCorner, IconButton, Textarea } from "@numosai/ui";
+import type { AppIconName } from "@numosai/ui";
 import type { AssistantConversation } from "../components/AssistantPanel";
 import type { PageId } from "./index";
 
@@ -25,41 +25,41 @@ export interface HomePageProps {
 const SUGGESTED_PROMPTS = ["I want to add a teammate", "I want to connect a bank account"];
 
 interface FlowTile {
-  icon: LucideIcon;
+  app: AppIconName;
   label: string;
   page: PageId;
 }
 
-/** Same icon per app as `NavContent.tsx` — one visual identity for each workflow, reused everywhere it appears. */
+/** The real `<AppIcon>` component, `size="lg"` — the same tile every app
+ * switcher/header in this demo uses, not a one-off recreated here. */
 const RECORD_TILES: FlowTile[] = [
-  { icon: Inbox, label: "Collect", page: "collect" },
-  { icon: Banknote, label: "Pay", page: "pay" },
-  { icon: Calculator, label: "Accrue", page: "accruals" },
-  { icon: Scale, label: "Reconcile", page: "reconcile" },
+  { app: "collect", label: "Collect", page: "collect" },
+  { app: "pay", label: "Pay", page: "pay" },
+  { app: "accruals", label: "Accrue", page: "accruals" },
+  { app: "reconcile", label: "Reconcile", page: "reconcile" },
 ];
 
-const CLOSE_TILE: FlowTile = { icon: CheckSquare, label: "Close", page: "close" };
+const CLOSE_TILE: FlowTile = { app: "close", label: "Close", page: "close" };
 
 const REPORT_TILES: FlowTile[] = [
-  { icon: FlaskConical, label: "Analyze", page: "analyze" },
-  { icon: Telescope, label: "Forecast", page: "forecast" },
-  { icon: RadioTower, label: "Communicate", page: "communicate" },
+  { app: "analyze", label: "Analyze", page: "analyze" },
+  { app: "forecast", label: "Forecast", page: "forecast" },
+  { app: "communicate", label: "Communicate", page: "communicate" },
 ];
 
-function FlowTileButton({ icon: Icon, label, page, onNavigate }: FlowTile & { onNavigate: (page: PageId) => void }) {
+function FlowTileButton({ app, label, page, onNavigate }: FlowTile & { onNavigate: (page: PageId) => void }) {
   return (
     <button type="button" className="home-flow__tile" onClick={() => onNavigate(page)}>
-      <span className="app-icon-tile app-icon-tile--lg home-flow__tile-icon" aria-hidden>
-        {/* strokeWidth is in the icon's own 24x24 viewBox space, not screen
-            pixels — rendering at size=48 (2x) doubles every viewBox unit to
-            2 screen px, so a "normal" strokeWidth of 2 (matching every other
-            24px icon in this app) comes out at 4 screen px here, noticeably
-            heavier than the rest of the app's icons rather than just bigger.
-            1.25 lands the on-screen stroke at 2.5px — close to the app's
-            standard 2px weight, with a touch more heft to suit the larger
-            size, instead of scaling the weight up 1:1 with the size. */}
-        <Icon size={48} strokeWidth={1.25} />
-        <GrainCorner color="var(--background-positive-base)" className="home-flow__tile-ornament" />
+      <span className="home-flow__tile-icon" aria-hidden>
+        <span className="home-flow__tile-icon-crop">
+          <AppIcon app={app} size="lg" />
+          <GrainCorner color="var(--background-positive-base)" className="home-flow__tile-ornament" />
+        </span>
+        {app === "close" ? (
+          <Badge size="lg" status="negative" className="home-flow__tile-badge">
+            1d
+          </Badge>
+        ) : null}
       </span>
       <span className="home-flow__tile-label">{label}</span>
     </button>

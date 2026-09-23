@@ -104,6 +104,24 @@
   opacity: 0;
 }
 
+/*
+ * Fixed prefix/suffix text (e.g. "$" / "USD") — confirmed against Figma:
+ * always `--content-subtle`, never the icon's focus/error/success brand
+ * tint (the same muted color in both the default and focused reference
+ * examples), only dimming to `--content-disabled` alongside the rest of a
+ * disabled field.
+ */
+.ds-text-input__affix {
+  flex-shrink: 0;
+  overflow: hidden;
+  color: var(--content-subtle);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ds-text-input__field:has(:disabled) .ds-text-input__affix {
+  color: var(--content-disabled);
+}
+
 .ds-text-input__icon {
   display: inline-flex;
   align-items: center;
@@ -144,7 +162,8 @@
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
 }
-.ds-text-input--lg .ds-text-input__control {
+.ds-text-input--lg .ds-text-input__control,
+.ds-text-input--lg .ds-text-input__affix {
   font: var(--type-paragraph-m-regular);
   letter-spacing: var(--type-paragraph-m-regular-tracking);
 }
@@ -161,7 +180,8 @@
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
 }
-.ds-text-input--md .ds-text-input__control {
+.ds-text-input--md .ds-text-input__control,
+.ds-text-input--md .ds-text-input__affix {
   font: var(--type-paragraph-s-regular);
   letter-spacing: var(--type-paragraph-s-regular-tracking);
 }
@@ -178,7 +198,8 @@
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
 }
-.ds-text-input--sm .ds-text-input__control {
+.ds-text-input--sm .ds-text-input__control,
+.ds-text-input--sm .ds-text-input__affix {
   font: var(--type-paragraph-xs-regular);
   letter-spacing: var(--type-paragraph-xs-regular-tracking);
 }
@@ -209,7 +230,9 @@
     border-radius: var(--radius-lg);
   }
   .ds-text-input--md .ds-text-input__control,
-  .ds-text-input--sm .ds-text-input__control {
+  .ds-text-input--sm .ds-text-input__control,
+  .ds-text-input--md .ds-text-input__affix,
+  .ds-text-input--sm .ds-text-input__affix {
     font: var(--type-paragraph-m-regular);
     letter-spacing: var(--type-paragraph-m-regular-tracking);
   }

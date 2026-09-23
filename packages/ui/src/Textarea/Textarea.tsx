@@ -8,7 +8,10 @@ import "./Textarea.css";
 export type TextareaSize = "sm" | "md" | "lg";
 export type TextareaStatus = "default" | "error" | "success";
 
-export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
+// "prefix" is omitted because `HTMLAttributes` already declares it as the
+// (obscure, unrelated) RDFa `prefix` attribute typed `string` — this
+// component's own `prefix` is a `ReactNode` render slot, not that.
+export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size" | "prefix"> {
   /** Field label, rendered above the textarea. */
   label?: ReactNode;
   /** Helper or validation text, rendered below the textarea. */
@@ -18,6 +21,14 @@ export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaE
   size?: TextareaSize;
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
+  /**
+   * Fixed text rendered immediately before the value — e.g. a currency
+   * symbol. Unlike `leadingIcon`, this is real content (not `aria-hidden`),
+   * so a screen reader reads it as part of the field. Not shown by default.
+   */
+  prefix?: ReactNode;
+  /** Fixed text rendered immediately after the value. Same real-content reasoning as `prefix`. */
+  suffix?: ReactNode;
 }
 
 /**
@@ -29,7 +40,7 @@ export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaE
  * since a multi-line field's first line is the meaningful anchor point.
  */
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
-  { label, helpText, status = "default", size = "lg", leadingIcon, trailingIcon, className, id, disabled, rows = 3, ...rest },
+  { label, helpText, status = "default", size = "lg", leadingIcon, trailingIcon, prefix, suffix, className, id, disabled, rows = 3, ...rest },
   ref,
 ) {
   const generatedId = useId();
@@ -45,6 +56,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
 
       <div className={clsx("ds-textarea__field", `ds-textarea__field--${status}`)}>
         {leadingIcon ? <span className="ds-textarea__icon" aria-hidden>{leadingIcon}</span> : null}
+        {prefix ? <span className="ds-textarea__affix">{prefix}</span> : null}
         <textarea
           ref={ref}
           id={inputId}
@@ -56,6 +68,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
           autoComplete="off"
           {...rest}
         />
+        {suffix ? <span className="ds-textarea__affix">{suffix}</span> : null}
         {trailingIcon ? <span className="ds-textarea__icon" aria-hidden>{trailingIcon}</span> : null}
       </div>
 

@@ -14,13 +14,12 @@ function firstTabValue(children: ReactNode): string | undefined {
 
 export interface MobileAppHeaderProps {
   /**
-   * Which app tile to show — an `AppIconName` reuses `<AppIcon>` directly
-   * (at the smaller size this header's confirmed Figma instance scales it
-   * to). `AppIcon`'s own name enum is closed to whatever apps Figma has
+   * Which app tile to show — an `AppIconName` reuses `<AppIcon size="sm">`
+   * directly, matching this header's own confirmed Figma instance size
+   * exactly. `AppIcon`'s own name enum is closed to whatever apps Figma has
    * actually designed a glyph for, so pass a `ReactNode` instead for
-   * anything else — typically a `.ds-mobile-app-header__icon`-sized icon
-   * of your own in the same tile styling, rather than forcing a
-   * misleading `AppIconName` that doesn't really represent your app.
+   * anything else, rather than forcing a misleading `AppIconName` that
+   * doesn't really represent your app.
    */
   icon: AppIconName | ReactNode;
   title: ReactNode;
@@ -46,10 +45,9 @@ export interface MobileAppHeaderProps {
  * A mobile page header: a branded app icon + title, a row of tabs for
  * switching between that page's sub-views, and an optional trailing
  * action — matches Figma's MobileAppHeader exactly. Nothing about the
- * icon or tabs is reimplemented: the icon is `<AppIcon>` (confirmed as a
- * scaled-down instance of the same component — Figma's own 4.8px corner
- * radius is exactly `<AppIcon>`'s usual 8px at the 0.6× scale from 40px
- * down to this header's 24px, not a distinct token), and the tabs are
+ * icon or tabs is reimplemented: the icon is `<AppIcon size="sm">` (this
+ * header's own confirmed Figma instance is exactly `<AppIcon>`'s "sm"
+ * size — 24px tile, 4px radius — not a separate one-off), and the tabs are
  * `<Tabs>`/`<TabList>`/`<Tab>` — confirmed color-for-color identical to
  * their existing styling (unselected `content-brand-primary`, selected
  * `content-base`, the sliding `border-brand` indicator).
@@ -138,7 +136,7 @@ export function MobileAppHeader({
     <header className={clsx("ds-mobile-app-header", className)}>
       <div className="ds-mobile-app-header__row">
         <button type="button" className="ds-mobile-app-header__icon-button" onClick={handleIconClick} aria-label="Back to overview">
-          {typeof icon === "string" ? <AppIcon app={icon as AppIconName} className="ds-mobile-app-header__icon" /> : icon}
+          {typeof icon === "string" ? <AppIcon app={icon as AppIconName} size="sm" /> : icon}
         </button>
 
         <div ref={scrollRef} className="ds-mobile-app-header__scroll" data-fade-start={fadeStart} data-fade-end={fadeEnd}>

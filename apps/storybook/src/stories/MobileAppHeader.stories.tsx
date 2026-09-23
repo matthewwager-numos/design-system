@@ -64,7 +64,7 @@ function OverflowDemo() {
   const [tab, setTab] = useState("tab-1");
   return (
     <div style={PREVIEW_STYLE}>
-      <MobileAppHeader icon="reports" title="Reports" value={tab} onValueChange={setTab}>
+      <MobileAppHeader icon="communicate" title="Communicate" value={tab} onValueChange={setTab}>
         {Array.from({ length: 8 }, (_, i) => (
           <Tab key={i} value={`tab-${i + 1}`}>
             Section {i + 1}
@@ -87,7 +87,7 @@ function IconNavigatesBackDemo() {
       <p style={{ margin: "0 0 0.75rem", font: "var(--type-paragraph-s-regular)", color: "var(--content-subtle)" }}>
         Scroll the tabs, then tap the icon — it scrolls the title/tabs strip back to the start (the icon itself never scrolls) and selects "Section 1", the first tab, automatically. Pass <code>onIconClick</code> too for anything else that tap should also do.
       </p>
-      <MobileAppHeader icon="reports" title="Reports" value={tab} onValueChange={setTab}>
+      <MobileAppHeader icon="communicate" title="Communicate" value={tab} onValueChange={setTab}>
         {Array.from({ length: 8 }, (_, i) => (
           <Tab key={i} value={`tab-${i + 1}`}>
             Section {i + 1}

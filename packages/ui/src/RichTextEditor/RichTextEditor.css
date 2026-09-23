@@ -1,0 +1,351 @@
+/*
+ * RichTextEditor styles — the Field's own padding/radius/type tokens are
+ * identical to TextInput/Textarea at every size (confirmed against Figma
+ * directly, same as Textarea's own comment on this), so this mirrors that
+ * scale rather than inventing a parallel one. The two real differences:
+ * the Field stacks vertically (content row, then an embedded toolbar row,
+ * not a single row), and the permanent blue focus ring Figma's static
+ * export shows is real `:focus-within` here, not a hardcoded border —
+ * same reasoning as every other input in this family.
+ */
+
+.ds-rich-text-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.ds-rich-text-editor__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  background: var(--background-element);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-rich-text-editor__field:hover:not(:focus-within):not(.ds-rich-text-editor__field--error):not(.ds-rich-text-editor__field--success):not(.ds-rich-text-editor__field--disabled) {
+  background: var(--background-hover);
+}
+
+.ds-rich-text-editor__field:focus-within {
+  background: var(--background-default);
+  border-color: var(--border-brand);
+  box-shadow: var(--shadow-focus-brand);
+}
+
+.ds-rich-text-editor__field--disabled {
+  background: var(--background-secondary);
+}
+
+.ds-rich-text-editor__field--error {
+  background: var(--background-default);
+  border-color: var(--border-negative);
+  box-shadow: var(--shadow-focus-negative);
+}
+.ds-rich-text-editor__field--error:focus-within {
+  border-color: var(--border-negative);
+  box-shadow: var(--shadow-focus-negative);
+}
+
+.ds-rich-text-editor__field--success {
+  background: var(--background-default);
+  border-color: var(--border-positive);
+  box-shadow: var(--shadow-focus-positive);
+}
+.ds-rich-text-editor__field--success:focus-within {
+  border-color: var(--border-positive);
+  box-shadow: var(--shadow-focus-positive);
+}
+
+.ds-rich-text-editor__body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+/* Fixed prefix/suffix text — see TextInput.css's own comment on the same
+   pattern: always `--content-subtle`, never the icon's focus/error/success
+   brand tint, only dimming alongside the rest of a disabled field. */
+.ds-rich-text-editor__affix {
+  flex-shrink: 0;
+  overflow: hidden;
+  color: var(--content-subtle);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ds-rich-text-editor__field--disabled .ds-rich-text-editor__affix {
+  color: var(--content-disabled);
+}
+
+.ds-rich-text-editor__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--content-placeholder);
+}
+.ds-rich-text-editor__field:focus-within .ds-rich-text-editor__icon {
+  color: var(--content-brand-primary);
+}
+.ds-rich-text-editor__field--error .ds-rich-text-editor__icon {
+  color: var(--content-negative);
+}
+.ds-rich-text-editor__field--success .ds-rich-text-editor__icon {
+  color: var(--content-positive);
+}
+.ds-rich-text-editor__field--disabled .ds-rich-text-editor__icon {
+  color: var(--content-disabled);
+}
+
+.ds-rich-text-editor__content {
+  flex: 1 0 0;
+  min-width: 0;
+  outline: none;
+  color: var(--content-base);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* A fully-cleared editor often still holds a stray <br> (see the
+   normalization in handleInput) — once it's really empty, :empty matches. */
+.ds-rich-text-editor__content:empty::before {
+  content: attr(data-placeholder);
+  color: var(--content-placeholder);
+  pointer-events: none;
+}
+
+.ds-rich-text-editor__field--disabled .ds-rich-text-editor__content {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+/* ── Toolbar ───────────────────────────────────────────────────────── */
+
+.ds-rich-text-editor__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  overflow-x: auto;
+  /* Scrolls rather than wraps once every group can't fit — same reasoning
+     as <TabList>'s own horizontal overflow — but the scrollbar itself stays
+     hidden, since a formatting toolbar reads better as a clean strip than
+     a visibly scrollable one. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ds-rich-text-editor__toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.ds-rich-text-editor__toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0);
+  flex-shrink: 0;
+  padding: 0 var(--space-0);
+  border-right: 1px solid var(--border-subtle);
+}
+.ds-rich-text-editor__toolbar-group:last-child {
+  border-right: none;
+}
+
+.ds-rich-text-editor__tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--content-subtle);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+/* Toolbar icons stay 16px regardless of the editor's own S/M/L size —
+   confirmed against Figma, same as <IconButton>'s icon staying independent
+   of its own size tier. */
+.ds-rich-text-editor__tool svg {
+  width: 1rem;
+  height: 1rem;
+}
+.ds-rich-text-editor__tool:hover:not(:disabled) {
+  background: var(--background-hover);
+  color: var(--content-emphasis);
+}
+/* Matches Figma's own "active" Bold example: a plain hover-tint background,
+   not a brand-colored one — this only needs to read as "applied here", not
+   compete with the field's own brand-blue focus ring. */
+.ds-rich-text-editor__tool[aria-pressed="true"] {
+  background: var(--background-hover);
+  color: var(--content-emphasis);
+}
+.ds-rich-text-editor__tool:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-rich-text-editor__tool-select {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-0);
+  flex-shrink: 0;
+  height: 1.5rem;
+  padding: 0 var(--space-1);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--content-subtle);
+  font: var(--type-paragraph-xs-medium);
+  letter-spacing: var(--type-paragraph-xs-medium-tracking);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ds-rich-text-editor__tool-select:hover:not(:disabled) {
+  background: var(--background-hover);
+  color: var(--content-emphasis);
+}
+.ds-rich-text-editor__tool-select:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+.ds-rich-text-editor__tool-select-label {
+  max-width: 4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ds-rich-text-editor__tool-select svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* The emoji menu reuses <DropdownMenuContent>'s own menu/keyboard-nav
+   plumbing — it's still a real role="menu" list of role="menuitem"
+   buttons, just laid out as a grid instead of a stacked column. */
+.ds-rich-text-editor__emoji-menu {
+  display: grid;
+  grid-template-columns: repeat(6, auto);
+  min-width: unset;
+}
+.ds-rich-text-editor__emoji-menu .ds-dropdown-menu-item {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.ds-rich-text-editor__help {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--content-subtle);
+}
+.ds-rich-text-editor__help--error {
+  color: var(--content-negative);
+}
+.ds-rich-text-editor__help--success {
+  color: var(--content-positive);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-rich-text-editor--lg .ds-rich-text-editor__field {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+}
+.ds-rich-text-editor--lg .ds-rich-text-editor__content,
+.ds-rich-text-editor--lg .ds-rich-text-editor__affix {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+.ds-rich-text-editor--lg .ds-rich-text-editor__content {
+  min-height: 3rem;
+}
+.ds-rich-text-editor--lg .ds-rich-text-editor__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-rich-text-editor--lg .ds-rich-text-editor__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ds-rich-text-editor--md .ds-rich-text-editor__field {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+.ds-rich-text-editor--md .ds-rich-text-editor__content,
+.ds-rich-text-editor--md .ds-rich-text-editor__affix {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-rich-text-editor--md .ds-rich-text-editor__content {
+  min-height: 2.5rem;
+}
+.ds-rich-text-editor--md .ds-rich-text-editor__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-rich-text-editor--md .ds-rich-text-editor__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-rich-text-editor--sm .ds-rich-text-editor__field {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.ds-rich-text-editor--sm .ds-rich-text-editor__content,
+.ds-rich-text-editor--sm .ds-rich-text-editor__affix {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-rich-text-editor--sm .ds-rich-text-editor__content {
+  min-height: 2rem;
+}
+.ds-rich-text-editor--sm .ds-rich-text-editor__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-rich-text-editor--sm .ds-rich-text-editor__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Below this width, "md"/"sm" render at "lg" metrics regardless of the
+   `size` prop — same iOS auto-zoom-on-focus reasoning as every other input
+   in this family (see TextInput.css's own comment). */
+@media (max-width: 767px) {
+  .ds-rich-text-editor--md .ds-rich-text-editor__field,
+  .ds-rich-text-editor--sm .ds-rich-text-editor__field {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+  .ds-rich-text-editor--md .ds-rich-text-editor__content,
+  .ds-rich-text-editor--sm .ds-rich-text-editor__content,
+  .ds-rich-text-editor--md .ds-rich-text-editor__affix,
+  .ds-rich-text-editor--sm .ds-rich-text-editor__affix {
+    font: var(--type-paragraph-m-regular);
+    letter-spacing: var(--type-paragraph-m-regular-tracking);
+  }
+  .ds-rich-text-editor--md .ds-rich-text-editor__content,
+  .ds-rich-text-editor--sm .ds-rich-text-editor__content {
+    min-height: 3rem;
+  }
+  .ds-rich-text-editor--md .ds-rich-text-editor__help,
+  .ds-rich-text-editor--sm .ds-rich-text-editor__help {
+    font: var(--type-paragraph-s-regular);
+    letter-spacing: var(--type-paragraph-s-regular-tracking);
+  }
+}

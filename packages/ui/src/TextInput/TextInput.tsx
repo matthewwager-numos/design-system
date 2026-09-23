@@ -8,7 +8,10 @@ import "./TextInput.css";
 export type TextInputSize = "sm" | "md" | "lg";
 export type TextInputStatus = "default" | "error" | "success";
 
-export interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
+// "prefix" is omitted because `HTMLAttributes` already declares it as the
+// (obscure, unrelated) RDFa `prefix` attribute typed `string` — this
+// component's own `prefix` is a `ReactNode` render slot, not that.
+export interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "prefix"> {
   /** Field label, rendered above the input. */
   label?: ReactNode;
   /** Helper or validation text, rendered below the input. */
@@ -21,6 +24,15 @@ export interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElemen
   leadingIcon?: ReactNode;
   /** Optional icon to render after the input text. */
   trailingIcon?: ReactNode;
+  /**
+   * Fixed text rendered inside the field, immediately before the value —
+   * e.g. a currency symbol. Unlike `leadingIcon`, this is real content (not
+   * `aria-hidden`), so a screen reader reads it as part of the field.
+   * Not shown by default.
+   */
+  prefix?: ReactNode;
+  /** Fixed text rendered inside the field, immediately after the value — e.g. a unit or currency code. Same real-content reasoning as `prefix`. */
+  suffix?: ReactNode;
 }
 
 /**
@@ -32,7 +44,7 @@ export interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElemen
  * app state a browser can't infer on its own.
  */
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function TextInput(
-  { label, helpText, status = "default", size = "lg", leadingIcon, trailingIcon, className, id, disabled, ...rest },
+  { label, helpText, status = "default", size = "lg", leadingIcon, trailingIcon, prefix, suffix, className, id, disabled, ...rest },
   ref,
 ) {
   const generatedId = useId();
@@ -48,6 +60,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
 
       <div className={clsx("ds-text-input__field", `ds-text-input__field--${status}`)}>
         {leadingIcon ? <span className="ds-text-input__icon" aria-hidden>{leadingIcon}</span> : null}
+        {prefix ? <span className="ds-text-input__affix">{prefix}</span> : null}
         <input
           ref={ref}
           id={inputId}
@@ -63,6 +76,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
           autoComplete="off"
           {...rest}
         />
+        {suffix ? <span className="ds-text-input__affix">{suffix}</span> : null}
         {trailingIcon ? <span className="ds-text-input__icon" aria-hidden>{trailingIcon}</span> : null}
       </div>
 

@@ -1,28 +1,40 @@
 /*
  * AppIcon styles — pure token-driven CSS. No hard-coded colors or sizes.
- * Every glyph draws with `currentColor`, so the tile's `color` (set here to
- * --green-700, matching every glyph's baked Figma stroke color) recolors
- * all of them at once.
+ * The glyph itself is a real Lucide icon drawing with `currentColor`, so
+ * the tile's own `color` recolors it; centered via flexbox rather than
+ * Figma's absolute-position + translate(-50%, -50%), since that's simpler
+ * and produces the identical result for a single centered child.
  */
 
 .ds-app-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  background: var(--app-icon-fill);
+  color: var(--app-icon-stroke);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+/* Confirmed 1:1 against Figma's S/M/L: each step's radius is its own token
+   (not a fixed proportion of the tile), so these deliberately don't follow
+   the sm→md→lg naming of the --radius-* scale itself — "lg" here pairs
+   with --radius-xl, not --radius-lg. */
+
+.ds-app-icon--sm {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.ds-app-icon--md {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: var(--radius-md);
-  background: var(--button-primary-default);
-  color: var(--green-700);
 }
 
-.ds-app-icon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* The Accruals icon layers a dark accent on top of its own green fill. */
-.ds-app-icon__accent-strong {
-  color: var(--brand-dark-blue);
+.ds-app-icon--lg {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-xl);
 }

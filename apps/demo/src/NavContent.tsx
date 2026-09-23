@@ -2,7 +2,7 @@ import {
   Banknote,
   Bell,
   Calculator,
-  CheckSquare,
+  CalendarCheck,
   FlaskConical,
   Home,
   Inbox,
@@ -14,7 +14,20 @@ import {
   Users,
 } from "lucide-react";
 import { DropdownMenuItem, NavItem, NavSection, NavUser } from "@numosai/ui";
+import type { BadgeStatus } from "@numosai/ui";
 import type { PageId } from "./pages";
+
+// Placeholder until a real close-calendar/period-end date exists to derive
+// this from — swap this constant (and the ramp below) for a real
+// days-remaining calculation once one does.
+const DAYS_UNTIL_CLOSE = 1;
+
+/** Gets more urgent as the close deadline actually gets closer, not a fixed color. */
+function closeBadgeStatus(daysRemaining: number): BadgeStatus {
+  if (daysRemaining <= 1) return "negative";
+  if (daysRemaining <= 3) return "notice";
+  return "info";
+}
 
 export interface NavContentProps {
   active: PageId;
@@ -58,7 +71,13 @@ export function NavContent({ active, onNavigate, onSignOut }: NavContentProps) {
           <NavItem icon={<Scale size={24} />} selected={active === "reconcile"} onClick={() => onNavigate("reconcile")}>
             Reconcile
           </NavItem>
-          <NavItem icon={<CheckSquare size={24} />} selected={active === "close"} onClick={() => onNavigate("close")}>
+          <NavItem
+            icon={<CalendarCheck size={24} />}
+            selected={active === "close"}
+            onClick={() => onNavigate("close")}
+            badge={`${DAYS_UNTIL_CLOSE}d`}
+            badgeStatus={closeBadgeStatus(DAYS_UNTIL_CLOSE)}
+          >
             Close
           </NavItem>
         </NavSection>

@@ -1,12 +1,13 @@
 import { useRef, useState } from "react";
 import type { ChangeEvent, KeyboardEvent } from "react";
-import { Archive, ChevronDown, ChevronLeft, ChevronUp, Flag, MailOpen, Paperclip, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronUp, Flag, Paperclip, X } from "lucide-react";
 import {
   Accordion,
   AccordionItem,
   Avatar,
   Banner,
   Button,
+  ButtonGroup,
   Checkbox,
   FileUpload,
   IconButton,
@@ -14,7 +15,6 @@ import {
   Pagination,
   Textarea,
   Toggle,
-  Tooltip,
   useMeasuredHeightVar,
 } from "@numosai/ui";
 import { NOTIFICATIONS } from "../../data/notifications";
@@ -359,40 +359,29 @@ export function InboxTab() {
             className={`notifications-footer-track${selectedIds.size > 0 ? " notifications-footer-track--open" : ""}${focusedItem ? " notifications-footer-track--preview-open" : ""}`}
           >
             <div className="notifications-footer-track__inner">
-              <ModalFooter className="notifications-footer-bulk">
-                {/* Primary/secondary/tertiary visual weight, not just three
-                    equal icons — Archive is the action most bulk selections
-                    are actually for, Mark as read a close second, Flag the
-                    least reached-for of the three. */}
-                <div className="notifications-footer-actions">
-                  <Tooltip content="Archive">
-                    <IconButton
-                      icon={<Archive size={20} />}
-                      aria-label="Archive"
-                      variant="primary"
-                      onClick={archiveSelected}
-                      disabled={selectedIds.size === 0}
-                    />
-                  </Tooltip>
-                  <Tooltip content="Mark as read">
-                    <IconButton
-                      icon={<MailOpen size={20} />}
-                      aria-label="Mark as read"
-                      variant="secondary"
-                      onClick={markSelectedRead}
-                      disabled={selectedIds.size === 0}
-                    />
-                  </Tooltip>
-                  <Tooltip content="Flag">
-                    <IconButton
-                      icon={<Flag size={20} />}
-                      aria-label="Flag"
-                      variant="ghost"
-                      onClick={flagSelected}
-                      disabled={selectedIds.size === 0}
-                    />
-                  </Tooltip>
-                </div>
+              {/* Standard footer shape, same as every other footer in this
+                  demo (e.g. Collect's own bulk-action modal) — a plain link
+                  button for the tertiary option on the left
+                  (`secondaryAction`), primary + secondary right-aligned in
+                  their own `<ButtonGroup>`. Not icon buttons: those read as
+                  a generic toolbar, not this app's own established "footer
+                  full of real buttons" language. */}
+              <ModalFooter
+                className="notifications-footer-bulk"
+                secondaryAction={
+                  <Button variant="link" onClick={flagSelected} disabled={selectedIds.size === 0}>
+                    Flag
+                  </Button>
+                }
+              >
+                <ButtonGroup>
+                  <Button variant="secondary" onClick={markSelectedRead} disabled={selectedIds.size === 0}>
+                    Mark as read
+                  </Button>
+                  <Button variant="primary" onClick={archiveSelected} disabled={selectedIds.size === 0}>
+                    Archive
+                  </Button>
+                </ButtonGroup>
               </ModalFooter>
 
               {focusedItem && (

@@ -22,7 +22,7 @@ export { Fieldset, FieldsetRow } from "./Fieldset";
 export type { FieldsetProps, FieldsetRowProps, FieldsetSize } from "./Fieldset";
 
 export { AppIcon } from "./AppIcon";
-export type { AppIconProps, AppIconName } from "./AppIcon";
+export type { AppIconProps, AppIconName, AppIconSize } from "./AppIcon";
 
 export { TextInput } from "./TextInput";
 export type { TextInputProps, TextInputSize, TextInputStatus } from "./TextInput";
@@ -209,6 +209,9 @@ export type { JournalEntryProps, JournalEntryValue, JournalEntryLine } from "./J
 
 export { EmptyState } from "./EmptyState";
 export type { EmptyStateProps } from "./EmptyState";
+
+export { RichTextEditor } from "./RichTextEditor";
+export type { RichTextEditorProps, RichTextEditorSize, RichTextEditorStatus } from "./RichTextEditor";
 
 // Not a component — a small utility `<Wizard>` uses internally to pin its
 // own footer, and that consuming apps can reuse for the same "fixed chrome

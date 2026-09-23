@@ -78,6 +78,15 @@ export const Disabled: Story = {
   ),
 };
 
+export const WithPrefixAndSuffix: Story = {
+  name: "With prefix and suffix",
+  render: () => (
+    <div style={PREVIEW_STYLE}>
+      <SearchInput label="Amount" placeholder="0.00" prefix="$" suffix="USD" />
+    </div>
+  ),
+};
+
 export const NoDropdown: Story = {
   name: "Without options (plain search box)",
   render: () => (

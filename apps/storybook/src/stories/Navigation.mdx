@@ -87,6 +87,22 @@ Pass `items` to a `<NavItem>` to turn it into a disclosure instead of a link —
 
 Only shown while Navigation is expanded — collapsed, there's no room for a flyout yet, so the item falls back to a plain icon + tooltip like any other `<NavItem>`. That's a real gap, not a design choice: closing it means adding flyout/popover support, which doesn't exist yet.
 
+## Badges
+
+Pass `badge` to show a count/status indicator on a `<NavItem>` — matches Figma's own updated Nav Item: a full `<Badge size="lg">` after the label while expanded, or a plain `size="sm"` dot in the icon's own corner while collapsed, rather than disappearing entirely. `badgeStatus` sets its color (any `BadgeStatus`), defaulting to `"negative"` to match Figma's own example — override it per item, since what a badge means varies (a days-until-due badge might step from `"info"` to `"notice"` to `"negative"` as a deadline actually gets closer, not stay one fixed color):
+
+```tsx
+<NavItem icon={<CalendarCheck size={24} />} badge="1d" badgeStatus="negative">
+  Close
+</NavItem>
+```
+
+<Canvas of={NavigationStories.WithBadges} />
+
+Collapse the sidebar above (or see `Collapsed`) to check the dot form:
+
+<Canvas of={NavigationStories.Collapsed} />
+
 ## NavUser and the account menu
 
 `<NavUser>` doesn't hardcode what the chevron opens — you pass `<DropdownMenuItem>`s as children, same as `<DropdownMenu>` anywhere else. Because the row sits at the *bottom* of the sidebar, its menu opens upward: `<DropdownMenuContent placement="top">`, a new prop added to `<DropdownMenu>` alongside this component (previously it only ever opened downward, which would've pushed the account menu off-screen here). See `<DropdownMenu>`'s own docs for the full placement/keyboard/accessibility behavior.
@@ -111,5 +127,5 @@ Everything else (`--background-brand-subdued` selected fill, `--content-emphasis
 
 `<Navigation>`: `expanded`, `defaultExpanded`, `onExpandedChange`, `className`.
 `<NavSection>`: `grow`, plus any native `<div>` prop.
-`<NavItem>`: `icon` (required), `href`, `selected`, `disabled`, `onClick`, `items`, `defaultOpen`, `className`.
+`<NavItem>`: `icon` (required), `href`, `selected`, `disabled`, `onClick`, `items`, `defaultOpen`, `badge`, `badgeStatus` (default `"negative"`), `className`.
 `<NavUser>`: `name` (required), `avatarSrc`, `initials`, `children` (the account menu's `<DropdownMenuItem>`s).

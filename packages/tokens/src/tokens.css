@@ -172,6 +172,16 @@
   --button-primary-default: var(--brand-dark-blue);
   --button-primary-hover: var(--brand-1100);
 
+  /* AppIcon's own Fill/Stroke pair — deliberately NOT the same as
+     --button-primary-default/--green-700 it used to borrow, even though
+     light mode happens to match: dark mode swaps the two rather than just
+     re-deriving --button-primary-default's own dark value, giving the
+     tile a green fill with a dark-blue glyph instead of a lighter-blue
+     fill with the same static green glyph. Confirmed from Figma's own
+     AppIcon semantic group (Color Semantic collection). */
+  --app-icon-fill: var(--brand-dark-blue);
+  --app-icon-stroke: var(--green-600);
+
   --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
   --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);
   --overlay-inverse-50: color-mix(in srgb, var(--beige-100) 50%, transparent);
@@ -444,6 +454,9 @@
     --button-primary-default: var(--brand-400);
     --button-primary-hover: var(--brand-500);
 
+    --app-icon-fill: var(--green-600);
+    --app-icon-stroke: var(--brand-dark-blue);
+
     --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
     --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);
     --overlay-inverse-50: color-mix(in srgb, var(--beige-100) 50%, transparent);
@@ -527,6 +540,9 @@
   --button-primary-default: var(--brand-dark-blue);
   --button-primary-hover: var(--brand-1100);
 
+  --app-icon-fill: var(--brand-dark-blue);
+  --app-icon-stroke: var(--green-600);
+
   --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
   --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);
   --overlay-inverse-50: color-mix(in srgb, var(--beige-100) 50%, transparent);
@@ -596,6 +612,9 @@
   --button-primary-active: var(--brand-600);
   --button-primary-default: var(--brand-400);
   --button-primary-hover: var(--brand-500);
+
+  --app-icon-fill: var(--green-600);
+  --app-icon-stroke: var(--brand-dark-blue);
 
   --overlay-default-25: color-mix(in srgb, var(--gray-600) 25%, transparent);
   --overlay-default-50: color-mix(in srgb, var(--gray-600) 50%, transparent);

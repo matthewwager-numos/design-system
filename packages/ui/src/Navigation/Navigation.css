@@ -176,6 +176,7 @@
 }
 
 .ds-nav-item__icon {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,6 +185,14 @@
 .ds-nav-item__icon svg {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+/* The collapsed-rail badge — a plain `<Badge size="sm">` dot nudged into
+   the icon's own corner, matching Figma's collapsed example exactly. */
+.ds-nav-item__badge-dot {
+  position: absolute;
+  top: -0.125rem;
+  right: -0.125rem;
 }
 
 .ds-nav-item__label {

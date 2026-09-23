@@ -45,7 +45,7 @@ function HeaderPlayground({ variant, title, subNav, actions }: HeaderPlaygroundA
   return (
     <Header
       variant={variant}
-      icon={variant === "app" ? <AppIcon app="tasks" /> : undefined}
+      icon={variant === "app" ? <AppIcon app="accruals" /> : undefined}
       title={title}
       onClose={() => {}}
       subNav={subNav ? <ExampleSubNav /> : undefined}

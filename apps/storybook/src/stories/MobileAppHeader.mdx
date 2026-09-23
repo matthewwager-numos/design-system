@@ -35,7 +35,7 @@ const [tab, setTab] = useState("recurring");
 
 ## Nothing here is reimplemented
 
-The icon is a real `<AppIcon>` — confirmed as a scaled-down instance of the same component, not a new one: Figma's own 4.8px corner radius on this header's icon is exactly `<AppIcon>`'s usual 8px radius at the 0.6× scale down from its normal 40px to this header's 24px, not a distinct design decision.
+The icon is a real `<AppIcon size="sm">` — this header's own confirmed Figma instance is exactly `<AppIcon>`'s "sm" size (a 24px tile, 4px radius), not a separate one-off scaled down from its default.
 
 The tabs are the real `<Tabs>`/`<TabList>`/`<Tab>` components — `children` takes `<Tab>`s directly, same as anywhere else `<Tabs>` is used. Confirmed color-for-color identical to their existing styling (unselected `content-brand-primary`, selected `content-base`, the sliding `border-brand` indicator) — nothing about tab appearance is overridden here.
 

@@ -43,12 +43,6 @@
   cursor: pointer;
 }
 
-.ds-mobile-app-header__icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: var(--radius-sm);
-}
-
 /* Title and tabs scroll together as one strip — confirmed from Figma: the
    icon is the only fixed element, not just the tabs. Scrollbar hidden
    since the edge fade below is the scroll affordance. `position: relative`
