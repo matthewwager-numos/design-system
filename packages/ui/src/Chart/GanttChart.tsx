@@ -207,23 +207,32 @@ export function GanttChart({ groups, milestones = [], defaultCollapsedGroups = [
                 />
               </div>
 
-              {!isCollapsed &&
-                group.tasks.map((task) => (
-                  <div className="ds-gantt-chart__row" key={task.id}>
-                    <span className="ds-gantt-chart__label">{task.label}</span>
-                    <Bar
-                      label={task.label}
-                      start={task.start}
-                      end={task.end}
-                      color={color}
-                      rangeStart={rangeStart}
-                      totalDays={totalDays}
-                      popoverContent={task.popoverContent}
-                      popoverTitle={task.popoverTitle}
-                      popoverActions={task.popoverActions}
-                    />
-                  </div>
-                ))}
+              {/* Animates to the rows' real content height via the grid
+                  `fr`-unit trick (no JS measurement needed) — same pattern
+                  as `<Accordion>`'s own panel. Rows stay mounted even while
+                  collapsed (only visually clipped to 0 height), so this can
+                  actually transition instead of the old instant mount/
+                  unmount. */}
+              <div className="ds-gantt-chart__group-rows-track" data-expanded={!isCollapsed}>
+                <div className="ds-gantt-chart__group-rows">
+                  {group.tasks.map((task) => (
+                    <div className="ds-gantt-chart__row" key={task.id}>
+                      <span className="ds-gantt-chart__label">{task.label}</span>
+                      <Bar
+                        label={task.label}
+                        start={task.start}
+                        end={task.end}
+                        color={color}
+                        rangeStart={rangeStart}
+                        totalDays={totalDays}
+                        popoverContent={task.popoverContent}
+                        popoverTitle={task.popoverTitle}
+                        popoverActions={task.popoverActions}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           );
         })}

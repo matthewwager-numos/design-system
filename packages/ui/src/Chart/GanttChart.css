@@ -76,6 +76,24 @@
   color: var(--content-emphasis);
 }
 
+/* Animates a group's rows open/closed via the grid `fr`-unit trick — same
+   pattern as `<Accordion>`'s own panel track: 0fr collapsed, 1fr expanded,
+   no JS measurement needed since it transitions to the rows' real content
+   height either way. */
+.ds-gantt-chart__group-rows-track {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--motion-toggle);
+}
+.ds-gantt-chart__group-rows-track[data-expanded="true"] {
+  grid-template-rows: 1fr;
+}
+
+.ds-gantt-chart__group-rows {
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* ── Timeline ──────────────────────────────────────────────────────── */
 
 .ds-gantt-chart__timeline {

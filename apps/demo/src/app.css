@@ -1108,6 +1108,23 @@ a {
   color: var(--content-emphasis);
 }
 
+/* A section title with trailing "jump to a real tab" entry points (see
+   CloseApp's own Overview) — wraps on narrow widths rather than squeezing
+   the actions down to nothing. */
+.overview-section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.overview-section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
 .overview-chart-row {
   display: flex;
   flex-wrap: wrap;
@@ -1140,12 +1157,20 @@ a {
   color: var(--content-subtle);
 }
 
-/* A gauge's own content is a small centered circle — cards holding one
-   center their content instead of stretching it to the card's full,
-   otherwise-empty width. */
-.overview-chart-card--centered {
-  align-items: center;
-  text-align: center;
+/* A `<DonutChart>`'s own card — the title/description stay left-aligned
+   like every other chart card (no `text-align`/`align-items` override
+   here), but the ring and its key split the card's own width evenly
+   instead of sitting centered as one shrink-to-fit unit. `flex: 1 1 0%` on
+   both ignores their natural content width for an even 50/50 share; the
+   ring's own fixed pixel `size` still governs the actual circle drawn
+   inside it, just now centered within its own wider half (`.ds-donut-
+   chart__ring` is already `display:grid;place-items:center`). */
+.overview-chart-card--donut .ds-donut-chart {
+  width: 100%;
+}
+.overview-chart-card--donut .ds-donut-chart__ring,
+.overview-chart-card--donut .ds-chart-legend--vertical {
+  flex: 1 1 0%;
 }
 
 /* ── Numos Assistant (FAB + squeeze panel) ────────────────────────────

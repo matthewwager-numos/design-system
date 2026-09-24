@@ -14,20 +14,8 @@ import {
   Users,
 } from "lucide-react";
 import { DropdownMenuItem, NavItem, NavSection, NavUser } from "@numosai/ui";
-import type { BadgeStatus } from "@numosai/ui";
+import { DAYS_UNTIL_CLOSE, closeBadgeStatus } from "./data/close";
 import type { PageId } from "./pages";
-
-// Placeholder until a real close-calendar/period-end date exists to derive
-// this from — swap this constant (and the ramp below) for a real
-// days-remaining calculation once one does.
-const DAYS_UNTIL_CLOSE = 1;
-
-/** Gets more urgent as the close deadline actually gets closer, not a fixed color. */
-function closeBadgeStatus(daysRemaining: number): BadgeStatus {
-  if (daysRemaining <= 1) return "negative";
-  if (daysRemaining <= 3) return "notice";
-  return "info";
-}
 
 export interface NavContentProps {
   active: PageId;

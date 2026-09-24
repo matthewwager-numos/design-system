@@ -3,6 +3,12 @@
  * exactly: Paragraph XS Regular in content-placeholder (not content-subtle
  * — confirmed a deliberate choice distinct from the more commonly-used
  * muted text color elsewhere in this design system).
+ *
+ * The vertical variant (only ever `<DonutChart>`'s own key) additionally
+ * supports a right-aligned value per row — the value (not the label) is
+ * content-emphasis there, since the number is the actual data point being
+ * read off the key; the label stays the same muted placeholder tone as
+ * every other legend.
  */
 
 .ds-chart-legend {
@@ -20,15 +26,37 @@
 .ds-chart-legend--vertical {
   flex-direction: column;
   flex-wrap: nowrap;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: flex-start;
   gap: var(--space-1);
+  /* This is itself a flex item, sitting beside `<DonutChart>`'s own ring —
+     same "flex items don't shrink below their own content's width by
+     default" issue as `.ds-chart-legend__label` below, just one level up:
+     without this, the *whole legend* refuses to shrink to its allotted
+     share of the row (see `.overview-chart-card--donut`'s 50/50 split),
+     which starves the label of any real reason to ever truncate. */
+  min-width: 0;
 }
 
 .ds-chart-legend__item {
   display: flex;
   align-items: center;
   gap: var(--space-1);
+}
+
+/* Only the vertical/keyed variant needs the value pushed to the row's own
+   far edge — stretch (see above) is what gives this row real width to
+   push against; a horizontal legend's items stay shrink-to-fit. */
+.ds-chart-legend--vertical .ds-chart-legend__item {
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.ds-chart-legend__swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
 }
 
 .ds-chart-legend__dot {
@@ -39,8 +67,22 @@
 }
 
 .ds-chart-legend__label {
+  /* A flex item's default min-width is `auto`, which floors its shrink at
+     its own content's width — the exact thing that needs to NOT happen for
+     `text-overflow: ellipsis` below to ever actually trigger instead of
+     just overflowing `.ds-chart-legend__swatch`'s own box. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font: var(--type-paragraph-xs-regular);
   letter-spacing: var(--type-paragraph-xs-regular-tracking);
   color: var(--content-placeholder);
   white-space: nowrap;
+}
+
+.ds-chart-legend__value {
+  flex: none;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-emphasis);
 }

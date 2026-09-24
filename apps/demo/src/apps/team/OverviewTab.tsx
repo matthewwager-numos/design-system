@@ -42,12 +42,12 @@ export function OverviewTab() {
       <div className="overview-section">
         <h2 className="overview-section-title">Breakdown</h2>
         <div className="overview-chart-row">
-          <div className="overview-chart-card overview-chart-card--centered">
+          <div className="overview-chart-card overview-chart-card--donut">
             <h3 className="overview-chart-card__title">By department</h3>
             {byDepartmentChart.length === 0 ? (
               <p className="overview-chart-card__description">No employees yet.</p>
             ) : (
-              <DonutChart data={byDepartmentChart} centerLabel="Employees" size={160} thickness={20} />
+              <DonutChart data={byDepartmentChart} centerLabel="Employees" size={160} thickness={10} />
             )}
           </div>
           <div className="overview-chart-card">

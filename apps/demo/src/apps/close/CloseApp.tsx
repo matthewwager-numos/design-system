@@ -82,7 +82,7 @@ function CloseAppContent({ tab, onTabChange }: CloseAppProps) {
       </div>
 
       <div className="app-body">
-        {tab === "overview" && <OverviewTab />}
+        {tab === "overview" && <OverviewTab onNavigate={onTabChange} />}
         {tab === "inputs" && <InputsTab />}
         {tab === "tasks" && <TasksTab />}
         {tab === "history" && <HistoryTab />}

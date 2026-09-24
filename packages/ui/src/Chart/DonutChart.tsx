@@ -25,7 +25,15 @@ export interface DonutChartProps {
   showCenterLabel?: boolean;
   /** Ring outer diameter in px. */
   size?: number;
-  /** Ring stroke thickness, in the same px units as `size`. */
+  /**
+   * Ring stroke thickness, in the same viewBox units `size` scales (not a
+   * literal px value independent of `size` — the ring is drawn in a fixed
+   * 100×100 viewBox, so this is really a fraction of the outer radius: at
+   * the default, `innerRadius = 50 - 8 = 42`, a 0.84 inner:outer ratio).
+   * Defaults to 8, a thinner ring than Figma's own heavier reference —
+   * confirmed against real usage to look more elegant and leave more room
+   * for center content at typical chart sizes.
+   */
   thickness?: number;
   className?: string;
 }
@@ -75,11 +83,11 @@ export function DonutChart({
   showLegend = true,
   showCenterLabel = true,
   size = 120,
-  thickness = 16,
+  thickness = 8,
   className,
 }: DonutChartProps) {
   const total = data.reduce((sum, d) => sum + d.value, 0) || 1;
-  const legendItems = data.map((d, i) => ({ label: d.label, color: d.color ?? chartColor(i) }));
+  const legendItems = data.map((d, i) => ({ label: d.label, color: d.color ?? chartColor(i), value: String(d.value) }));
   const { hoveredKey, tooltip, tooltipVisible, showTooltipAtPoint, showTooltipAtElement, hideTooltip } = useChartHover();
   // Scopes the <mask> id to this instance — SVG ids are document-global, so
   // two DonutCharts on one page would otherwise silently share (and fight

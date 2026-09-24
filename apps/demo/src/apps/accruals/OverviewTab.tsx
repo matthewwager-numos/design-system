@@ -60,13 +60,13 @@ export function OverviewTab() {
       <div className="overview-section">
         <h2 className="overview-section-title">Breakdown</h2>
         <div className="overview-chart-row">
-          <div className="overview-chart-card overview-chart-card--centered">
+          <div className="overview-chart-card overview-chart-card--donut">
             <h3 className="overview-chart-card__title">By category</h3>
             <p className="overview-chart-card__description">Accrual amount, in thousands of dollars</p>
             {/* A full `accrualCurrency` string (with cents) overflowed the
                 ring's own inner circle and collided with the legend at this
                 size — the compact "$3.2M" form fits comfortably. */}
-            <DonutChart data={byCategory} centerValue={accrualCurrencyCompact.format(categoryGrandTotal)} centerLabel="Total accrual" size={200} thickness={22} />
+            <DonutChart data={byCategory} centerValue={accrualCurrencyCompact.format(categoryGrandTotal)} centerLabel="Total accrual" size={200} thickness={11} />
           </div>
           <div className="overview-chart-card">
             <h3 className="overview-chart-card__title">By vendor</h3>
