@@ -112,7 +112,7 @@ export function OverviewTab({ onNavigate }: OverviewTabProps) {
   ];
 
   return (
-    <div className="page page--full-width">
+    <div className="page page--full-width page--overview">
       <div className="overview-metrics">
         <DisplayMetric value={`${DAYS_UNTIL_CLOSE}d`} label="Days to close" color={closeMetricColor(closeBadgeStatus(DAYS_UNTIL_CLOSE))} />
         <DisplayMetric value={String(tasks.length)} label="Total tasks" color="brand" />

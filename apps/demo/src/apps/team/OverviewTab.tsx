@@ -31,7 +31,7 @@ export function OverviewTab() {
   }));
 
   return (
-    <div className="page page--full-width">
+    <div className="page page--full-width page--overview">
       <div className="overview-metrics">
         <DisplayMetric value={String(employees.length)} label="Total employees" color="brand" />
         <DisplayMetric value={String(fullTimeCount)} label="Full-time" color="green" />

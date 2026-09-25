@@ -1072,6 +1072,23 @@ a {
 
 /* ── Overview template (shared by every app's own Overview tab) ───────── */
 
+/* `.app-body`'s own shared gutter is a tight 4px on mobile (see its own
+   comment — most content supplies its own generous padding instead of
+   relying on it), too tight for this template's own metrics/section grid
+   to breathe. Cancels that 4px via a negative margin, then adds a real 16px
+   inset of its own — and caps this page to vertical scrolling only, so a
+   wide chart (e.g. `<GanttChart>`'s own timeline, or any future one) can't
+   drag the whole page sideways; `.overview-chart-card`'s own
+   `overflow-x: auto` below is the contained release valve for that instead
+   of just clipping it unreachably. */
+@media (max-width: 767px) {
+  .page--overview {
+    margin: 0 calc(-1 * var(--space-1));
+    padding: 0 var(--space-4);
+    overflow-x: hidden;
+  }
+}
+
 /* Mobile-first, matching every other breakpoint in this file: a fixed 2x2
    grid below 48rem (four metrics fit exactly, no remainder cell) rather
    than however many columns the desktop flex-basis naturally happens to
@@ -1141,6 +1158,11 @@ a {
   border-radius: var(--radius-md);
   background: var(--background-default);
   box-shadow: var(--shadow-l1);
+  /* A contained horizontal scroll for whatever's inside (e.g. a wide
+     `<GanttChart>` timeline on a narrow screen) — a no-op when content
+     already fits, so this is safe to leave on every card, not just Gantt's
+     own. Keeps that scrolling local to the card instead of the page. */
+  overflow-x: auto;
 }
 
 .overview-chart-card__title {

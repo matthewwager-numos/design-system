@@ -42,7 +42,7 @@ export function OverviewTab() {
   const byCategoryCount = Array.from(subsidiaryCountByCategory.entries()).map(([label, value]) => ({ label, value }));
 
   return (
-    <div className="page page--full-width">
+    <div className="page page--full-width page--overview">
       <div className="overview-metrics">
         <DisplayMetric value={accrualCurrency.format(totals.augMtd)} label="Aug-26 MTD" color="green" />
         <DisplayMetric value={accrualCurrency.format(totals.momVariance)} label="MoM Variance" color="yellow" />
