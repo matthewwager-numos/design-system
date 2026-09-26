@@ -1,0 +1,111 @@
+/*
+ * DatePicker styles — pure token-driven CSS, confirmed against Figma's own
+ * Datepicker/Date components directly. No background/border/shadow on the
+ * root: this is meant to sit *inside* a `<DropdownMenuPanel>` (or similar),
+ * which already supplies that chrome — see DatePicker.tsx's own comment.
+ */
+
+.ds-date-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ds-date-picker__head {
+  display: flex;
+  gap: var(--space-1);
+}
+/* The month/year <Select>s share this row's width evenly regardless of
+   their own label's length ("Jan" vs. "September"). */
+.ds-date-picker__head > * {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+/* Confirmed from Figma: rows have a real gap (space-1) but columns sit
+   flush against each other — a range's connected Start/Middle/End pill
+   (see below) depends on adjacent cells having no gap between them. */
+.ds-date-picker__days {
+  display: grid;
+  grid-template-columns: repeat(7, 1.5rem);
+  gap: var(--space-1) 0;
+}
+
+.ds-date-picker__weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-placeholder);
+}
+
+.ds-date-picker__day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  background: none;
+  padding: 0;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-base);
+  cursor: pointer;
+}
+
+.ds-date-picker__day--blank {
+  cursor: default;
+}
+
+.ds-date-picker__day--enabled:hover {
+  border-radius: var(--radius-sm);
+  background: var(--background-element);
+  color: var(--content-link-hover);
+}
+
+.ds-date-picker__day:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
+.ds-date-picker__day--disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+/* A single picked date (mode="single"), or a range collapsed to one day —
+   rounded on every corner, same token pair "start"/"end" use. */
+.ds-date-picker__day--selected {
+  border-radius: var(--radius-sm);
+  background: var(--content-brand-primary);
+  color: var(--content-base-inverse);
+}
+
+/* Start/End are the range's own dark, rounded "end caps" — only rounded on
+   their own outward-facing side, so the square inward side sits flush
+   against Middle's own square edge, reading as one connected pill. */
+.ds-date-picker__day--start {
+  border-top-left-radius: var(--radius-sm);
+  border-bottom-left-radius: var(--radius-sm);
+  background: var(--content-brand-primary);
+  color: var(--content-base-inverse);
+}
+
+.ds-date-picker__day--end {
+  border-top-right-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-sm);
+  background: var(--content-brand-primary);
+  color: var(--content-base-inverse);
+}
+
+/* The pill's own light "bridge" between the two dark end caps — square
+   (no radius), a lighter fill than Start/End, confirmed from Figma. */
+.ds-date-picker__day--middle {
+  background: var(--background-selected);
+  color: var(--content-base);
+}

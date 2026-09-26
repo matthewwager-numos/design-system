@@ -1,0 +1,80 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as DiagramStories from "./Diagram.stories";
+
+<Meta of={DiagramStories} />
+
+# Diagram
+
+Three small pieces for building a flow diagram or system schematic: `<DiagramGrid>` (the grid), `<DiagramNode>` (a block), and `<DiagramConnector>` (a line/corner/branch/dot segment). Nothing here computes layout or routes a connector between two nodes automatically — the same "the consumer supplies the layout" philosophy `<GanttChart>` already uses (explicit `start`/`end` dates, not a computed schedule). Here, that means every node and connector gets an explicit `row`/`column`, the same way you'd sketch the diagram out on graph paper.
+
+## When to use
+
+- A system diagram, pipeline, or schematic where flow can branch, converge, or loop back — a grid of explicit connectors handles all three; a tree only really grows outward from a root, and a generic node-graph library brings auto-routing complexity this doesn't need.
+- Anything you'd otherwise reach for a heavier diagramming library to build, where the shapes involved are simple (boxes and lines) and a hand-placed grid is enough.
+
+## When NOT to use
+
+- A user-editable canvas (drag nodes around, draw your own connections) — this is for an author (you, in code) to lay out a fixed diagram, not an end-user diagramming tool.
+- A literal org chart or file tree, where content only ever branches one direction from a root — a tree component (not built yet) would fit that better than fighting a grid to look like one.
+
+## Implementation
+
+```tsx
+import { DiagramGrid, DiagramNode, DiagramConnector } from "@numosai/ui";
+import { GitBranch, Hammer, Rocket, ShieldCheck } from "lucide-react";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<DiagramGrid columns={6}>
+  <DiagramNode row={1} column={1}><GitBranch size={16} /></DiagramNode>
+  <DiagramConnector row={1} column={2} variant="line" rotation={90} badge={{ status: "complete" }} />
+  <DiagramNode row={1} column={3}><Hammer size={16} /></DiagramNode>
+  <DiagramConnector row={1} column={4} variant="corner" rotation={270} />
+  <DiagramNode row={2} column={4}><ShieldCheck size={16} /></DiagramNode>
+  <DiagramConnector row={2} column={5} variant="line" rotation={90} dashed arrow />
+  <DiagramNode row={2} column={6}><Rocket size={16} /></DiagramNode>
+</DiagramGrid>
+```
+
+<Canvas of={DiagramStories.Default} />
+
+## The grid
+
+`<DiagramGrid columns={n}>` is a plain CSS grid — rows grow automatically as content needs them. Every cell is `cellSize` square (defaults to 2rem/32px, matching the reference design). A cell with nothing placed in it is just an empty grid cell; there's no dedicated "blank" tile to render for a gap.
+
+## Nodes
+
+`<DiagramNode row={r} column={c}>` places a tile at that cell. Its content is a plain slot — an icon, an `<Avatar>`, an `<img>`, or any custom content — since a real diagram's nodes end up being a genuine mix of all of those, not one closed shape:
+
+<Canvas of={DiagramStories.WithAnEntityNode} />
+
+Pass `tile={false}` for content that already draws its own box (like the `<Avatar type="entity">` above) — otherwise it would sit inside a second, redundant background square. `rowSpan`/`columnSpan` let a node cover more than one cell, for a wider labeled block. Pass `onClick` to make it a real, focusable button (matching `<NavItem>`'s own pattern) instead of a static label.
+
+## Connectors
+
+`<DiagramConnector row={r} column={c}>` draws one segment: `variant` is `"line"` (straight), `"corner"` (a rounded turn), `"branch"` (a three-way split), or `"dot"` (a plain waypoint marker, no line). `rotation` (`0 | 90 | 180 | 270`) reaches every orientation from that one drawn shape — a `"corner"` connects bottom↔right at `0`, and each 90° step rotates that clockwise (`90` → right↔top, `180` → top↔left, `270` → left↔bottom). A `"branch"` connects its stem (top at `0`) to the other three sides split left/right; rotating moves which side the stem is on.
+
+`dashed` swaps a solid line for a dashed one (e.g. a conditional/inferred path vs. a confirmed one). `arrow` adds an arrowhead at the connector's own forward end — the same end `rotation`'s own doc describes — and only applies to `"line"`/`"corner"` (a `"branch"` has two forward ends, a `"dot"` has none).
+
+<Canvas of={DiagramStories.ConnectorVariants} />
+
+## Status badges
+
+`badge` centers a real `<Badge>` on the connector — the same component and colors used everywhere else in this library, not a one-off:
+
+```tsx
+<DiagramConnector row={1} column={2} variant="line" rotation={90} badge={{ status: "complete" }} />
+<DiagramConnector row={3} column={2} variant="line" rotation={90} badge={{ status: "error" }} />
+```
+
+`status="complete"`/`"error"` show `<Badge>`'s own built-in check/x icon regardless of anything else passed; any other `BadgeStatus` shows `icon` if you give it one.
+
+## Accessibility
+
+- A `<DiagramNode>` with `onClick` renders a real `<button>` — pass `aria-label` (or a text child) so it has an accessible name, same as any icon-only control.
+- A `<DiagramNode>` with no `onClick` and a `<DiagramConnector>` are both presentational — a whole diagram's meaning usually isn't recoverable from one tile in isolation, so consider a text summary or table alongside it for anyone not viewing it visually, the same way you would for a chart.
+
+## Props
+
+`<DiagramGrid>`: `columns` (required), `cellSize` (default `"2rem"`), `className`.
+`<DiagramNode>`: `row`/`column` (required), `rowSpan`/`columnSpan` (default `1`), `tile` (default `true`), `onClick`, `aria-label`, `className`.
+`<DiagramConnector>`: `row`/`column` (required), `variant` (default `"line"`), `rotation` (default `0`), `dashed`, `arrow`, `badge` (`{ status, icon? }`), `className`.

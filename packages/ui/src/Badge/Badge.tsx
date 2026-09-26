@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
+import { CircleAlert, CircleCheck, CircleX } from "lucide-react";
 import { clsx } from "clsx";
 import "./Badge.css";
 
@@ -9,7 +10,12 @@ export type BadgeSize = "sm" | "md" | "lg";
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   /** Status color. */
   status?: BadgeStatus;
-  /** Badge size. "sm" is a plain dot with no content; "complete"/"error" always render their icon regardless of size (Figma only defines them at "lg"). */
+  /**
+   * Badge size. "sm" is a plain dot with no content. "complete"/"error"
+   * always render their own icon regardless of size; "notice" only does at
+   * "md" — everything else about a plain-color status (children/dot) is
+   * unaffected. See `statusIcon` below for which icon each size gets.
+   */
   size?: BadgeSize;
 }
 
@@ -26,6 +32,28 @@ const ErrorIcon = () => (
 );
 
 /**
+ * Figma originally only defined "complete"/"error" at "lg" — a plain
+ * check/x (above) composited onto a separately-colored circle. "md" was
+ * confirmed later, and swaps in Lucide's own `circle-check`/`circle-x`/
+ * `circle-alert` glyphs instead: at 16px, the icon's own drawn circle can
+ * just BE the badge's edge (sized to fill it exactly — see Badge.css),
+ * which reads cleaner than gluing two circles together at that size. "md"
+ * is also the first size "notice" gets a forced icon at all — "sm"/"lg"
+ * notice is still a plain-color status like positive/negative/info.
+ */
+function statusIcon(status: BadgeStatus, size: BadgeSize): ReactNode | null {
+  if (size === "md") {
+    if (status === "complete") return <CircleCheck aria-hidden />;
+    if (status === "error") return <CircleX aria-hidden />;
+    if (status === "notice") return <CircleAlert aria-hidden />;
+    return null;
+  }
+  if (status === "complete") return <CheckIcon />;
+  if (status === "error") return <ErrorIcon />;
+  return null;
+}
+
+/**
  * A status/count indicator. Variants map 1:1 to the Figma component
  * variants (Neutral/Positive/Negative/Notice/Info/Complete/Error); sizes
  * too. Everything else (color, radius, spacing) is driven by tokens.
@@ -34,7 +62,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
   { status = "neutral", size = "lg", className, children, ...rest },
   ref,
 ) {
-  const icon = status === "complete" ? <CheckIcon /> : status === "error" ? <ErrorIcon /> : null;
+  const icon = statusIcon(status, size);
 
   return (
     <span

@@ -1,4 +1,4 @@
-import { cloneElement, useCallback, useEffect, useId, useRef, useState } from "react";
+import { cloneElement, useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import type { HTMLAttributes, ReactElement, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { clsx } from "clsx";
@@ -34,6 +34,11 @@ export interface DropdownMenuProps {
  * <Select> builds on.
  */
 export function DropdownMenu({ children, open: controlledOpen, defaultOpen = false, onOpenChange, size = "lg" }: DropdownMenuProps) {
+  // Not the throwing `useDropdownMenuContext` helper — `null` here just
+  // means this <DropdownMenu> isn't nested inside another one, which is the
+  // ordinary case, not an error.
+  const parent = useContext(DropdownMenuContext);
+
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = useCallback(
@@ -47,6 +52,31 @@ export function DropdownMenu({ children, open: controlledOpen, defaultOpen = fal
   const triggerRef = useRef<HTMLElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const contentId = useId();
+  // Content ids of any <DropdownMenu> directly nested in this one's own
+  // content (registered below) — see `registerNestedContentId`'s own doc.
+  const nestedContentIdsRef = useRef<Set<string>>(new Set());
+
+  const registerNestedContentId = useCallback((id: string) => {
+    nestedContentIdsRef.current.add(id);
+    return () => {
+      nestedContentIdsRef.current.delete(id);
+    };
+  }, []);
+
+  // If THIS <DropdownMenu> is itself nested inside another one (e.g.
+  // <Select>'s own, used by <DatePicker>'s month/year pickers when the
+  // whole calendar sits inside <DateInput>'s own panel), tell that parent
+  // about our own content id — otherwise a click inside our menu (which
+  // the parent can't see as "inside" its own portaled content, since ours
+  // portals to document.body separately) would look like an outside click
+  // to the parent and close it out from under us. Only registers one level
+  // up, not transitively through further nesting — flagged here since
+  // there's no real 3-levels-deep case in this codebase yet to confirm the
+  // fix against.
+  useEffect(() => {
+    if (!parent) return;
+    return parent.registerNestedContentId(contentId);
+  }, [parent, contentId]);
 
   useEffect(() => {
     if (!open) return;
@@ -62,6 +92,13 @@ export function DropdownMenu({ children, open: controlledOpen, defaultOpen = fal
       // contentId specifically so this check can still find them.
       const portalRoot = document.getElementById(contentId);
       if (portalRoot?.contains(target)) return;
+      // Same reasoning, one level deeper: a <DropdownMenu> nested inside
+      // ours (registered via registerNestedContentId) also portals
+      // separately, so a click inside *its* content needs the same
+      // "actually still inside" treatment.
+      for (const nestedId of nestedContentIdsRef.current) {
+        if (document.getElementById(nestedId)?.contains(target)) return;
+      }
       setOpen(false);
     }
     document.addEventListener("pointerdown", handlePointerDown);
@@ -69,7 +106,7 @@ export function DropdownMenu({ children, open: controlledOpen, defaultOpen = fal
   }, [open, setOpen, contentId]);
 
   return (
-    <DropdownMenuContext.Provider value={{ open, setOpen, triggerRef, contentId, size }}>
+    <DropdownMenuContext.Provider value={{ open, setOpen, triggerRef, contentId, size, registerNestedContentId }}>
       <div className="ds-dropdown-menu-root" ref={rootRef}>
         {children}
       </div>

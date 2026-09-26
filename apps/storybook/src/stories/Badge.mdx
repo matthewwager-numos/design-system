@@ -15,7 +15,7 @@ A small status or count indicator. Use it to surface a state (positive/negative/
 
 - Attaching a status to another element (a list item, a nav icon, a table row).
 - Showing a count — `size="md"` or `"lg"` renders whatever you pass as `children`.
-- Use `status="complete"` / `"error"` for a fixed check/x icon instead of a count — these always render their icon regardless of `children`, and are always a fixed-size circle (`1.5rem` square) rather than sized to content, since there's no text to size around.
+- Use `status="complete"` / `"error"` for a fixed check/x icon instead of a count — these always render their icon regardless of `children`, and are always a fixed-size circle (`1.5rem` at `size="lg"`, `1rem` at `size="md"`) rather than sized to content, since there's no text to size around. `status="notice"` gets the same treatment, but only at `size="md"` so far — at `"lg"` it's still a plain-color pill like `positive`/`negative`/`info`.
 
 ## When NOT to use
 
@@ -52,6 +52,12 @@ import "@numosai/ui/styles.css"; // once, at your app entry
 ## Sizes
 
 <Canvas of={BadgeStories.Sizes} />
+
+### Complete/error/notice have their own icon per size
+
+`"lg"` (the original, default size) composites a plain check/x onto a solid-colored circle. `"md"` (confirmed later) swaps in Lucide's own `circle-check`/`circle-x`/`circle-alert` glyphs instead — at 16px, the icon's own drawn circle can just be the badge's edge, rather than compositing two circles. `"notice"` only has a confirmed icon at `"md"`; at `"lg"` it still renders as a plain-color pill, same as `positive`/`negative`/`info`.
+
+<Canvas of={BadgeStories.IconAtEachSize} />
 
 ## Accessibility
 

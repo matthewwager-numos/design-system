@@ -1,0 +1,85 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as DateInputStories from "./DateInput.stories";
+
+<Meta of={DateInputStories} />
+
+# DateInput
+
+A date field built on `<DatePicker>` — matches the reference design's own Input/Date exactly: the same Field padding/radius/type tokens as `<TextInput>` at every size, with a fixed leading Calendar icon. The field is a real, typeable `<input>` — type a date by hand, or click the field to open the calendar in a real `<DropdownMenuPanel>` and pick a day instead.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- Any single date value — a due date, a birthdate, a period-end date.
+
+## When NOT to use
+
+- A date *range* (a from/to pair) — this is single-value only, matching Figma's own spec. A range field would be a separate component built the same way, not a mode bolted onto this one.
+- Somewhere a plain native picker is good enough and you don't need this design system's own calendar look — `<TextInput type="date">` is simpler and gets the OS's own picker for free.
+
+## Implementation
+
+```tsx
+import { DateInput } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<DateInput label="Due date" />
+```
+
+Type digits only — `/` is inserted automatically as you go (the `/` and `-` keys are blocked in the field, since a manually-typed one would just get stripped right back out), so `09272026` becomes `09/27/2026` live. Month and day each accept 1 or 2 digits: `922026` becomes `9/2/2026` (single-digit month and day, still a full 4-digit year). A typed date only commits (calling `onChange`) once it fully parses to a real calendar date, at which point it also snaps to the zero-padded canonical form (`09/02/2026`). Or click the field (or its calendar icon) to open the picker instead; picking a date fills the field and closes the panel automatically. On blur, the field snaps back to match whatever's actually committed, so an incomplete or invalid typed string doesn't linger looking accepted.
+
+<Canvas of={DateInputStories.Default} />
+
+### Controlled
+
+```tsx
+const [date, setDate] = useState<Date | null>(null);
+
+<DateInput label="Due date" value={date} onChange={setDate} />
+```
+
+Omit `value`/`onChange` (use `defaultValue` instead) to let the field manage its own state uncontrolled.
+
+<Canvas of={DateInputStories.WithValue} />
+
+## The embedded panel
+
+The dropdown itself is a real `<DropdownMenuPanel>` — confirmed from Figma's own "Dropdown" wrapper, which *is* that component (its background/border/shadow match exactly), holding a plain `<DatePicker>`. Two things are scaled to this field's own size instead of `<DropdownMenuPanel>`'s usual tiers, confirmed against all three of Figma's paired "Dropdown" frames (not just "lg"): its padding (4px/8px/12px, not the panel's default 8px/12px/16px steps) and its corner radius (`radius-sm`/`radius-md`/`radius-lg`, not the panel's own sm-tier `radius-md`) — both happen to land on exactly `<TextInput>`'s own lg/md/sm scale.
+
+## Validation
+
+<Canvas of={DateInputStories.Error} />
+<Canvas of={DateInputStories.Success} />
+
+## Help text
+
+<Canvas of={DateInputStories.WithHelpText} />
+
+## Disabled
+
+<Canvas of={DateInputStories.Disabled} />
+
+## Sizes
+
+<Canvas of={DateInputStories.Sizes} />
+
+## Disabling dates / week start
+
+Forwarded straight to the embedded `<DatePicker>` — see its own docs:
+
+```tsx
+<DateInput label="Delivery date" isDateDisabled={(date) => date.getDay() === 0 || date.getDay() === 6} />
+```
+
+## Accessibility
+
+- The field is a real `<input>` wired to its `label` via `htmlFor`/`id` (same as `<TextInput>`), so typing works with no extra wiring. The leading calendar icon is a separate real `<button aria-label="Open calendar">`, independently focusable and operable via keyboard.
+- `status="error"` sets `aria-invalid` on the input.
+- See `<DatePicker>`'s own accessibility notes for the calendar itself — including the one real gap it has (no full ARIA grid/arrow-key navigation pattern).
+
+## Props
+
+`label`, `helpText`, `status`, `size` (`"sm" | "md" | "lg"`, default `"lg"`), `placeholder` (default `"MM / DD / YYYY"`), `value`/`defaultValue`/`onChange`, `isDateDisabled`, `weekStartsOn`, `disabled`, `name`, `id`, `className`.

@@ -62,3 +62,25 @@ export const Sizes: Story = {
     </div>
   ),
 };
+
+export const IconAtEachSize: Story = {
+  name: "Complete/error/notice, lg vs. md",
+  render: () => (
+    <div style={{ display: "flex", gap: "var(--space-5)" }}>
+      {(["complete", "error", "notice"] as const).map((status) => (
+        <div key={status} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--space-2)" }}>
+          <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center" }}>
+            {/* "notice" has no confirmed icon at "lg" yet — falls back to a
+                plain-color pill like any other status, so it needs real
+                children here or it'd render empty. */}
+            <Badge status={status} size="lg">
+              {status === "notice" ? "!" : undefined}
+            </Badge>
+            <Badge status={status} size="md" />
+          </div>
+          <span style={{ font: "var(--type-paragraph-xs-regular)", color: "var(--content-subtle)" }}>{status}</span>
+        </div>
+      ))}
+    </div>
+  ),
+};

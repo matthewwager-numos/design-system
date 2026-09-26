@@ -1,0 +1,236 @@
+/*
+ * DateInput styles — pure token-driven CSS. Mirrors TextInput.css's exact
+ * field anatomy/scale (confirmed against Figma directly): a wrapping
+ * `__field` div (also the `<DropdownMenuTrigger>` target — clicking
+ * anywhere in it, including the icon, opens the calendar) around a real
+ * `__control` input, hover/focus driven by `:focus-within` on the wrapper
+ * rather than a pseudo-class on the field itself. The one real difference
+ * from TextInput is the fixed leading icon (always Calendar, not optional).
+ */
+
+.ds-date-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+/* <DropdownMenu>'s own root wrapper is display:inline-block (shrink-to-fit
+   by design) — this needs it to fill the field's own width instead, same
+   reasoning as `<Select>`'s own identical override. */
+.ds-date-input .ds-dropdown-menu-root {
+  display: block;
+  width: 100%;
+}
+
+.ds-date-input:has(.ds-date-input__control:disabled) .ds-date-input__label {
+  color: var(--content-disabled);
+}
+
+.ds-date-input__field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  border: 1px solid transparent;
+  background: var(--background-element);
+  color: var(--content-subtle);
+  cursor: text;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.ds-date-input__field:hover:not(:focus-within):not(.ds-date-input__field--error):not(.ds-date-input__field--success):not(.ds-date-input__field--disabled) {
+  background: var(--background-hover);
+}
+
+.ds-date-input__field:focus-within {
+  background: var(--background-default);
+  border-color: var(--border-brand);
+  box-shadow: var(--shadow-focus-brand);
+}
+
+.ds-date-input__field--disabled {
+  background: var(--background-secondary);
+  cursor: not-allowed;
+}
+
+.ds-date-input__field--error {
+  background: var(--background-default);
+  border-color: var(--border-negative);
+  box-shadow: var(--shadow-focus-negative);
+}
+.ds-date-input__field--error:focus-within {
+  border-color: var(--border-negative);
+  box-shadow: var(--shadow-focus-negative);
+}
+.ds-date-input__field--error .ds-date-input__control {
+  color: var(--content-emphasis);
+}
+
+.ds-date-input__field--success {
+  background: var(--background-default);
+  border-color: var(--border-positive);
+  box-shadow: var(--shadow-focus-positive);
+}
+.ds-date-input__field--success:focus-within {
+  border-color: var(--border-positive);
+  box-shadow: var(--shadow-focus-positive);
+}
+.ds-date-input__field--success .ds-date-input__control {
+  color: var(--content-emphasis);
+}
+
+.ds-date-input__control {
+  flex: 1 0 0;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  color: var(--content-base);
+}
+
+.ds-date-input__control::placeholder {
+  color: var(--content-placeholder);
+}
+
+.ds-date-input__control:disabled {
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+
+.ds-date-input__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  border: none;
+  padding: 0;
+  background: none;
+  color: var(--content-placeholder);
+  cursor: pointer;
+}
+.ds-date-input__icon:disabled {
+  cursor: not-allowed;
+}
+.ds-date-input__icon:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.ds-date-input__field:focus-within .ds-date-input__icon {
+  color: var(--content-brand-primary);
+}
+.ds-date-input__field--error .ds-date-input__icon {
+  color: var(--content-negative);
+}
+.ds-date-input__field--success .ds-date-input__icon {
+  color: var(--content-positive);
+}
+.ds-date-input__field--disabled .ds-date-input__icon {
+  color: var(--content-disabled);
+}
+
+.ds-date-input__help {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--content-subtle);
+}
+
+.ds-date-input__help--error {
+  color: var(--content-negative);
+}
+
+.ds-date-input__help--success {
+  color: var(--content-positive);
+}
+
+/* The embedded calendar panel — `<DropdownMenuPanel>` itself already
+   supplies the confirmed background/border/shadow (Figma's own "Dropdown"
+   wrapper *is* that component); its padding and radius are overridden
+   inline per size in DateInput.tsx instead (an inline style already beats
+   any stylesheet rule, so no override selector is needed here) — Figma's
+   own S/M/L Input/Date each pair with a differently-padded, differently-
+   rounded "Dropdown" around the same fixed-size calendar (4px/8px/12px
+   padding, radius-sm/md/lg), not `<DropdownMenuPanel>`'s own default
+   8/12/16px-padding, radius-md/md/lg tiers. */
+
+/* ── Sizes ─────────────────────────────────────────────────────────── */
+
+.ds-date-input--lg .ds-date-input__field {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+}
+.ds-date-input--lg .ds-date-input__control {
+  font: var(--type-paragraph-m-regular);
+  letter-spacing: var(--type-paragraph-m-regular-tracking);
+}
+.ds-date-input--lg .ds-date-input__help {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-date-input--lg .ds-date-input__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ds-date-input--md .ds-date-input__field {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+.ds-date-input--md .ds-date-input__control {
+  font: var(--type-paragraph-s-regular);
+  letter-spacing: var(--type-paragraph-s-regular-tracking);
+}
+.ds-date-input--md .ds-date-input__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-date-input--md .ds-date-input__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ds-date-input--sm .ds-date-input__field {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.ds-date-input--sm .ds-date-input__control {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-date-input--sm .ds-date-input__help {
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+}
+.ds-date-input--sm .ds-date-input__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Below this width, "md"/"sm" render at "lg" metrics regardless of the
+   `size` prop — same reasoning as `<TextInput>`'s own identical override:
+   16px+ control text keeps iOS Safari from auto-zooming on focus, and the
+   bigger tap target suits a touch viewport. Matches the same breakpoint
+   `apps/demo` uses (`48rem`/768px). The leading icon is deliberately NOT
+   part of this bump. */
+@media (max-width: 767px) {
+  .ds-date-input--md .ds-date-input__field,
+  .ds-date-input--sm .ds-date-input__field {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+  .ds-date-input--md .ds-date-input__control,
+  .ds-date-input--sm .ds-date-input__control {
+    font: var(--type-paragraph-m-regular);
+    letter-spacing: var(--type-paragraph-m-regular-tracking);
+  }
+  .ds-date-input--md .ds-date-input__help,
+  .ds-date-input--sm .ds-date-input__help {
+    font: var(--type-paragraph-s-regular);
+    letter-spacing: var(--type-paragraph-s-regular-tracking);
+  }
+}

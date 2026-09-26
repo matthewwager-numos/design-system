@@ -1,0 +1,73 @@
+import { Meta, Canvas } from "@storybook/blocks";
+import * as DatePickerStories from "./DatePicker.stories";
+
+<Meta of={DatePickerStories} />
+
+# DatePicker
+
+A month-grid date picker — matches the reference design's own Datepicker exactly: two compact `<Select size="sm">`s for month/year navigation (reusing the real `<Select>` component, not a one-off dropdown), a weekday header row, and a 7-column day grid supporting both a single picked date and a connected start/end range.
+
+<Canvas of={DatePickerStories.Default} />
+
+## When to use
+
+- Building a single date field — reach for `<DateInput>` instead, which already pairs this exact picker with the confirmed Input/Date trigger and panel. Use `<DatePicker>` directly only for a custom pairing `<DateInput>` doesn't cover (e.g. a different trigger shape, or the range mode below, which `<DateInput>` doesn't have yet).
+- A date range — `mode="range"` renders the confirmed connected Start/Middle/End pill across the span.
+
+## When NOT to use
+
+- A plain, single-line date value with no picking UI needed — a real `<input type="date">` (via `<TextInput type="date">`) is simpler and gets the OS's own native picker for free.
+
+## Implementation
+
+```tsx
+import { DatePicker } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<DatePicker value={date} onChange={setDate} />
+```
+
+`value`/`onChange` (or `defaultValue` for uncontrolled use) drive a single picked date. Omit `month`/`defaultMonth` to let the picker start from whatever's already picked (or today) — pass `month`/`onMonthChange` only if something else needs to control which month is showing.
+
+## Dropped into a dropdown of your own
+
+The picker has no border/shadow/background of its own (unlike `<DropdownMenuPanel>`), since it's meant to sit *inside* one of those, not stand alone as its own popover — this is exactly how `<DateInput>` itself is built:
+
+```tsx
+<DropdownMenu>
+  <DropdownMenuTrigger>{/* your own trigger */}</DropdownMenuTrigger>
+  <DropdownMenuPanel matchTriggerWidth={false} style={{ width: "12.5rem" }}>
+    <DatePicker value={date} onChange={setDate} />
+  </DropdownMenuPanel>
+</DropdownMenu>
+```
+
+`matchTriggerWidth={false}` matters here — the calendar has its own natural width, unrelated to however wide the trigger happens to be, the same reasoning `<DropdownMenu>`'s own docs give for a `<Slider>`/`<Checkbox>` filter panel. For an actual date *input* rather than a custom trigger, use `<DateInput>` — it already does exactly this.
+
+<Canvas of={DatePickerStories.InADropdown} />
+
+## Range selection
+
+`mode="range"` switches to `rangeValue`/`onRangeChange` (or `defaultRangeValue`), an `{ start, end }` pair. Picking a date before an existing start replaces the start and clears the end, rather than picking backwards — clicking start again commits a single-day range instead. While a start is picked but no end is yet, hovering (or keyboard-focusing) a later date previews the would-be range live, using the same confirmed Start/Middle/End tokens — a real, expected range-picker convenience Figma's own static reference doesn't show as a distinct state, but the tokens themselves confirm what it should look like.
+
+<Canvas of={DatePickerStories.RangeSelection} />
+
+## Disabling dates
+
+`isDateDisabled` is a plain predicate, called per date — return `true` to render it in the confirmed "disabled" state (unclickable, muted text) instead of "enabled":
+
+```tsx
+<DatePicker isDateDisabled={(date) => date.getDay() === 0 || date.getDay() === 6} />
+```
+
+<Canvas of={DatePickerStories.WithDisabledDates} />
+
+## Accessibility
+
+- Every day is a real, individually tabbable `<button>` — native Enter/Space selection for free, disabled dates use the real `disabled` attribute, and each has an `aria-label` with the full date (e.g. "January 11, 2026") rather than just the bare number.
+- This does **not** implement the full WAI-ARIA "Date Picker Dialog" pattern (`role="grid"`, roving `tabindex`, arrow-key navigation between cells) — a real gap against that pattern, not a silent one. Tab order moves through every visible day in DOM order instead.
+- The month/year `<Select>`s have no visible label (there's no room for one in this compact header) — they're given an `aria-label` instead (`"Month"`/`"Year"`).
+
+## Props
+
+`mode` (`"single" | "range"`, default `"single"`), `value`/`defaultValue`/`onChange` (single mode), `rangeValue`/`defaultRangeValue`/`onRangeChange` (range mode), `month`/`defaultMonth`/`onMonthChange`, `isDateDisabled`, `weekStartsOn` (`0 | 1`, default `0`), `className`.

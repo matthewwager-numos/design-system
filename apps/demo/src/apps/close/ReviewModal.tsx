@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, ButtonGroup, Header, Modal, ModalBody, ModalFooter, Select, TextInput } from "@numosai/ui";
+import { Button, ButtonGroup, DateInput, Header, Modal, ModalBody, ModalFooter, Select } from "@numosai/ui";
 import { ASSIGNEES } from "../../data/tasks";
 
 export interface ReviewModalProps {
@@ -13,6 +13,22 @@ export interface ReviewModalProps {
 }
 
 const REVIEWER_OPTIONS = ASSIGNEES.map((name) => ({ value: name, label: name }));
+
+// `dueDate` is stored as the ISO `yyyy-mm-dd` string the rest of this app's
+// data layer expects (`Task.reviewDueDate`) — `<DateInput>` itself works in
+// terms of `Date`, so these two convert at the boundary. Parsed/formatted
+// locally (not `Date.toISOString()`), since that's UTC and would shift the
+// date near a timezone offset.
+function parseISODate(iso: string): Date | null {
+  const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
+function toISODate(date: Date): string {
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
 
 /**
  * Prompts for a reviewer and a review due date before a task (or a whole
@@ -46,7 +62,7 @@ export function ReviewModal({ open, count = 1, defaultReviewer, onClose, onSubmi
       <ModalBody>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
           <Select label="Reviewer" options={REVIEWER_OPTIONS} value={reviewer} onChange={setReviewer} placeholder="Choose a reviewer" />
-          <TextInput label="Review due date" type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} />
+          <DateInput label="Review due date" value={parseISODate(dueDate)} onChange={(date) => setDueDate(toISODate(date))} />
         </div>
       </ModalBody>
       <ModalFooter>

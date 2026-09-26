@@ -31,6 +31,8 @@ export interface SelectProps {
   /** Renders a hidden native input so the value participates in a real <form> submission. */
   name?: string;
   id?: string;
+  /** Only read by assistive tech when there's no visible `label` — e.g. a compact select with no room for one (a calendar's own month/year navigation). */
+  "aria-label"?: string;
   className?: string;
 }
 
@@ -53,6 +55,7 @@ export function Select({
   disabled = false,
   name,
   id,
+  "aria-label": ariaLabel,
   className,
 }: SelectProps) {
   const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
@@ -83,6 +86,7 @@ export function Select({
             id={fieldId}
             disabled={disabled}
             aria-invalid={status === "error" || undefined}
+            aria-label={!label ? ariaLabel : undefined}
             className={clsx("ds-select__field", `ds-select__field--${status}`)}
           >
             {selected?.leadingIcon ? <span className="ds-select__icon" aria-hidden>{selected.leadingIcon}</span> : null}

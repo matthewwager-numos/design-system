@@ -63,9 +63,6 @@
   margin: 0;
   width: 100%;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* Shared by both the span (plain text) and button (clickable) renders of

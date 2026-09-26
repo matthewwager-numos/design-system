@@ -6,8 +6,7 @@ import { LogEntry } from "@numosai/ui";
 // sentences exactly — but with PP Neue Montreal unavailable here (falls
 // back to --font-sans, same known gap noted in Button.css), the fallback
 // renders very slightly wider, so this needs a bit more room to stay on
-// one line for a clean "Default" demo. LongDescription below uses its own,
-// deliberately narrower width instead, to actually demonstrate truncation.
+// one line for a clean "Default" demo.
 const PREVIEW_STYLE = { width: "32rem" };
 
 const meta: Meta<typeof LogEntry> = {
@@ -104,7 +103,7 @@ export const Clickable: Story = {
 };
 
 export const LongDescription: Story = {
-  name: "A long description (truncates)",
+  name: "A long description (wraps)",
   args: {
     subject: "Acme Manufacturing Co.’s",
     description: "billing address changed from 100 Old Warehouse Rd, Suite 4B, Springfield, IL to 4400 Commerce Park Drive, Building C, Springfield, IL",

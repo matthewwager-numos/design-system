@@ -1,0 +1,37 @@
+/*
+ * DiagramNode — pure token-driven CSS. `tile` off leaves only layout (grid
+ * placement + centering) behind, for content — an `<Avatar>`, an `<img>` —
+ * that already draws its own box.
+ */
+
+.ds-diagram-node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  border: none;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+}
+
+.ds-diagram-node--tile {
+  border-radius: var(--radius-sm);
+  background: var(--background-element);
+}
+
+button.ds-diagram-node {
+  cursor: pointer;
+}
+
+button.ds-diagram-node--tile:hover {
+  background: var(--background-hover);
+}
+
+button.ds-diagram-node:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}

@@ -1,0 +1,42 @@
+/*
+ * DiagramConnector — pure token-driven CSS. Stroke color/weight match
+ * apps/demo's own hand-built HomePage flow connectors (`--border-base` at
+ * 1.5, `vector-effect: non-scaling-stroke` so the line stays crisp
+ * regardless of `--ds-diagram-cell`'s own size).
+ */
+
+.ds-diagram-connector {
+  position: relative;
+}
+
+.ds-diagram-connector__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ds-diagram-connector__path {
+  fill: none;
+  stroke: var(--border-base);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.ds-diagram-connector__path--dashed {
+  stroke-dasharray: 4 3;
+}
+
+.ds-diagram-connector__dot {
+  fill: var(--border-base);
+}
+
+.ds-diagram-connector__arrow {
+  fill: var(--border-base);
+}
+
+.ds-diagram-connector__badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

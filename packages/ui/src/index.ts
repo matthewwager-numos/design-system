@@ -213,6 +213,22 @@ export type { EmptyStateProps } from "./EmptyState";
 export { RichTextEditor } from "./RichTextEditor";
 export type { RichTextEditorProps, RichTextEditorSize, RichTextEditorStatus } from "./RichTextEditor";
 
+export { DatePicker } from "./DatePicker";
+export type { DatePickerProps, DatePickerMode, DateRange } from "./DatePicker";
+
+export { DateInput } from "./DateInput";
+export type { DateInputProps, DateInputSize, DateInputStatus } from "./DateInput";
+
+export { DiagramGrid, DiagramNode, DiagramConnector } from "./Diagram";
+export type {
+  DiagramGridProps,
+  DiagramNodeProps,
+  DiagramConnectorProps,
+  DiagramConnectorVariant,
+  DiagramConnectorRotation,
+  DiagramConnectorBadge,
+} from "./Diagram";
+
 // Not a component — a small utility `<Wizard>` uses internally to pin its
 // own footer, and that consuming apps can reuse for the same "fixed chrome
 // needs a real measured height, not a guess" problem (e.g. a fixed mobile

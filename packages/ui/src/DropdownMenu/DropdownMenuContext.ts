@@ -17,6 +17,16 @@ export interface DropdownMenuContextValue {
    * rare case that genuinely needs to.
    */
   size: DropdownMenuSize;
+  /**
+   * Lets a `<DropdownMenu>` directly nested inside this one's own content
+   * (e.g. `<Select>`'s own, used by `<DatePicker>`'s month/year pickers
+   * when the whole calendar sits inside `<DateInput>`'s own panel) register
+   * its portaled content id — so this menu's outside-click check treats a
+   * click inside that nested menu's own (separately-portaled) content as
+   * inside itself too, instead of incorrectly closing out from under it.
+   * Returns an unregister function.
+   */
+  registerNestedContentId: (id: string) => () => void;
 }
 
 export const DropdownMenuContext = createContext<DropdownMenuContextValue | null>(null);

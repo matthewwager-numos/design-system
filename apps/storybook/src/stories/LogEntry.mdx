@@ -58,9 +58,9 @@ Pass `onSubjectClick`/`onActorClick` to render `subject`/`actor` as real buttons
 
 <Canvas of={LogEntryStories.Clickable} />
 
-## Long text truncates
+## Long text
 
-Both the subject+description line and the byline truncate with an ellipsis rather than wrapping — confirmed from Figma (`white-space: nowrap` + `text-overflow: ellipsis` on both, not a multi-line clamp):
+The subject+description line wraps onto as many lines as it needs — a long description reads better in full than clipped mid-sentence. The byline still truncates with an ellipsis rather than wrapping, since `actor`/`timestamp` are a short, fixed-shape line rather than free-form prose:
 
 <Canvas of={LogEntryStories.LongDescription} />
 

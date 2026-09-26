@@ -1,0 +1,12 @@
+/*
+ * DiagramGrid — pure token-driven CSS beyond the two data-driven custom
+ * properties (`--ds-diagram-columns`/`--ds-diagram-cell`, set inline per
+ * instance in DiagramGrid.tsx, same reasoning as `<GanttChart>`'s own
+ * `--ds-gantt-columns`).
+ */
+
+.ds-diagram-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-diagram-columns), var(--ds-diagram-cell));
+  grid-auto-rows: var(--ds-diagram-cell);
+}

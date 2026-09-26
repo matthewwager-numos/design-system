@@ -58,24 +58,38 @@
   color: var(--background-notice);
 }
 
-.ds-badge--info {
-  background: var(--content-info);
-  color: var(--content-brand-inverse);
-}
-
-/* ── Icon (Complete/Error) ─────────────────────────────────────────── */
-/* Fixed square + border-radius:full = a true circle — overriding the size
-   classes above, which use min-width + asymmetric padding sized for text
+/* ── Icon (Complete/Error/Notice) ──────────────────────────────────────
+   Fixed square + border-radius:full = a true circle — overriding the size
+   classes below, which use min-width + asymmetric padding sized for text
    content (a count badge like "12" should be a pill, not forced square).
-   An icon-only badge has no text to size around, so it should always be a
-   circle regardless of `size`, matching Figma (which only ever shows
-   Complete/Error at one fixed circular size). */
+   An icon-only badge has no text to size around, so it's always a circle
+   regardless of the size tier. Two confirmed sizes so far: "lg" (the
+   default — a plain check/x composited onto this circle, see Badge.tsx)
+   and "md" (a smaller circle where the icon's own circle-check/circle-x/
+   circle-alert glyph fills the whole thing — see `.ds-badge__icon svg`
+   below for why the same fixed icon size works at both). "notice" only
+   has a confirmed icon at "md"; "sm" isn't defined for any of the three
+   yet, so it keeps the plain dot every other status gets there. */
 .ds-badge--complete,
 .ds-badge--error {
   width: 1.5rem;
   height: 1.5rem;
   min-width: 0;
   padding: 0;
+}
+
+.ds-badge--complete.ds-badge--md,
+.ds-badge--error.ds-badge--md,
+.ds-badge--notice.ds-badge--md {
+  width: 1rem;
+  height: 1rem;
+  min-width: 0;
+  padding: 0;
+}
+
+.ds-badge--info {
+  background: var(--content-info);
+  color: var(--content-brand-inverse);
 }
 
 .ds-badge__icon svg {
