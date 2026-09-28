@@ -213,6 +213,9 @@ export type { EmptyStateProps } from "./EmptyState";
 export { RichTextEditor } from "./RichTextEditor";
 export type { RichTextEditorProps, RichTextEditorSize, RichTextEditorStatus } from "./RichTextEditor";
 
+export { Calendar } from "./Calendar";
+export type { CalendarProps, CalendarDateStatus } from "./Calendar";
+
 export { DatePicker } from "./DatePicker";
 export type { DatePickerProps, DatePickerMode, DateRange } from "./DatePicker";
 

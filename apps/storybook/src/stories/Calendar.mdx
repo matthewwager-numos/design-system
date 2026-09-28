@@ -1,0 +1,76 @@
+import { Meta, Canvas, Controls, Primary } from "@storybook/blocks";
+import * as CalendarStories from "./Calendar.stories";
+
+<Meta of={CalendarStories} />
+
+# Calendar
+
+A month-grid *display* calendar — matches the reference design's own Calendar exactly: a weekday header and a 7-column day grid, each day optionally highlighted with a status color. Clicking a day with details opens a `<Popover>` — for picking a date instead of viewing one, reach for `<DatePicker>` instead; this is for showing a month at a glance (a close calendar, a deadline overview) with details on demand.
+
+<Primary />
+
+<Controls />
+
+## When to use
+
+- An "at a glance" month view where individual days carry meaning through color — overdue items, warnings, completed work — and clicking one reveals more (which invoice, which account, why it's flagged).
+
+## When NOT to use
+
+- Picking a single date or a range — use `<DatePicker>`, which is built for exactly that.
+
+## Implementation
+
+```tsx
+import { Calendar } from "@numosai/ui";
+import "@numosai/ui/styles.css"; // once, at your app entry
+
+<Calendar
+  month={new Date(2026, 0, 1)}
+  getDateStatus={(date) => (date.getDate() === 9 ? "negative" : undefined)}
+  getDateDetails={(date) => (date.getDate() === 9 ? "Bank feed import overdue — 2 accounts haven't synced since the 4th." : undefined)}
+/>
+```
+
+`getDateStatus` is a plain predicate, called once per visible day — return `"negative"`, `"notice"`, or `"positive"` to highlight it, or `undefined` (or omit the prop entirely) for the plain, unhighlighted cell.
+
+<Canvas of={CalendarStories.Default} />
+<Canvas of={CalendarStories.WithStatuses} />
+
+## Clicking a day for details
+
+`getDateDetails` is the same shape of predicate, called once per visible day — return the content for that day's popover (a string, or any richer `ReactNode`), and the day renders as a real, clickable button that opens a `<Popover>` titled with the full date (e.g. "January 9, 2026") on click. Return `null`/`undefined` (or omit the prop entirely) to leave a day as a plain, non-interactive cell — a day with nothing to say doesn't get a dead click target that opens an empty popover.
+
+<Canvas of={CalendarStories.WithDetails} />
+
+## It flexes as it resizes
+
+Every dimension is fluid — the grid uses `fr` columns and rows, so it stretches to fill whatever box it's given. An `aspect-ratio` matching the reference design's own proportions is the default height, so it looks right by width alone with no extra sizing; a container that sets its own height overrides that default the normal CSS way.
+
+<Canvas of={CalendarStories.Fluid} />
+
+## The weekday header abbreviates as it narrows
+
+Below a full name's comfortable width, the header switches to a 3-letter abbreviation, then to a single letter at the narrowest sizes (`<DatePicker>`'s own S M T W R F S) — driven by a container query against the calendar's own box, not the viewport, since this can sit in a narrow sidebar on a wide screen just as easily as on an actual phone.
+
+## Today
+
+Whichever day matches the real current date always renders in medium weight — with `--content-emphasis` for a plain/default-status day, or that status's own `--content-negative`/`--content-notice`/`--content-positive` color instead when today also carries a status (its usual tinted-background `-base` color would otherwise clash with "today, and it's overdue" rather than reinforcing it). Not a prop — there's exactly one real today, so nothing to configure.
+
+<Canvas of={CalendarStories.Today} />
+
+## Week start
+
+`weekStartsOn` (`0 | 1`, default `0`) rotates both the weekday header and the day grid — matching `<DatePicker>`'s own prop.
+
+<Canvas of={CalendarStories.WeekStartsMonday} />
+
+## Accessibility
+
+- The weekday header and leading blank cells are `aria-hidden` — a screen reader gets straight to the actual days.
+- A day with no `getDateDetails` content is a plain, non-focusable `<div>` with no `aria-label` beyond its visible number — there's nothing to activate, and the visible digit is the whole of what it communicates.
+- A day *with* details is a real `<button>`, keyboard-reachable and operable with Enter/Space like any `<Popover>` trigger — see that component's own accessibility notes (`role="dialog"`, Escape to close, focus returns to the day on close).
+
+## Props
+
+`month` (a `Date`, only year/month read — defaults to today), `getDateStatus`, `getDateDetails`, `weekStartsOn` (`0 | 1`, default `0`), `className`.

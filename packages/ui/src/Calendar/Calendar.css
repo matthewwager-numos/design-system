@@ -1,0 +1,162 @@
+/*
+ * Calendar styles — pure token-driven CSS, matching Figma's own Calendar
+ * component. Figma's own "Radius/XS" primitive is 4px, which is this
+ * codebase's `--radius-sm` (the same naming offset already confirmed
+ * elsewhere, e.g. DatePicker/DateInput), and its "Space/2XS" (2px) is
+ * `--space-0` — a half-step below the main space-1..8 scale, used here for
+ * both the cell padding's vertical side and the grid gap.
+ */
+
+.ds-calendar {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: var(--space-0);
+  width: 100%;
+  /* Matches Figma's own reference frame (276×205) — any container that
+     sets its own height (e.g. a fixed-height overview card) overrides this
+     automatically, same as any other `aspect-ratio` default. */
+  aspect-ratio: 276 / 205;
+}
+
+.ds-calendar__weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-0) var(--space-1);
+  border-radius: var(--radius-sm);
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  color: var(--content-placeholder);
+}
+
+/* Abbreviates as the calendar's own box narrows — a container query, not a
+   viewport one, since this can end up in a narrow sidebar on a wide screen
+   just as easily as on an actual phone. Declared narrowest-tier-last so its
+   rules win at equal specificity once both queries match. */
+.ds-calendar__weekday-abbr,
+.ds-calendar__weekday-letter {
+  display: none;
+}
+@container (max-width: 30rem) {
+  .ds-calendar__weekday-full {
+    display: none;
+  }
+  .ds-calendar__weekday-abbr {
+    display: inline;
+  }
+}
+@container (max-width: 22rem) {
+  .ds-calendar__weekday-abbr {
+    display: none;
+  }
+  .ds-calendar__weekday-letter {
+    display: inline;
+  }
+}
+
+/* An interactive day's `<Popover>` wraps its `<button>` in a
+   `.ds-popover-root` span that's `display: inline-block` by default (fine
+   for Popover's usual inline triggers elsewhere) — inline-block sizes to
+   its own content, not the grid cell, so left alone the button inside it
+   only grows as tall as its own text, leaving interactive days visibly
+   shorter than their plain-`<div>` siblings. Scoped to Calendar rather than
+   changed on `.ds-popover-root` itself, since every other Popover usage
+   still wants the default inline sizing. */
+.ds-calendar .ds-popover-root {
+  display: flex;
+  height: 100%;
+}
+
+.ds-calendar__day {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  border: none;
+  padding: var(--space-0) var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--background-secondary);
+  font-family: inherit;
+  font: var(--type-paragraph-xs-regular);
+  letter-spacing: var(--type-paragraph-xs-regular-tracking);
+  text-align: left;
+  color: var(--content-placeholder);
+}
+
+.ds-calendar__day--blank {
+  background: none;
+}
+
+/* A day with `getDateDetails` content renders as a real `<button>` instead
+   of a plain `<div>` (see Calendar.tsx) — this resets its remaining button
+   defaults and adds the hover/focus/open affordance a clickable cell needs:
+   its own background and text color swap (the same tint/"-base" token pair
+   `<Badge>`'s solid "positive"/"negative"/"notice" variants already use,
+   just inverted from which one is the background), rather than an outline
+   or ring layered on top. `[aria-describedby]` is present exactly while
+   this day's own `<Popover>` is open (`<Popover>` sets it via `cloneElement`
+   only then) — reusing that instead of separate open-tracking state, so
+   the swapped state persists after a click even once the pointer moves
+   off the button. */
+.ds-calendar__day--interactive {
+  cursor: pointer;
+}
+.ds-calendar__day--interactive:hover,
+.ds-calendar__day--interactive:focus-visible,
+.ds-calendar__day--interactive[aria-describedby] {
+  background: var(--content-placeholder);
+  color: var(--background-secondary);
+}
+.ds-calendar__day--interactive.ds-calendar__day--negative:hover,
+.ds-calendar__day--interactive.ds-calendar__day--negative:focus-visible,
+.ds-calendar__day--interactive.ds-calendar__day--negative[aria-describedby] {
+  background: var(--background-negative-base);
+  color: var(--background-negative);
+}
+.ds-calendar__day--interactive.ds-calendar__day--notice:hover,
+.ds-calendar__day--interactive.ds-calendar__day--notice:focus-visible,
+.ds-calendar__day--interactive.ds-calendar__day--notice[aria-describedby] {
+  background: var(--background-notice-base);
+  color: var(--background-notice);
+}
+.ds-calendar__day--interactive.ds-calendar__day--positive:hover,
+.ds-calendar__day--interactive.ds-calendar__day--positive:focus-visible,
+.ds-calendar__day--interactive.ds-calendar__day--positive[aria-describedby] {
+  background: var(--background-positive-base);
+  color: var(--background-positive);
+}
+
+.ds-calendar__day--negative {
+  background: var(--background-negative);
+  color: var(--background-negative-base);
+}
+
+.ds-calendar__day--notice {
+  background: var(--background-notice);
+  color: var(--background-notice-base);
+}
+
+.ds-calendar__day--positive {
+  background: var(--background-positive);
+  color: var(--background-positive-base);
+}
+
+/* Today: medium weight always; emphasis color on the plain/default status,
+   or that status's own `--content-*` token (a stronger, text-appropriate
+   color, distinct from the tinted-background `-base` tokens the status
+   rules above use) when today also carries a status — otherwise the two
+   would clash instead of reading as "today, and it's overdue." */
+.ds-calendar__day--today {
+  font-weight: var(--font-weight-medium);
+  color: var(--content-emphasis);
+}
+.ds-calendar__day--today.ds-calendar__day--negative {
+  color: var(--content-negative);
+}
+.ds-calendar__day--today.ds-calendar__day--notice {
+  color: var(--content-notice);
+}
+.ds-calendar__day--today.ds-calendar__day--positive {
+  color: var(--content-positive);
+}

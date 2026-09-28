@@ -1195,6 +1195,18 @@ a {
   flex: 1 1 0%;
 }
 
+/* Collect/Pay's own calendar and systems-diagram sections sit directly on
+   the page — no card background/shadow/padding, no `overflow-x: auto`
+   scroll container — since `<Calendar>`'s own rounded, colored cells and
+   `<SystemsDiagram>`'s own tiles already read as complete on their own,
+   without a second box drawn around them. Only the calendar needs a width
+   cap: left unconstrained it'd stretch to this page's own full width and
+   end up wide and flat instead of a normal-looking month grid; the diagram
+   is already narrow on its own (a fixed-size grid, not a fluid one). */
+.overview-calendar {
+  max-width: 28rem;
+}
+
 /* ── Numos Assistant (FAB + squeeze panel) ────────────────────────────
    Desktop only (≥48rem, matching the rest of the app-shell's own squeeze
    layout below) — see AssistantPanel.tsx's own doc comment for why mobile

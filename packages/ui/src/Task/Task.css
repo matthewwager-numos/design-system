@@ -12,6 +12,11 @@
   gap: var(--space-2);
   box-sizing: border-box;
   width: 100%;
+  /* Floors at the smallest supported mobile viewport (same 320px convention
+     as `<Modal>`'s own `min-width`) so the badge/text/meta/button row never
+     gets squeezed tighter than that — `width: 100%` still lets it grow to
+     fill whatever wider container it's actually placed in. */
+  min-width: 20rem;
   padding: var(--space-4);
   border-radius: var(--radius-md);
   background: var(--background-default);

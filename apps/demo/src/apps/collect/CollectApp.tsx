@@ -1,5 +1,6 @@
-import { Inbox, History as HistoryIcon, Settings as SettingsIcon, TowerControl, Warehouse } from "lucide-react";
+import { Inbox, History as HistoryIcon, Settings as SettingsIcon, Warehouse } from "lucide-react";
 import { EmptyState, Header, MobileAppHeader, Tab, TabList, Tabs, useMeasuredHeightVar } from "@numosai/ui";
+import { OverviewTab } from "./OverviewTab";
 import { WorkTab } from "./WorkTab";
 
 export type CollectAppTab = "overview" | "inputs" | "work" | "output" | "history" | "settings";
@@ -12,12 +13,12 @@ export interface CollectAppProps {
 
 /**
  * The Collect app (accounts receivable) — same header/tabs anatomy every
- * left-nav app shares (see `AccrualsApp`/`CloseApp`). Its own eponymous
- * "Collect" tab (`WorkTab`) is the one built out so far: a `<TaskList>` of
- * prescribed bulk actions, each opening a full-screen review flow. The
- * other 5 tabs are still the same stub `<EmptyState>` copy this app had
- * under `<WorkflowAppShell>` before — replace them the same way, one at a
- * time, when they're built out for real.
+ * left-nav app shares (see `AccrualsApp`/`CloseApp`). "Overview" and its
+ * eponymous "Collect" tab (`WorkTab`, a `<TaskList>` of prescribed bulk
+ * actions, each opening a full-screen review flow) are the two built out so
+ * far. The other 4 tabs are still the same stub `<EmptyState>` copy this
+ * app had under `<WorkflowAppShell>` before — replace them the same way,
+ * one at a time, when they're built out for real.
  */
 export function CollectApp({ tab, onTabChange }: CollectAppProps) {
   const mobileHeaderRef = useMeasuredHeightVar<HTMLDivElement>("--mobile-app-header-height");
@@ -70,7 +71,7 @@ export function CollectApp({ tab, onTabChange }: CollectAppProps) {
       </div>
 
       <div className="app-body">
-        {tab === "overview" && <EmptyState icon={<TowerControl size={24} />} title="Not built yet" description="A control-tower summary of collections status will live here." />}
+        {tab === "overview" && <OverviewTab />}
         {tab === "inputs" && (
           <EmptyState icon={<Inbox size={24} />} title="Not built yet" description="Customer invoices, payment terms, incoming remittances, and aging data will land here." />
         )}
